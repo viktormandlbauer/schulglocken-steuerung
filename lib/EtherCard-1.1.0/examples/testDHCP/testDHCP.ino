@@ -5,16 +5,6 @@
 //
 // License: GPLv2
 
-<<<<<<< HEAD
-void setup()
-{
-
-}
-
-void loop()
-{
-
-=======
 #include <EtherCard.h>
 
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
@@ -34,7 +24,7 @@ void setup () {
   Serial.println();
 
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 14) == 0)
+  if (ether.begin(sizeof Ethernet::buffer, mymac, SS) == 0)
     Serial.println(F("Failed to access Ethernet controller"));
 
   Serial.println(F("Setting up DHCP"));
@@ -49,5 +39,4 @@ void setup () {
 
 void loop () {
   ether.packetLoop(ether.packetReceive());
->>>>>>> network
 }
