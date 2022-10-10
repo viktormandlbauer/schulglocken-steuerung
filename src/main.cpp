@@ -21,7 +21,6 @@ namespace
     Adafruit_GFX &tft = Waveshield;
     Adafruit_GFX_Button button;
     TSPoint p;
-
 }
 
 void setup()
