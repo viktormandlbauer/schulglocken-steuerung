@@ -3,6 +3,8 @@
 #include <Adafruit_GFX.h>
 #include <Waveshare_ILI9486.h>
 #include <EtherCard.h>
+#include <Wire.h>
+#include <RTClib.h>
 
 // Colors
 #define BLACK 0x0000
@@ -21,6 +23,8 @@ namespace
     Adafruit_GFX &tft = Waveshield;
     Adafruit_GFX_Button button;
     TSPoint p;
+    RTC_DS1307 rtc;
+    DateTime now;
 }
 
 void setup()
@@ -28,7 +32,18 @@ void setup()
     Serial.begin(9600);
     while (!Serial)
         ;
-    Serial.println("Simple button");
+    if (!rtc.begin())
+    {
+        Serial.println("Couldn't find RTC");
+        Serial.flush();
+        while (1)
+            delay(10);
+    }
+    if (!rtc.isrunning())
+    {
+        Serial.println("RTC is NOT running, let's set the time!");
+        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    }
 
     SPI.begin();
     Waveshield.begin();
@@ -42,9 +57,8 @@ void setup()
 void loop()
 {
     p = Waveshield.getPoint();
-
     Waveshield.normalizeTsPoint(p);
-    Serial.println(p.z);
+
     if (p.z > 0)
     {
         if (button.contains(p.x, p.y))
@@ -57,9 +71,17 @@ void loop()
     if (button.isPressed())
     {
     }
-    delay(100);
 
-    tft.setCursor(0, 0);
-    tft.setTextColor(WHITE);  tft.setTextSize(6);
-	tft.println("17:48:43");
+    now = rtc.now();
+    char format[] = "hh:mm:ss";
+    char *timestring = now.toString(format);
+    int size = 1;
+    int y = 0;
+    int x = 50;
+    for (int i = 0; i < strlen(timestring); i++)
+    {
+        tft.drawChar(x + 30 * i, y, timestring[i], WHITE, BLACK, size);
+    }
+
+    delay(1000);
 }
