@@ -35,7 +35,7 @@ void setup()
     Waveshield.fillScreen(BLACK);
     Waveshield.setRotation(1);
 
-    button.initButton(&tft, X_DIM / 2, Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
+    button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
     button.drawButton(true);
 }
 
@@ -58,4 +58,8 @@ void loop()
     {
     }
     delay(100);
+
+    tft.setCursor(0, 0);
+    tft.setTextColor(WHITE);  tft.setTextSize(6);
+	tft.println("17:48:43");
 }
