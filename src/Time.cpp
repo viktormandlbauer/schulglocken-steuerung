@@ -1,4 +1,7 @@
-
+#include "DEBUG.h"
+#ifdef DEBUG_TIME
+#define DEBUG
+#endif
 
 #include <Time.h>
 
@@ -20,10 +23,18 @@ void init_rtc_module()
     }
 }
 
-char *get_time_string(String timeformat)
+String get_time_string(String timeformat)
 {
     DateTime now = rtc.now();
     char arr[timeformat.length() + 1];
     strcpy(arr, timeformat.c_str());
-    return now.toString(arr);
+
+    String timestring = now.toString(arr);
+
+#ifdef DEBUG
+    Serial.print("[Info] Timestring: ");
+    Serial.println(timestring);
+#endif 
+
+    return timestring;
 }

@@ -3,4 +3,4 @@
 #include <RTClib.h>
 
 void init_rtc_module();
-char *get_time_string(String format);
+String get_time_string(String format);

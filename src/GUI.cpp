@@ -1,6 +1,7 @@
-#include <Arduino.h>
-#include <Adafruit_GFX.h>
-#include <Waveshare_ILI9486.h>
+#include "DEBUG.h"
+#ifdef DEBUG_GUI
+#define DEBUG
+#endif
 
 #include <GUI.h>
 
@@ -13,6 +14,7 @@ void init_display()
 {
     SPI.begin();
     Waveshield.begin();
+    Waveshield.setRotation(1);
 }
 
 bool check_button_pressed()
@@ -34,16 +36,19 @@ bool check_button_pressed()
     }
 }
 
-void draw_time(char *timestring)
+void draw_button()
 {
-    // Waveshield.setRotation(1);
-    // button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
-    // button.drawButton(true);
+    Waveshield.setRotation(1);
+    button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
+    button.drawButton(true);
+}
 
-    int size = 1;
-    int y = 0;
-    int x = 50;
-    for (int i = 0; i < strlen(timestring); i++)
+void draw_time(String timestring)
+{
+    uint8_t size = 5;
+    uint8_t y = 0;
+    uint8_t x = 50;
+    for (uint8_t i = 0; i < timestring.length(); i++)
     {
         tft.drawChar(x + 30 * i, y, timestring[i], WHITE, BLACK, size);
     }

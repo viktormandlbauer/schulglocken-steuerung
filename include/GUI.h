@@ -1,3 +1,7 @@
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include <Waveshare_ILI9486.h>
+
 // Colors
 #define BLACK 0x0000
 #define WHITE 0xFFFF
@@ -11,4 +15,4 @@
 
 void init_display();
 bool check_button_pressed();
-void draw_time(char *timestring);
+void draw_time(String timestring);

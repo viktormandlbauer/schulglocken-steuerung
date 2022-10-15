@@ -4,9 +4,9 @@
 class Network
 {
 private:
+    byte mac_address[6] = {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
     bool dhcp;
     byte *ip_address;
-    byte *mac_address;
     byte *gw_address;
     byte *subnetmask;
     byte *dns_address;
@@ -23,6 +23,8 @@ public:
     byte *get_gw();
     void set_dns(byte dns_address[4]);
     byte *get_dns();
+    void set_subnetmask(byte subnetmask[4]);
+    byte *get_subnetmask();
     bool init_network();
     bool test_gateway();
     bool test_ntp();

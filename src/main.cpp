@@ -10,19 +10,21 @@
 #include "GUI.h"
 #include "Network.h"
 
-
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(57600);
 
     init_rtc_module();
     init_display();
+
+    Network nw = Network();
+    nw.init_network();
 }
 
 void loop()
 {
-    String timeformat = "hh:mm";
+    char buf[] = "hh:mm:ss";
 
-    draw_time(get_time_string(timeformat));
+    draw_time(get_time_string(buf));
     delay(1000);
 }
