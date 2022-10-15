@@ -1,13 +1,15 @@
 // Libraries
-#include <Arduino.h>
-#include <Adafruit_GFX.h>
-#include <Waveshare_ILI9486.h>
-#include <EtherCard.h>
-#include <Wire.h>
-#include <RTClib.h>
+//#include <Arduino.h>
+//#include <Adafruit_GFX.h>
+//#include <Waveshare_ILI9486.h>
+//#include <EtherCard.h>
+//#include <Wire.h>
+//#include <RTClib.h>
 
 #include "Time.h"
 #include "GUI.h"
+#include "Network.h"
+
 
 void setup()
 {
@@ -19,6 +21,8 @@ void setup()
 
 void loop()
 {
-    draw_time(get_time_string("hh:mm"));
+    String timeformat = "hh:mm";
+
+    draw_time(get_time_string(timeformat));
     delay(1000);
 }

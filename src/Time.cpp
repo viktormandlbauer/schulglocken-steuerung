@@ -1,6 +1,4 @@
-#include <Arduino.h>
-#include <Wire.h>
-#include <RTClib.h>
+
 
 #include <Time.h>
 
@@ -22,9 +20,10 @@ void init_rtc_module()
     }
 }
 
-char *get_time_string(char format[])
+char *get_time_string(String timeformat)
 {
     DateTime now = rtc.now();
-    char *timestring = now.toString(format);
-    return timestring;
+    char arr[timeformat.length() + 1];
+    strcpy(arr, timeformat.c_str());
+    return now.toString(arr);
 }
