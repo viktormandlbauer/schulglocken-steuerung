@@ -4,7 +4,7 @@
 #endif
 
 #include "Network.h"
-#define CHIP_SELECT 14
+#include "HTTP_PAGE.h"
 
 byte Ethernet::buffer[700];
 
@@ -140,4 +140,12 @@ bool Network::test_ntp()
 {
 
     return true;
+}
+
+bool Network::show_http_status()
+{
+    word len = ether.packetReceive();
+    word pos = ether.packetLoop(len);
+    memcpy_P(ether.tcpOffset(), page, sizeof page);
+    ether.httpServerReply((sizeof page) - 1);
 }

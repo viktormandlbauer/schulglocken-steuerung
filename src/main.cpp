@@ -10,6 +10,11 @@
 #include "GUI.h"
 #include "Network.h"
 
+namespace
+{
+    Network nw;
+}
+
 void setup()
 {
     Serial.begin(57600);
@@ -17,7 +22,7 @@ void setup()
     init_rtc_module();
     init_display();
 
-    Network nw = Network();
+    nw = Network();
     nw.init_network();
 }
 
@@ -26,5 +31,6 @@ void loop()
     char buf[] = "hh:mm:ss";
 
     draw_time(get_time_string(buf));
-    delay(1000);
+
+    nw.show_http_status();
 }

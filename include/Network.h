@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <EtherCard.h>
 
+#define CHIP_SELECT 14
 class Network
 {
 private:
@@ -28,4 +29,5 @@ public:
     bool init_network();
     bool test_gateway();
     bool test_ntp();
+    bool show_http_status();
 };
