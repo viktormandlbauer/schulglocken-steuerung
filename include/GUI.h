@@ -16,3 +16,4 @@
 void init_display();
 bool check_button_pressed();
 void draw_time(String timestring);
+void draw_button();
