@@ -2,49 +2,32 @@
 #include <EtherCard.h>
 #define CHIP_SELECT 14
 
-// server 0.at.pool.ntp.org
-// server 1.at.pool.ntp.org
-// server 2.at.pool.ntp.org
-// server 3.at.pool.ntp.org
-const char NTP_REMOTEHOST[] PROGMEM = "0.at.pool.ntp.org"; // NTP server name
+// Local UDP port to use
 
-const unsigned int NTP_REMOTEPORT = 123; // NTP requests are to port 123
-const unsigned int NTP_LOCALPORT = 8888; // Local UDP port to use
-const unsigned int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-
-class Network
+namespace Network
 {
-private:
-    byte mac_address[6] = {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
-    bool dhcp;
-    String *ntp_address;
-    byte *ip_address;
-    byte *gw_address;
-    byte *subnetmask;
-    byte *dns_address;
+    const byte mac_address[6] = {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
+    const unsigned int NTP_LOCALPORT = 8888;
+    const unsigned int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+    const unsigned int NTP_REMOTEPORT = 123; // NTP requests are to port 123
 
-public:
-    bool connected;
+    // server 0.at.pool.ntp.org
+    // server 1.at.pool.ntp.org
+    // server 2.at.pool.ntp.org
+    // server 3.at.pool.ntp.org
 
-    Network();
-    Network(byte ip_address[4], byte gw_address[4], byte dns_address[4], byte subnetmask[4]);
+    // Network Configuration
+    bool init_ethernet();
+    bool init_static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm[4]);
+    bool init_dhcp_setup();
 
-    void set_ip(byte ip_address[4]);
-    void set_gw(byte gw_address[4]);
-    void set_dns(byte dns_address[4]);
-    void set_subnetmask(byte subnetmask[4]);
-    void set_ntpadr(String ntp_server);
-
-    byte *get_ip();
-    byte *get_gw();
-    byte *get_dns();
-    byte *get_subnetmask();
-    String *get_ntpsrv();
-
-    bool init_network();
-    bool check_network();
-    bool test_gateway();
-    bool dns_lookup();
+    // NTP
+    bool set_ntpserver(char *ntp_server);
+    void udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, const char *packetBuffer, uint16_t len);
+    void sendNTPpacket(const uint8_t *remoteAddress);
     unsigned long get_ntp_time();
+
     bool show_http_status();
-};
+    bool print_networking_config();
+    char *resolve_ip_address();
+}

@@ -13,7 +13,10 @@
 #define X_DIM 480
 #define Y_DIM 320
 
-void init_display();
-bool check_button_pressed();
-void draw_time(String timestring);
-void draw_button();
+namespace GUI
+{
+    void init_display();
+    bool check_button_pressed();
+    void draw_time(String timestring);
+    void draw_button();
+}

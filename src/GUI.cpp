@@ -10,14 +10,14 @@ Adafruit_GFX &tft = Waveshield;
 Adafruit_GFX_Button button;
 TSPoint p;
 
-void init_display()
+void GUI::init_display()
 {
     SPI.begin();
     Waveshield.begin();
     Waveshield.setRotation(1);
 }
 
-bool check_button_pressed()
+bool GUI::check_button_pressed()
 {
     p = Waveshield.getPoint();
     Waveshield.normalizeTsPoint(p);
@@ -36,14 +36,14 @@ bool check_button_pressed()
     }
 }
 
-void draw_button()
+void GUI::draw_button()
 {
     Waveshield.setRotation(1);
     button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
     button.drawButton(true);
 }
 
-void draw_time(String timestring)
+void GUI::draw_time(String timestring)
 {
     uint8_t size = 5;
     uint8_t y = 0;

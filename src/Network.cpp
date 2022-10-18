@@ -3,99 +3,20 @@
 #define DEBUG
 #endif
 
-#include "Network.h"
 #include "HTTP_PAGE.h"
+#include "Network.h"
 
 byte Ethernet::buffer[700];
 
-Network::Network()
-{
-    dhcp = true;
-    connected = false;
-}
+using namespace Network;
 
-Network::Network(byte ip_address[4], byte gw_address[4], byte dns_address[4], byte subnetmask[4])
-{
-    this->set_ip(ip_address);
-    this->set_gw(gw_address);
-    this->set_dns(dns_address);
-    this->set_subnetmask(subnetmask);
-    connected = false;
-    dhcp = false;
-}
-
-void Network::set_ip(byte ip_address[4])
-{
-    this->ip_address = ip_address;
-#ifdef DEBUG
-    ether.printIp("[Info] Set IP-Addr.: ", ether.myip);
-#endif
-}
-byte *Network::get_ip()
-{
-    return this->ip_address;
-}
-
-void Network::set_gw(byte gw_address[4])
-{
-#ifdef DEBUG
-    ether.printIp("[Info] Set gatway:   ", ether.gwip);
-#endif
-    this->gw_address = gw_address;
-}
-
-byte *Network::get_gw()
-{
-    return this->ip_address;
-}
-
-void Network::set_dns(byte dns_address[4])
-{
-#ifdef DEBUG
-    ether.printIp("[Info] Set DNS:      ", ether.dnsip);
-#endif
-    this->dns_address = dns_address;
-}
-
-byte *Network::get_dns()
-{
-    return this->dns_address;
-}
-
-void Network::set_subnetmask(byte subnetmask[4])
-{
-#ifdef DEBUG
-    ether.printIp("[Info] Set SNM:      ", ether.netmask);
-#endif
-    this->subnetmask = subnetmask;
-}
-
-byte *Network::get_subnetmask()
-{
-    return this->subnetmask;
-}
-
-void Network::set_ntpsrv(String server)
-{
-#ifdef DEBUG
-    Serial.println("[Info] Set NTP-Server:  ");
-    Serial.print(server);
-#endif
-}
-
-String Network::get_ntpsrv()
-{
-    return this->ntpsrv;
-}
-
-bool Network::init_network()
+bool Network::init_ethernet()
 {
 #ifdef DEBUG
     Serial.println("[Info] Activate ethernet ...");
 #endif
-    if (ether.begin(sizeof Ethernet::buffer, this->mac_address, CHIP_SELECT) == 0)
+    if (ether.begin(sizeof Ethernet::buffer, mac_address, CHIP_SELECT) == 0)
     {
-        this->connected = false;
         return false;
 #ifdef DEBUG
         Serial.println("[Error] Failed to active ethernet.");
@@ -104,62 +25,53 @@ bool Network::init_network()
 #ifdef DEBUG
     Serial.println("[Info] Ethernet activated.");
 #endif
+}
 
-    if (dhcp)
+bool Network::init_static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm[4])
+{
+    ether.staticSetup(ip, gw, dns, snm);
+
+#ifdef DEBUG
+    Serial.println(F("[Info] Network Static-IP Setup"));
+    ether.printIp("[Info] IP:   ", ether.myip);
+    ether.printIp("[Info] GW:   ", ether.gwip);
+    ether.printIp("[Info] DNS:  ", ether.dnsip);
+    ether.printIp("[Info] NM:   ", ether.netmask);
+#endif
+}
+
+bool Network::init_dhcp_setup()
+{
+    if (!ether.dhcpSetup())
     {
+
 #ifdef DEBUG
-        Serial.println(F("[Info] Setup DHCP"));
+        Serial.println("[Error] DHCP failed.");
 #endif
-        if (!ether.dhcpSetup())
-        {
-#ifdef DEBUG
-            Serial.println("[Error] DHCP failed.");
-#endif
-            return false;
-        }
-        else
-        {
-            this->set_ip(ether.myip);
-            this->set_dns(ether.dnsip);
-            this->set_gw(ether.gwip);
-            this->set_subnetmask(ether.netmask);
-#ifdef DEBUG
-            Serial.println("[Info] DHCP successfull");
-#endif
-        }
+
+        return false;
     }
-    else
-    {
+
 #ifdef DEBUG
-        Serial.println(F("[Info] Setup Static-IP"));
+    Serial.println(F("[Info] Network DHCP Setup"));
+    ether.printIp("[Info] IP:   ", ether.myip);
+    ether.printIp("[Info] GW:   ", ether.gwip);
+    ether.printIp("[Info] DNS:  ", ether.dnsip);
+    ether.printIp("[Info] NM:   ", ether.netmask);
 #endif
-        ether.staticSetup(this->ip_address, this->gw_address, this->dns_address, this->subnetmask);
-    }
+
     return true;
 }
 
-bool Network::check_network()
-{
-}
-
-bool Network::test_gateway()
-{
-    while (ether.clientWaitingGw())
-        ;
-    ether.packetLoop(ether.packetReceive());
-#ifdef DEBUG
-    Serial.println("Gateway found");
-#endif
-    return true;
-}
-
-void sendNTPpacket(const uint8_t *remoteAddress)
+void Network::sendNTPpacket(const uint8_t *remoteAddress)
 {
     // buffer to hold outgoing packet
     byte packetBuffer[NTP_PACKET_SIZE];
+
     // set all bytes in the buffer to 0
     memset(packetBuffer, 0, NTP_PACKET_SIZE);
-    // Initialize values needed to form NTP request
+    
+    // Initialize values needed to for NTP request
     // (see URL above for details on the packets)
     packetBuffer[0] = 0b11100011; // LI, Version, Mode
     packetBuffer[1] = 0;          // Stratum, or type of clock
@@ -177,7 +89,7 @@ void sendNTPpacket(const uint8_t *remoteAddress)
     Serial.println("NTP request sent.");
 }
 
-void udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, const char *packetBuffer, uint16_t len)
+void Network::udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, const char *packetBuffer, uint16_t len)
 {
     Serial.println("NTP response received.");
 
@@ -201,39 +113,37 @@ void udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t sr
     Serial.println(epoch);
 }
 
-unsigned long Network::get_ntp_time()
+unsigned long get_ntp_time()
 {
-    bool dns_reachable;
-    if (!ether.dnsLookup(this->ntp_address))
-    {
-        dns_reachable = false;
-    }
-    else
-    {
-        dns_reachable = true;
-        return false;
-    }
+    ether.dnsLookup(NTP_REMOTEPORT);
 
     uint8_t ntpIp[IP_LEN];
     ether.copyIp(ntpIp, ether.hisip);
     ether.printIp("NTP: ", ntpIp);
 
-#ifdef DEBUG
-    if (dns_reachable)
-    {
-        Serial.println("DNS failed");
-    }
-#endif
+    // TODO:
+    // Verbindungsaufbau mit NTP Server
+    return true;
+}
+
+char *Network::resolve_ip_address()
+{
+    uint8_t ntpIp[IP_LEN];
+    ether.copyIp(ntpIp, ether.hisip);
+    ether.printIp("NTP: ", ntpIp);
+}
+
+bool Network::set_ntpserver(char *ntp_server)
+{
+    ether.dnsLookup(ntp_server);
+    uint8_t ntpIp[IP_LEN];
+    ether.copyIp(ntpIp, ether.hisip);
 
     ether.udpServerListenOnPort(&udpReceiveNtpPacket, NTP_LOCALPORT);
     Serial.println("Started listening for response.");
     ether.packetLoop(ether.packetReceive());
 
     sendNTPpacket(ntpIp);
-
-    // TODO:
-    // Verbindungsaufbau mit NTP Server
-    return true;
 }
 
 bool Network::show_http_status()
@@ -243,3 +153,13 @@ bool Network::show_http_status()
     memcpy_P(ether.tcpOffset(), page, sizeof page);
     ether.httpServerReply((sizeof page) - 1);
 }
+
+#ifdef DEBUG
+bool Network::print_networking_config()
+{
+    ether.printIp(ether.myip);
+    ether.printIp(ether.dnsip);
+    ether.printIp(ether.gwip);
+    ether.printIp(ether.netmask);
+}
+#endif

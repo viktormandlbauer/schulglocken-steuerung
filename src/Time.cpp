@@ -5,10 +5,13 @@
 
 #include <Time.h>
 
+using namespace Time;
+
 RTC_DS1307 rtc;
 
-void init_rtc_module()
+void Time::init_rtc_module()
 {
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     if (!rtc.begin())
     {
         Serial.println("Couldn't find RTC");
@@ -19,22 +22,20 @@ void init_rtc_module()
     if (!rtc.isrunning())
     {
         Serial.println("RTC is NOT running, let's set the time!");
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     }
 }
 
-String get_time_string(String timeformat)
+String Time::get_time_string(String format)
 {
     DateTime now = rtc.now();
-    char arr[timeformat.length() + 1];
-    strcpy(arr, timeformat.c_str());
-
+    char arr[format.length() + 1];
+    strcpy(arr, format.c_str());
     String timestring = now.toString(arr);
 
 #ifdef DEBUG
     Serial.print("[Info] Timestring: ");
     Serial.println(timestring);
-#endif 
+#endif
 
     return timestring;
 }
