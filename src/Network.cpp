@@ -133,9 +133,13 @@ char *Network::resolve_ip_address()
     ether.printIp("NTP: ", ntpIp);
 }
 
-bool Network::set_ntpserver(char *ntp_server)
+bool Network::set_ntpserver(String ntp_server)
 {
-    ether.dnsLookup(ntp_server);
+    int str_length = ntp_server.length() + 1;
+    char char_array[str_length + 1];
+    ntp_server.toCharArray(char_array, str_length);
+
+    ether.dnsLookup(char_array);
     uint8_t ntpIp[IP_LEN];
     ether.copyIp(ntpIp, ether.hisip);
 

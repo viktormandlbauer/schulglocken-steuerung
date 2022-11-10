@@ -1,4 +1,4 @@
 #define DEBUG_NETWORK
-//#define DEBUG_GUI
-//#define DEBUG_TIME
-//#define DEBUG_util
+#define DEBUG_GUI
+#define DEBUG_TIME
+#define DEBUG_util
