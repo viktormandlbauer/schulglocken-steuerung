@@ -70,7 +70,7 @@ void Network::sendNTPpacket(const uint8_t *remoteAddress)
 
     // set all bytes in the buffer to 0
     memset(packetBuffer, 0, NTP_PACKET_SIZE);
-    
+
     // Initialize values needed to for NTP request
     // (see URL above for details on the packets)
     packetBuffer[0] = 0b11100011; // LI, Version, Mode
@@ -146,12 +146,35 @@ bool Network::set_ntpserver(char *ntp_server)
     sendNTPpacket(ntpIp);
 }
 
-bool Network::show_http_status()
+BufferFiller bfill;
+
+static word homePage()
 {
+    long t = millis() / 1000;
+    word h = t / 3600;
+    byte m = (t / 60) % 60;
+    byte s = t % 60;
+    bfill = ether.tcpOffset();
+    bfill.emit_p(PSTR(
+                     "HTTP/1.0 200 OK\r\n"
+                     "Content-Type: text/html\r\n"
+                     "Pragma: no-cache\r\n"
+                     "\r\n"
+                     //"<meta http-equiv='refresh' content='1'/>"
+                     "<title>RBBB server</title>"
+                     "<h1>$D$D:$D$D:$D$D</h1>"),
+                 h / 10, h % 10, m / 10, m % 10, s / 10, s % 10);
+    return bfill.position();
+}
+
+bool Network::http_response(String body)
+{
+
     word len = ether.packetReceive();
     word pos = ether.packetLoop(len);
-    memcpy_P(ether.tcpOffset(), page, sizeof page);
-    ether.httpServerReply((sizeof page) - 1);
+
+    if (pos)                               // check if valid tcp data is received
+        ether.httpServerReply(homePage()); // send web page data
 }
 
 #ifdef DEBUG

@@ -27,7 +27,7 @@ namespace Network
     void sendNTPpacket(const uint8_t *remoteAddress);
     unsigned long get_ntp_time();
 
-    bool show_http_status();
+    bool http_response(String body);
     bool print_networking_config();
     char *resolve_ip_address();
 }

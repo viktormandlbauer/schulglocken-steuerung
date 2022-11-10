@@ -11,18 +11,21 @@ RTC_DS1307 rtc;
 
 void Time::init_rtc_module()
 {
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    if (!rtc.begin())
+
+    if (rtc.begin())
     {
-        Serial.println("Couldn't find RTC");
-        Serial.flush();
-        while (1)
-            delay(10);
+        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+#ifdef DEBUG
+        Serial.println("[Info] I2C for DS3231SN");
+        Serial.println("[Info] Finished RTC Setup");
+#endif
     }
-    if (!rtc.isrunning())
+#ifdef DEBUG
+    else
     {
-        Serial.println("RTC is NOT running, let's set the time!");
+        Serial.println("[Error Failed RTC Setup!");
     }
+#endif
 }
 
 String Time::get_time_string(String format)
