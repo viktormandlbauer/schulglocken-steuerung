@@ -4,7 +4,9 @@
 
 namespace Time
 {
-    void init_rtc_module();
-    String get_time_string(String format);
+    bool init_rtc_module();
 
+    // Return time
+    String get_time_string(String format);
+    int *get_time_values(int arr[]);
 }

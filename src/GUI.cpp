@@ -43,6 +43,10 @@ void GUI::draw_button()
     button.drawButton(true);
 }
 
+void GUI::draw_warning(){
+    // TODO - Show Warning on display
+}
+
 void GUI::draw_time(String timestring)
 {
     uint8_t size = 5;
