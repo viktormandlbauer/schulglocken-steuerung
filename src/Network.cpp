@@ -3,7 +3,6 @@
 #define DEBUG
 #endif
 
-#include "HTTP_PAGE.h"
 #include "Network.h"
 
 byte Ethernet::buffer[700];
@@ -25,6 +24,7 @@ bool Network::init_ethernet()
 #ifdef DEBUG
     Serial.println("[Info] Ethernet activated.");
 #endif
+    return true;
 }
 
 bool Network::init_static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm[4])
@@ -70,7 +70,7 @@ void Network::sendNTPpacket(const uint8_t *remoteAddress)
 
     // set all bytes in the buffer to 0
     memset(packetBuffer, 0, NTP_PACKET_SIZE);
-    
+
     // Initialize values needed to for NTP request
     // (see URL above for details on the packets)
     packetBuffer[0] = 0b11100011; // LI, Version, Mode
@@ -133,9 +133,13 @@ char *Network::resolve_ip_address()
     ether.printIp("NTP: ", ntpIp);
 }
 
-bool Network::set_ntpserver(char *ntp_server)
+bool Network::set_ntpserver(String ntp_server)
 {
-    ether.dnsLookup(ntp_server);
+    int str_length = ntp_server.length() + 1;
+    char char_array[str_length + 1];
+    ntp_server.toCharArray(char_array, str_length);
+
+    ether.dnsLookup(char_array);
     uint8_t ntpIp[IP_LEN];
     ether.copyIp(ntpIp, ether.hisip);
 
@@ -146,15 +150,30 @@ bool Network::set_ntpserver(char *ntp_server)
     sendNTPpacket(ntpIp);
 }
 
-bool Network::show_http_status()
+BufferFiller bfill;
+
+bool Network::http_response(byte day, byte month, byte year, byte hour, byte minute, byte second)
 {
+
     word len = ether.packetReceive();
     word pos = ether.packetLoop(len);
-    memcpy_P(ether.tcpOffset(), page, sizeof page);
-    ether.httpServerReply((sizeof page) - 1);
+
+    if (pos)
+    {
+        bfill = ether.tcpOffset();
+        bfill.emit_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n<meta http-equiv='refresh' content='1'/><title>Schulglockensteuerung</title><h1>$D$D:$D$D:$D$D</h1>"),
+                     hour / 10, hour % 10, minute / 10, minute % 10, second / 10, second % 10);
+        ether.httpServerReply(bfill.position());
+    }
+}
+
+bool set_warning(int type)
+{
+    // Set warning on html site
 }
 
 #ifdef DEBUG
+// Print networking config - only for debugging
 bool Network::print_networking_config()
 {
     ether.printIp(ether.myip);
