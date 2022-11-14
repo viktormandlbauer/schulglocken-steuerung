@@ -1,29 +1,40 @@
-// Libraries
-//#include <Arduino.h>
-//#include <Adafruit_GFX.h>
-//#include <Waveshare_ILI9486.h>
-//#include <EtherCard.h>
-//#include <Wire.h>
-//#include <RTClib.h>
-
-// PIN Connections (Using Arduino UNO):
-//   VCC -   3.3V
-//   GND -    GND
-//   SCK - Pin 13
-//   SO  - Pin 12
-//   SI  - Pin 11
-//   CS  - Pin  8
-
 #include <Arduino.h>
 #include "Time.h"
 #include "GUI.h"
 #include "Network.h"
+#include "Timequeue.h"
 
 bool error_flag;
 
 void setup()
 {
     Serial.begin(57600);
+
+    struct Timequeue::alert a1;
+    a1.hour = 3;
+    a1.minute = 4;
+    a1.second = 5;
+    struct Timequeue::alert a2;
+    a2.hour = 7;
+    a2.minute = 8;
+    a2.second = 9;
+    struct Timequeue::alert a3;
+    a3.hour = 10;
+    a3.minute = 11;
+    a3.second = 12;
+    struct Timequeue::alert a4;
+    a4.hour = 13;
+    a4.minute = 14;
+    a4.second = 15;
+    Timequeue::alert alerts[5];
+
+    alerts[0] = a1;
+    alerts[1] = a2;
+    alerts[2] = a3;
+    alerts[3] = a4;
+
+    Timequeue::extend_array();
+
     GUI::init_display();
 
     if (!Time::init_rtc_module())
