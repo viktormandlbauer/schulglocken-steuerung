@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <RTClib.h>
+#include <TimeLib.h>
+#include <LinkedList.h>
 
 namespace Time
 {
@@ -8,5 +10,5 @@ namespace Time
 
     // Return time
     String get_time_string(String format);
-    int *get_time_values(int arr[]);
+    
 }

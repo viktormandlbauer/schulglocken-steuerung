@@ -4,6 +4,9 @@
 #endif
 
 #include <Time.h>
+#include <Wire.h>
+#include <RTClib.h>
+#include <TimeLib.h>
 
 using namespace Time;
 
@@ -49,13 +52,4 @@ String Time::get_time_string(String format)
 #endif
 
     return timestring;
-}
-
-int *Time::get_time_values(int arr[])
-{
-    DateTime now = rtc.now();
-    arr[0] = now.hour();
-    arr[1] = now.minute();
-    arr[2] = now.second();
-    return arr;
 }
