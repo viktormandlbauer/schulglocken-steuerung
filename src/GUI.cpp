@@ -147,7 +147,7 @@ void GUI::draw_menu()
     tft.setTextSize(2);
     tft.print("Zeitplan AKTIV");
 
-    delay(5000);
+    delay(500);
 
     //Einstallungs Menü
     Waveshield.fillScreen(0x5acb);
@@ -164,6 +164,40 @@ void GUI::draw_menu()
     GUI::draw_button(X_DIM/2, (Y_DIM/10)*5,X_DIM/2, Y_DIM/8, "Uhrzeit",3, WHITE,WHITE,0x5acb);
     GUI::draw_button(X_DIM/2, (Y_DIM/10)*7,X_DIM/2, Y_DIM/8, "Sys. Info",3, WHITE,WHITE,0x5acb);
     GUI::draw_button(X_DIM/2, (Y_DIM/10)*9,X_DIM/2, Y_DIM/8, "Netzwerk",3, WHITE,WHITE,0x5acb);
+
+
+
+
+    #define backarrow_top_left_bound_x 100
+    #define backarrow_top_left_bound_y 100
+    #define back_arrow_with 150
+    #define back_arrow_height 150
+    #define distance_to_outline_px 10
+    #define text_height_px 15
+    #define textplacement_offset_x 0
+    #define textplacement_offset_y 0
+    tft.drawRoundRect(backarrow_top_left_bound_x,backarrow_top_left_bound_y, back_arrow_with, back_arrow_height,20, WHITE);
+
+    //fost ist left most point next is top right most then bottom right most
+    tft.fillTriangle(backarrow_top_left_bound_x + distance_to_outline_px ,backarrow_top_left_bound_y + back_arrow_height/2 - text_height_px/2,
+                     backarrow_top_left_bound_x + back_arrow_with/2,backarrow_top_left_bound_y + distance_to_outline_px,
+                     backarrow_top_left_bound_x + back_arrow_with/2, backarrow_top_left_bound_y + back_arrow_height - distance_to_outline_px - text_height_px,
+                     WHITE
+                     );
+
+    tft.fillRect(backarrow_top_left_bound_x + back_arrow_with/2,
+                 backarrow_top_left_bound_y + back_arrow_height/4,
+                 back_arrow_with/2 - distance_to_outline_px,
+                 (back_arrow_height - text_height_px/2) / 2,
+                 WHITE);
+                    
+    tft.setCursor(backarrow_top_left_bound_x + textplacement_offset_x,backarrow_top_left_bound_y + textplacement_offset_y);
+    tft.setTextSize(1);
+    tft.print("Zur ck");
+
+    //ü zeichnen
+    tft.cp437(true);
+    tft.drawChar(backarrow_top_left_bound_x + textplacement_offset_x + 18, backarrow_top_left_bound_y + textplacement_offset_y ,0x97,WHITE,0x5acb,1);//zeichnet kleines ü nach cp437 zeichensatz
 
     delay(30000);    
 }
