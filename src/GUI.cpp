@@ -168,15 +168,15 @@ void GUI::draw_menu()
 
 
 
-    #define backarrow_top_left_bound_x 100
-    #define backarrow_top_left_bound_y 100
-    #define back_arrow_with 150
-    #define back_arrow_height 150
-    #define distance_to_outline_px 10
+    #define backarrow_top_left_bound_x 5
+    #define backarrow_top_left_bound_y Y_DIM-55
+    #define back_arrow_with 50
+    #define back_arrow_height 50
+    #define distance_to_outline_px 5
     #define text_height_px 15
-    #define textplacement_offset_x 0
-    #define textplacement_offset_y 0
-    tft.drawRoundRect(backarrow_top_left_bound_x,backarrow_top_left_bound_y, back_arrow_with, back_arrow_height,20, WHITE);
+    #define textplacement_offset_x 8
+    #define textplacement_offset_y 35
+    tft.drawRoundRect(backarrow_top_left_bound_x,backarrow_top_left_bound_y, back_arrow_with, back_arrow_height,10, WHITE);
 
     //fost ist left most point next is top right most then bottom right most
     tft.fillTriangle(backarrow_top_left_bound_x + distance_to_outline_px ,backarrow_top_left_bound_y + back_arrow_height/2 - text_height_px/2,
@@ -186,9 +186,9 @@ void GUI::draw_menu()
                      );
 
     tft.fillRect(backarrow_top_left_bound_x + back_arrow_with/2,
-                 backarrow_top_left_bound_y + back_arrow_height/4,
+                 backarrow_top_left_bound_y + distance_to_outline_px + (back_arrow_height-text_height_px)/4,
                  back_arrow_with/2 - distance_to_outline_px,
-                 (back_arrow_height - text_height_px/2) / 2,
+                 (back_arrow_height - text_height_px) / 3,
                  WHITE);
                     
     tft.setCursor(backarrow_top_left_bound_x + textplacement_offset_x,backarrow_top_left_bound_y + textplacement_offset_y);
