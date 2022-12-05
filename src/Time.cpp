@@ -3,53 +3,67 @@
 #define DEBUG
 #endif
 
-#include <Time.h>
+#include "RTClib.h"
 #include <Wire.h>
-#include <RTClib.h>
 #include <TimeLib.h>
+#include <SPI.h>
+#include "Time.h"
+
+#include <LinkedList.h>
 
 using namespace Time;
 
 RTC_DS3231 rtc;
 
-bool Time::init_rtc_module()
+struct alert
+{
+    uint16_t time_trigger;
+    bool pause;
+};
 
+LinkedList<alert> scheduled;
+
+uint16_t Time::get_passing_seconds(byte hour, byte minute, byte second)
+{
+    return hour * 3600 + second;
+}
+
+void Time::add_alert(byte hour, byte minute, byte second)
 {
 
-    if (rtc.begin())
+    alert new_alert;
+    new_alert.time_trigger = get_passing_seconds(hour, minute, second);
+    new_alert.pause = false;
+    scheduled.add(new_alert);
+}
+
+time_t Time::time_provider()
+{
+    return rtc.now().unixtime();
+}
+
+bool Time::init_rtc_module()
+{
+    Wire.begin();
+    while (!rtc.begin())
+        ;
+
+    // Konfiguration der Synchronisation mit dem RTC Modul
+    setSyncProvider(time_provider);
+    setSyncInterval(5);
+
+    if (timeStatus() != timeSet)
     {
 #ifdef DEBUG
-        Serial.println("[Info] Finished RTC Setup");
+        Serial.println("[Error] Time not synced!");
 #endif
+        return false;
     }
     else
     {
-
-        // TODO - RTC Modul nicht funktionsfähig
 #ifdef DEBUG
-        Serial.println("[Error Failed RTC Setup!");
+        Serial.println("[Info] Time synced!");
 #endif
+        return true;
     }
-
-    if (rtc.lostPower())
-    {
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-#ifdef DEBUG
-        Serial.println("[Info] Adjusted time after power loss");
-#endif
-    }
-}
-
-String Time::get_time_string(String format)
-{
-    DateTime now = rtc.now();
-    char arr[format.length() + 1];
-    strcpy(arr, format.c_str());
-    String timestring = now.toString(arr);
-#ifdef DEBUG
-    Serial.print("[Info] Timestring: ");
-    Serial.println(timestring);
-#endif
-
-    return timestring;
 }
