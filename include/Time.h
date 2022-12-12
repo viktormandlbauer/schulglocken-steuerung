@@ -1,14 +1,12 @@
 #include <Arduino.h>
-#include <Wire.h>
 #include <RTClib.h>
+#include <Wire.h>
 #include <TimeLib.h>
-#include <LinkedList.h>
+#include <SPI.h>
 
 namespace Time
 {
     bool init_rtc_module();
-
-    // Return time
-    String get_time_string(String format);
-    
+    alert add_alert();
+    time_t time_provider();
 }
