@@ -18,9 +18,9 @@ namespace GUI
     void init_display();
     bool check_button_pressed();
     
-    
+    void draw_menu();
     void draw_time(String timestring);
-    void draw_button();
+    void draw_button(int x_pos, int y_pos,int xsize, int ysize, char *textarr,int textsize, uint16_t outlinecolor,uint16_t textcolor,uint16_t innercolor);
     void draw_warning();
 
 }
