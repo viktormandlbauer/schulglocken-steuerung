@@ -10,6 +10,11 @@ void setup()
     Time::init_rtc_module();
 }
 
+char time_string[9];
+
 void loop()
 {
+    Time::get_time(time_string);
+    Serial.println(time_string);
+    delay(1000);
 }
