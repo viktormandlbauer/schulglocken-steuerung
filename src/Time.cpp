@@ -12,9 +12,16 @@
 using namespace Time;
 
 RTC_DS3231 rtc;
-uint16_t alarms[100];
 
-time_t Time::time_provider()
+// Alarme
+uint16_t alarms[100];
+uint8_t alarm_type[100];
+
+// Ausnahmen
+uint16_t exception_date_begin[20];
+uint16_t exception_date_end[20];
+
+time_t time_provider()
 {
     return rtc.now().unixtime();
 }
