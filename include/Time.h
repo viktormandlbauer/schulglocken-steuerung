@@ -22,7 +22,7 @@ namespace Time
 
     // Schreibt die Zeit in "HH:MM:SS" Format in ein char Array
     // char time_string[9];
-    void get_time(char *time_string);
+    void get_current_timestring(char time_string[9]);
 
     uint16_t get_minutes_passed();
 
@@ -34,4 +34,6 @@ namespace Time
 
     uint8_t add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type);
     uint8_t remove_alarm(uint8_t hour, uint8_t minute);
+    void get_alarms_strings(char time_string[][9]);
+    uint8_t get_alarm_count();
 }

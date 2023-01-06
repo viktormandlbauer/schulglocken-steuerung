@@ -34,6 +34,9 @@ bool Time::init_rtc_module()
     while (!rtc.begin())
         ;
 
+    // Set system time as rtc time
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
     // Konfiguration der Synchronisation mit dem RTC Modul
     setSyncProvider(time_provider);
     setSyncInterval(5);
@@ -54,10 +57,55 @@ bool Time::init_rtc_module()
     }
 }
 
+void get_timestring(int hour, int minute, int second, char *time_string)
+{
+    if (hour < 10)
+    {
+        time_string[0] = '0';
+        time_string[1] = hour + '0';
+    }
+    else
+    {
+        time_string[0] = (char)hour / 10 + '0';
+        time_string[1] = hour % 10 + '0';
+    }
+
+    time_string[2] = ':';
+
+    if (minute < 10)
+    {
+        time_string[3] = '0';
+        time_string[4] = minute + '0';
+    }
+    else
+    {
+        time_string[3] = (char)minute / 10 + '0';
+        time_string[4] = minute % 10 + '0';
+    }
+
+    time_string[5] = ':';
+
+    if (second < 10)
+    {
+        time_string[6] = '0';
+        time_string[7] = second + '0';
+    }
+    else
+    {
+        time_string[6] = (char)second / 10 + '0';
+        time_string[7] = second % 10 + '0';
+    }
+}
+
 uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
 {
     // Interne Funtkion für die Konvertierung von Stunden und Minuten in vergehende Minuten von 00:00:00 weg
     return hour * 60 + minute;
+}
+
+void convert_alarm_to_timestring(uint16_t alarm, char *time_string)
+{
+    get_timestring(alarm / 60, alarm % 60, 0, time_string);
 }
 
 uint16_t Time::get_minutes_passed()
@@ -65,51 +113,11 @@ uint16_t Time::get_minutes_passed()
     return convert_time_to_alarm(hour(), minute());
 }
 
-void Time::get_time(char *time_string)
+void Time::get_current_timestring(char time_string[9])
 {
     // Schreibt die Zeit in "HH:MM:SS" Format in ein Char Array
     // char time_string[9];
-
-    int myhour = hour();
-    int myminute = minute();
-    int mysecond = second();
-
-    if (myhour < 10)
-    {
-        time_string[0] = '0';
-        time_string[1] = myhour + '0';
-    }
-    else
-    {
-        time_string[0] = (char)myhour / 10 + '0';
-        time_string[1] = myhour % 10 + '0';
-    }
-
-    time_string[2] = ':';
-
-    if (myminute < 10)
-    {
-        time_string[3] = '0';
-        time_string[4] = myminute + '0';
-    }
-    else
-    {
-        time_string[3] = (char)myminute / 10 + '0';
-        time_string[4] = myminute % 10 + '0';
-    }
-
-    time_string[5] = ':';
-
-    if (mysecond < 10)
-    {
-        time_string[6] = '0';
-        time_string[7] = mysecond + '0';
-    }
-    else
-    {
-        time_string[6] = (char)mysecond / 10 + '0';
-        time_string[7] = mysecond % 10 + '0';
-    }
+    get_timestring(hour(), minute(), second(), time_string);
 }
 
 uint8_t Time::add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type)
@@ -143,5 +151,19 @@ uint8_t Time::remove_alarm(uint8_t hour, uint8_t minute)
         alarm_count -= 1;
         return alarm_count;
     }
+    return alarm_count;
+}
+
+void Time::get_alarms_strings(char time_string[][9])
+{
+
+    for (int i = 0; i < alarm_count; i++)
+    {
+        convert_alarm_to_timestring(alarms[i], time_string[i]);
+    }
+}
+
+uint8_t Time::get_alarm_count()
+{
     return alarm_count;
 }
