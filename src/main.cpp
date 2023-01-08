@@ -12,11 +12,14 @@ void setup()
     // Beeper
     pinMode(A2, OUTPUT);
 
-    Time::add_alarm(21, 45, 1);
-    Time::add_alarm(21, 50, 1);
+    Time::add_alarm(17, 1, 1);
+    Time::add_alarm(17, 3, 1);
+    Time::add_alarm(17, 5, 1);
+    Time::add_alarm(16, 57, 1);
+    Time::add_alarm(16, 59, 1);
 }
 
-char time_strings[100][9];
+char time_strings[64][9];
 
 void print_time_info()
 {
@@ -25,8 +28,8 @@ void print_time_info()
     Serial.println(time_strings[0]);
 
     Serial.println("Current alarms:");
-    Time::get_alarms_strings(time_strings);
-    for (int i = 0; i < Time::get_alarm_count(); i++)
+    uint8_t alarm_count = Time::get_alarms_strings(time_strings);
+    for (int i = 0; i < alarm_count; i++)
     {
         Serial.println(time_strings[i]);
     }
@@ -34,6 +37,8 @@ void print_time_info()
 
 void loop()
 {
-    print_time_info();
+
+    Time::check_alarm();
+
     delay(1000);
 }
