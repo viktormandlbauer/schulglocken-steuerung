@@ -8,21 +8,29 @@ void setup()
     Serial.begin(57600);
 
     Time::init_rtc_module();
+    Time::init_alarm_interrupt();
+    Time::init_ring_types();
 
     // Beeper
     pinMode(A2, OUTPUT);
-
-    Time::add_alarm(17, 1, 1);
-    Time::add_alarm(17, 3, 1);
-    Time::add_alarm(17, 5, 1);
-    Time::add_alarm(16, 57, 1);
-    Time::add_alarm(16, 59, 1);
+    
+    // Add alarm
+    Time::add_alarm(20, 5, 0);
+    Time::add_alarm(20, 6, 1);
+    Time::add_alarm(20, 7, 2);
+    Time::add_alarm(20, 8, 0);
+    Time::add_alarm(20, 9, 1);
+    Time::add_alarm(20, 10, 2);
 }
+
+
+
 
 char time_strings[64][9];
 
 void print_time_info()
 {
+    // Function for debuggin purpose 
     Serial.println("Current time:");
     Time::get_current_timestring(time_strings[0]);
     Serial.println(time_strings[0]);
@@ -37,8 +45,5 @@ void print_time_info()
 
 void loop()
 {
-
     Time::check_alarm();
-
-    delay(1000);
 }

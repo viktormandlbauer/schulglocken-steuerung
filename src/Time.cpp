@@ -1,31 +1,49 @@
+// Einstellung für den DEBUG Mode
 #include "DEBUG.h"
 #ifdef DEBUG_TIME
 #define DEBUG
 #endif
 
+// Einbindung externer Libraries 
 #include "RTClib.h"
 #include <Wire.h>
 #include <TimeLib.h>
 #include <SPI.h>
+
+// Angabe des Header-Files
 #include "Time.h"
 
+// Verwendung des Namespaces
 using namespace Time;
 
+// RTC Objekt aus der RTClib
 RTC_DS3231 rtc;
 
-// Alarme
+// Anzahl der Alarme
 uint8_t alarm_count;
+
+// Array mit den Alarmzeiten
 uint16_t alarms[64];
-uint8_t alarm_type[64];
+
+// Array mit den Alarmtypen
+uint8_t type_alarms[64];
+
+// 64 bit Wert für die Abhandlung der Alarme
 uint64_t triggered;
 
-// Ausnahmen
+// Anzahl der Ausnahmen
 uint8_t exception_count;
+
+// Array mit 16 Bit Werten für Ausnahme Beginn-Tag
 uint16_t exception_date_begin[20];
+
+// Aray mit 16 Bit Werten für Ausnahme End-Tag
 uint16_t exception_date_end[20];
 
 time_t time_provider()
 {
+    // Rückgabe der aktuellen Unix Zeit
+    // Vergangene Sekunden nach dem 1.Januar 1970, 00:00 Uhr UTC
     return rtc.now().unixtime();
 }
 
@@ -33,7 +51,7 @@ bool Time::init_rtc_module()
 {
     /**
      * Initiierung des RTC Moduls
-    */
+     */
     Wire.begin();
     while (!rtc.begin())
         ;
@@ -127,6 +145,7 @@ void Time::get_current_timestring(char time_string[9])
 uint8_t Time::add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
     alarms[alarm_count] = convert_time_to_alarm(hour, minute);
+    type_alarms[alarm_count] = alarm_type;
     alarm_count += 1;
     return alarm_count;
 }
@@ -137,7 +156,7 @@ uint8_t Time::remove_alarm_at_index(uint8_t index)
     for (int i = index; i < alarm_count - 1; i++)
     {
         alarms[i] = alarms[i + 1];
-        alarm_type[i] = alarm_type[i + 1];
+        type_alarms[i] = type_alarms[i + 1];
     }
     alarm_count -= 1;
     return alarm_count;
@@ -165,7 +184,6 @@ uint16_t Time::get_minutes_passed()
     return convert_time_to_alarm(hour(), minute());
 }
 
-bool active_alarm = false;
 time_t alarm_start_time = 0;
 time_t alarm_end_time = 0;
 
@@ -173,46 +191,26 @@ time_t get_alarm_end_time()
 {
     //  5 Sekunden Alarm für Tests
     // TODO: Verschiedene Arten von Alarmen (Rhytmus usw.)
-    return alarm_start_time + 3;
-}
-
-void ring()
-{
-    if (active_alarm == false)
-    {
-        /**
-         * Wenn kein aktiver Alarm besteht, 
-         * wird die Endzeit des Alarms berechnet und das Läuten initiert.
-        */
-        alarm_start_time = time_provider();
-        alarm_end_time = get_alarm_end_time();
-        active_alarm = true;
-        analogWrite(A2, 1023);
-    }
-    if (alarm_end_time < time_provider())
-    {
-        /**
-         * Das Läuten endet sobald die Endzeit des Alarms überschritten worden ist.
-        */
-        active_alarm = false;
-        analogWrite(A2, LOW);
-    }
+    return alarm_start_time + 5;
 }
 
 // Funktionen zur Überprüfung des Status eines Alarms
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
 void set_triggered(uint8_t index) { triggered |= 0b1 << index; }
 
+uint8_t current_alarm_type = 0;
+uint32_t position = 0;
+bool finished = true;
+
 // Allgemeine Überprüfung eines Alarms
 bool Time::check_alarm()
 {
     // Testet ob Alarm aktiv ist
-    if (active_alarm)
+    if (!finished)
     {
 #ifdef DEBUG
         Serial.println("[Info] Alarm is active!");
 #endif
-        ring();
         return true;
     }
     else
@@ -235,16 +233,91 @@ bool Time::check_alarm()
                 if (current_time == alarms[i])
                 {
                     // Flag um ein erneutes Läuten in der selben Minute zu verhindern
+
                     set_triggered(i);
+                    current_alarm_type = type_alarms[i];
+                    finished = false;
 #ifdef DEBUG
                     Serial.print("[Info] Alarm triggered: ");
                     Serial.println(alarms[i]);
 #endif
-                    ring();
                     return true;
                 }
             }
         }
         return false;
+    }
+}
+
+uint32_t ring_types[3];
+
+void Time::init_ring_types()
+{
+    // Only 3 defined ring types atm
+    ring_types[0] = 0xAAAAAAAA;
+    ring_types[1] = 0xF0F0F0F0;
+    ring_types[2] = 0xAA0F0AAA;
+}
+
+void Time::init_alarm_interrupt()
+{
+    /*
+    Maximale Läutzeit - 8 Sekunden
+    32 bit: 32 x 250 Millisekunden definierbar
+    Clockspeed 16000 Mhz
+    Intervall: 0,0000000625 -> 62,5 ns
+
+    Compare Register with prescaler of 64:
+    (0,25/(1/16 000 000))/64 = 62 500
+    */
+
+    // Reset Timer1
+    TCCR1A = 0;
+
+    // Reset timer on compare interrupt match
+    TCCR1B &= ~(1 << WGM13);
+    TCCR1B |= (1 << WGM12);
+
+    // Set prescaler to 64
+    TCCR1B |= (1 << CS11);
+    TCCR1B |= (1 << CS10);
+
+    // Set compare register
+    TCNT1 = 0;
+    OCR1A = 62500;
+
+    // Enable Timer1 compare interrupt
+    TIMSK1 = (1 << OCIE1A);
+
+    // Enable global interrupts
+    interrupts();
+}
+
+ISR(TIMER1_COMPA_vect)
+{
+    // Wird abgefragt um ungewolltes Läuten zu vermeiden
+    if (!finished)
+    {
+        if (ring_types[current_alarm_type] & (1ul << position))
+        {
+            // HIGH wenn bit von ring_types an position 1 ist.
+            analogWrite(A2, 1023);
+        }
+        else
+        {
+            // LOW wenn bit von ring_types an position 0 ist.
+            analogWrite(A2, LOW);
+        }
+        if (position >= 32)
+        {
+            // Nach 8 Sekunden ist das Läuten fertig
+            finished = true;
+            position = 0;
+        }
+        else
+        {
+            // Position wird für den nächsten left-shift um 1 erhöht
+            position += 1;
+        }
     }
 }
