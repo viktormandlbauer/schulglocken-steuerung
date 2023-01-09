@@ -28,6 +28,6 @@ namespace Time
     uint8_t get_alarm_count();
     bool check_alarm();
     void init_alarm_interrupt();
-    void set_ring_types(uint8_t index, uint32_t ring_type);
+    void set_alarm_types(uint8_t index, uint32_t ring_type);
     uint32_t get_ring_type(uint8_t index);
 }

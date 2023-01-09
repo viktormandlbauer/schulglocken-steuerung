@@ -25,8 +25,11 @@ uint8_t alarm_count;
 // Array mit den Alarmzeiten
 uint16_t alarms[64];
 
-// Array mit den Alarmtypen
-uint8_t type_alarms[64];
+// Array mit Alarmtypzuweisung
+uint8_t alarms_type_assignment[64];
+
+// Array mit Alarmtypen
+uint32_t alarm_types[3];
 
 // 64 bit Wert für die Abhandlung der Alarme
 uint64_t triggered;
@@ -145,7 +148,7 @@ void Time::get_current_timestring(char time_string[9])
 uint8_t Time::add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
     alarms[alarm_count] = convert_time_to_alarm(hour, minute);
-    type_alarms[alarm_count] = alarm_type;
+    alarms_type_assignment[alarm_count] = alarm_type;
     alarm_count += 1;
     return alarm_count;
 }
@@ -156,7 +159,7 @@ uint8_t Time::remove_alarm_at_index(uint8_t index)
     for (int i = index; i < alarm_count - 1; i++)
     {
         alarms[i] = alarms[i + 1];
-        type_alarms[i] = type_alarms[i + 1];
+        alarms_type_assignment[i] = alarms_type_assignment[i + 1];
     }
     alarm_count -= 1;
     return alarm_count;
@@ -235,7 +238,7 @@ bool Time::check_alarm()
                     // Flag um ein erneutes Läuten in der selben Minute zu verhindern
 
                     set_triggered(i);
-                    current_alarm_type = type_alarms[i];
+                    current_alarm_type = alarms_type_assignment[i];
                     finished = false;
 #ifdef DEBUG
                     Serial.print("[Info] Alarm triggered: ");
@@ -249,16 +252,15 @@ bool Time::check_alarm()
     }
 }
 
-uint32_t ring_types[3];
 
 uint32_t Time::get_ring_type(uint8_t index)
 {
-    return ring_types[index];
+    return alarm_types[index];
 }
 
-void Time::set_ring_types(uint8_t index, uint32_t ring_type)
+void Time::set_alarm_types(uint8_t index, uint32_t ring_type)
 {
-    ring_types[index] = ring_type;
+    alarm_types[index] = ring_type;
 
     // ring_types[0] = 0xAAAAAAAA;
     // ring_types[1] = 0xF0F0F0F0;
@@ -304,7 +306,7 @@ ISR(TIMER1_COMPA_vect)
     // Wird abgefragt um ungewolltes Läuten zu vermeiden
     if (!finished)
     {
-        if (ring_types[current_alarm_type] & (1ul << position))
+        if (alarm_types[current_alarm_type] & (1ul << position))
         {
             // HIGH wenn bit von ring_types an position 1 ist.
             analogWrite(A2, 1023);

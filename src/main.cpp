@@ -12,14 +12,15 @@ void setup()
 
     // Beeper
     pinMode(A2, OUTPUT);
-    
+
+    Time::set_alarm_types(0, 0xAAAAAAAA);
+    Time::set_alarm_types(1, 0xF0F0F0F0);
+    Time::set_alarm_types(2, 0xAF00FF0A);
+
     // Add alarm
-    Time::add_alarm(20, 5, 0);
-    Time::add_alarm(20, 6, 1);
-    Time::add_alarm(20, 7, 2);
-    Time::add_alarm(20, 8, 0);
-    Time::add_alarm(20, 9, 1);
-    Time::add_alarm(20, 10, 2);
+    Time::add_alarm(20, 54, 0);
+    Time::add_alarm(20, 56, 1);
+    Time::add_alarm(21, 0, 2);
 }
 
 
