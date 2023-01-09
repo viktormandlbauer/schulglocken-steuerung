@@ -3,43 +3,46 @@
 #include "GUI.h"
 #include "Network.h"
 
-bool error_flag;
-
 void setup()
 {
     Serial.begin(57600);
 
+    Time::init_rtc_module();
+    Time::init_alarm_interrupt();
 
-    GUI::init_display();
+    // Beeper
+    pinMode(A2, OUTPUT);
+    
+    // Add alarm
+    Time::add_alarm(20, 5, 0);
+    Time::add_alarm(20, 6, 1);
+    Time::add_alarm(20, 7, 2);
+    Time::add_alarm(20, 8, 0);
+    Time::add_alarm(20, 9, 1);
+    Time::add_alarm(20, 10, 2);
+}
 
-    if (!Time::init_rtc_module())
+
+
+
+char time_strings[64][9];
+
+void print_time_info()
+{
+    // Function for debuggin purpose 
+    Serial.println("Current time:");
+    Time::get_current_timestring(time_strings[0]);
+    Serial.println(time_strings[0]);
+
+    Serial.println("Current alarms:");
+    uint8_t alarm_count = Time::get_alarms_strings(time_strings);
+    for (int i = 0; i < alarm_count; i++)
     {
-        GUI::draw_warning();
-        // Network::set_warning();
+        Serial.println(time_strings[i]);
     }
-
-    if (Network::init_ethernet())
-    {
-        // Static network setup
-        //Network::init_dhcp_setup();
-        uint8_t ip[] = {192, 168, 178, 48};
-        uint8_t gw[] = {192, 168, 178, 1};
-        uint8_t dns[] = {192, 168, 178, 1};
-        uint8_t snm[] = {255, 255, 255, 0};
-        Network::init_static_setup(ip, gw, dns, snm);
-    }
-    else
-    {
-        GUI::draw_warning();
-    }
-
-    GUI::draw_button();
 }
 
 void loop()
 {
-    char buf[] = "hh:mm:ss";
-
-    String time = Time::get_time_string(buf);
-    GUI::draw_time(time);
+    Time::check_alarm();
 }
