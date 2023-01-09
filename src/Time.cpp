@@ -4,7 +4,7 @@
 #define DEBUG
 #endif
 
-// Einbindung externer Libraries 
+// Einbindung externer Libraries
 #include "RTClib.h"
 #include <Wire.h>
 #include <TimeLib.h>
@@ -251,12 +251,18 @@ bool Time::check_alarm()
 
 uint32_t ring_types[3];
 
-void Time::init_ring_types()
+uint32_t Time::get_ring_type(uint8_t index)
 {
-    // Only 3 defined ring types atm
-    ring_types[0] = 0xAAAAAAAA;
-    ring_types[1] = 0xF0F0F0F0;
-    ring_types[2] = 0xAA0F0AAA;
+    return ring_types[index];
+}
+
+void Time::set_ring_types(uint8_t index, uint32_t ring_type)
+{
+    ring_types[index] = ring_type;
+
+    // ring_types[0] = 0xAAAAAAAA;
+    // ring_types[1] = 0xF0F0F0F0;
+    // ring_types[2] = 0xAA0F0AAA;
 }
 
 void Time::init_alarm_interrupt()

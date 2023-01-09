@@ -9,7 +9,6 @@ void setup()
 
     Time::init_rtc_module();
     Time::init_alarm_interrupt();
-    Time::init_ring_types();
 
     // Beeper
     pinMode(A2, OUTPUT);
