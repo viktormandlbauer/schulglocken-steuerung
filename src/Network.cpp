@@ -1,7 +1,10 @@
-#include "DEBUG.h"
+#include "DEFINITIONS.h"
 #ifdef DEBUG_NETWORK
 #define DEBUG
 #endif
+
+#include <Arduino.h>
+#include <EtherCard.h>
 
 #include "Network.h"
 

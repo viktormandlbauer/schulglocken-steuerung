@@ -1,3 +1,7 @@
+#define MAXIMUM_AMOUNT_ALARMS 64
+#define MAXIMUM_AMOUNT_ALARM_TYPES 3
+#define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
+
 /**
  * Dieser Bereich ist für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
  * Durch das Aktivieren werden über serial.print Statusinformation ausgegeben.

@@ -1,5 +1,3 @@
-#include <EEPROM.h>
-
 // 1024 bytes on the ATmega328P
 // 4 KB (4096 bytes) on the ATmega1280 and ATmega2560
 

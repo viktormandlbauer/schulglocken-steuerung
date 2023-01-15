@@ -1,5 +1,5 @@
 // Einstellung für den DEBUG Mode
-#include "DEBUG.h"
+#include "DEFINITIONS.h"
 #ifdef DEBUG_TIME
 #define DEBUG
 #endif
@@ -10,7 +10,7 @@
 #include <TimeLib.h>
 #include <SPI.h>
 
-// Angabe des Header-Files
+// Angabe des Header Files
 #include "Time.h"
 
 // Verwendung des Namespaces
@@ -19,17 +19,22 @@ using namespace Time;
 // RTC Objekt aus der RTClib
 RTC_DS3231 rtc;
 
-// Anzahl der Alarme
-uint8_t alarm_count;
+// Fixwerte für Arraygrößen
+#define MAXIMUM_AMOUNT_ALARMS 64
+#define MAXIMUM_AMOUNT_ALARM_TYPES 3
+#define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
 
 // Array mit den Alarmzeiten
-uint16_t alarms[64];
+uint16_t alarms[MAXIMUM_AMOUNT_ALARMS];
 
 // Array mit Alarmtypzuweisung
-uint8_t alarms_type_assignment[64];
+uint8_t alarms_type_assignment[MAXIMUM_AMOUNT_ALARMS];
+
+// Anzahl der Alarme
+uint8_t alarm_count = 0;
 
 // Array mit Alarmtypen
-uint32_t alarm_types[3];
+uint32_t alarm_types[MAXIMUM_AMOUNT_ALARM_TYPES];
 
 // 64 bit Wert für die Abhandlung der Alarme
 uint64_t triggered;
@@ -38,10 +43,10 @@ uint64_t triggered;
 uint8_t exception_count;
 
 // Array mit 16 Bit Werten für Ausnahme Beginn-Tag
-uint16_t exception_date_begin[20];
+uint16_t exception_date_begin[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 
 // Aray mit 16 Bit Werten für Ausnahme End-Tag
-uint16_t exception_date_end[20];
+uint16_t exception_date_end[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 
 time_t time_provider()
 {
@@ -175,10 +180,29 @@ uint8_t Time::get_alarms_strings(char time_string[][9])
     return alarm_count;
 }
 
+/*
+Setter und Getter für Alarme
+*/
+
 uint8_t Time::get_alarm_count()
 {
     // Gibt die Anzahl der aktuell eingestellten Alarme zurück
     return alarm_count;
+}
+
+uint16_t *Time::get_alarms()
+{
+    return alarms;
+}
+
+uint8_t *Time::get_alarm_assignements()
+{
+    return alarms_type_assignment;
+}
+
+void Time::set_alarm_count(uint8_t count)
+{
+    alarm_count = count;
 }
 
 uint16_t Time::get_minutes_passed()
@@ -251,7 +275,6 @@ bool Time::check_alarm()
         return false;
     }
 }
-
 
 uint32_t Time::get_ring_type(uint8_t index)
 {
