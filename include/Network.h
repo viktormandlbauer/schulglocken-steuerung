@@ -6,7 +6,7 @@
 
 namespace Network
 {
-    const byte mac_address[6] = {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
+    const byte mac_address[6] = MAC_ADDRESS
     const unsigned int NTP_LOCALPORT = 8888;
     const unsigned int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
     const unsigned int NTP_REMOTEPORT = 123; // NTP requests are to port 123

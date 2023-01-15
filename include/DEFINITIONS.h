@@ -8,6 +8,11 @@
 #define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
 
 /**
+ * MAC-Adresse der Netzwerkschnittstelle
+*/
+#define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
+
+/**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
  * Durch das Aktivieren werden über serial.print Statusinformation ausgegeben.
  * 
