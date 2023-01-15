@@ -1,9 +1,14 @@
+/**
+ * Bereich für das Setzen der Maximalwerte für Alarme, Alarmtypen und Ausnahmen.
+ * Der EEPROM Speicherplatz darf nicht überschritten werden. (4096 bytes)
+*/
+
 #define MAXIMUM_AMOUNT_ALARMS 64
 #define MAXIMUM_AMOUNT_ALARM_TYPES 3
 #define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
 
 /**
- * Dieser Bereich ist für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
+ * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
  * Durch das Aktivieren werden über serial.print Statusinformation ausgegeben.
  * 
  * Achtung: 
