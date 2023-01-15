@@ -1,16 +1,29 @@
 /**
- * Bereich für das Setzen der Maximalwerte für Alarme, Alarmtypen und Ausnahmen.
- * Der EEPROM Speicherplatz darf nicht überschritten werden. (4096 bytes)
+ * Programmdefinitionen
 */
 
+// Maximal möglich einstellbare Alarme
 #define MAXIMUM_AMOUNT_ALARMS 64
+
+// Maximal mögliche verschiedene Alarmtypen
 #define MAXIMUM_AMOUNT_ALARM_TYPES 3
+
+// Maximale Anzahl an Ausnahmen
 #define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
 
-/**
- * MAC-Adresse der Netzwerkschnittstelle
-*/
+// MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
+
+// Farbeschema grafischen Benutzeroberfläche
+#define BLACK 0x0000
+#define WHITE 0xFFFF
+#define PRIMARY 0x4C96
+#define SECONDARY 0x02F2
+#define BACKGROUNDS 0xC6DD
+
+// Displaydimension
+#define X_DIM 480
+#define Y_DIM 320
 
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
