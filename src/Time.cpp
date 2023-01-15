@@ -19,11 +19,6 @@ using namespace Time;
 // RTC Objekt aus der RTClib
 RTC_DS3231 rtc;
 
-// Fixwerte für Arraygrößen
-#define MAXIMUM_AMOUNT_ALARMS 64
-#define MAXIMUM_AMOUNT_ALARM_TYPES 3
-#define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
-
 // Array mit den Alarmzeiten
 uint16_t alarms[MAXIMUM_AMOUNT_ALARMS];
 
@@ -295,7 +290,7 @@ void Time::init_alarm_interrupt()
     /*
     Maximale Läutzeit - 8 Sekunden
     32 bit: 32 x 250 Millisekunden definierbar
-    Clockspeed 16000 Mhz
+    Clockspeed 16 Mhz
     Intervall: 0,0000000625 -> 62,5 ns
 
     Compare Register with prescaler of 64:
