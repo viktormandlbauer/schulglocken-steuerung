@@ -76,7 +76,7 @@ void test1()
 }
 
 int navigation = 0;
-bool check_action()
+void action_handler()
 {
     if (navigation == 0)
     {
@@ -104,6 +104,7 @@ void loop()
 {
     if (GUI::display_action())
     {
+        action_handler();
     }
     Time::check_alarm();
 }

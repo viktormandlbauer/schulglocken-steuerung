@@ -15,11 +15,11 @@
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
 // Farbeschema grafischen Benutzeroberfläche
-#define BLACK 0x0000
-#define WHITE 0xFFFF
-#define PRIMARY 0x4C96
-#define SECONDARY 0x02F2
-#define BACKGROUNDS 0xC6DD
+#define COLOR_BLACK 0x0000
+#define COLOR_WHITE 0xFFFF
+#define COLOR_PRIMARY 0x4C96
+#define COLOR_SECONDARY 0x02F2
+#define COLOR_BACKGROUND 0xC6DD
 
 // Displaydimension
 #define X_DIM 480
@@ -36,7 +36,7 @@
 
 // Aktivieren/Deaktivieren mittels Auskommentieren
 #define DEBUG_MAIN
-#define DEBUG_TIME
-#define DEBUG_STORAGE
+//#define DEBUG_TIME
+//#define DEBUG_STORAGE
 #define DEBUG_GUI
-#define DEBUG_NETWORK
+//#define DEBUG_NETWORK
