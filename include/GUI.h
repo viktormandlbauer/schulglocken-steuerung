@@ -10,5 +10,6 @@ namespace GUI
     bool display_action();
     bool check_input();
     void draw_time(String timestring);
-    uint8_t check_menu();
+    uint8_t menu();
+    uint8_t timeplan(char time_string[9], char alarms[5][6]);
 }

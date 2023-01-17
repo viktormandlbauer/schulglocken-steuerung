@@ -19,9 +19,10 @@ namespace Time
     bool check_alarm();
     uint8_t add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type);
     uint8_t remove_alarm_at_index(uint8_t index);
-    uint8_t get_alarms_strings(char time_string[][9]);
+    uint8_t get_alarms_strings(char time_string[][6]);
     uint8_t get_alarm_count();
     uint16_t *get_alarms();
+    void set_alarms(uint16_t *alarms);
     uint8_t *get_alarm_assignements();
     void set_alarm_count(uint8_t alarm_count);
 

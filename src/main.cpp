@@ -29,11 +29,15 @@ void setup()
     Serial.println("[Info] (Main) Display wurde aktiviert.");
 #endif
 
+
+    
+
     // Beeper
     pinMode(A2, OUTPUT);
 }
 
 char time_strings[64][9];
+char alarm_strings[5][6];
 
 void print_time_info()
 {
@@ -43,7 +47,7 @@ void print_time_info()
     Serial.println(time_strings[0]);
 
     Serial.println("Current alarms:");
-    uint8_t alarm_count = Time::get_alarms_strings(time_strings);
+    uint8_t alarm_count = Time::get_alarms_strings(alarm_strings);
     for (int i = 0; i < alarm_count; i++)
     {
         Serial.println(time_strings[i]);
@@ -73,17 +77,28 @@ void test1()
 
     // Storage::save_alarms(alarms, alarm_type_assignement, Time::get_alarm_count());
     Time::set_alarm_count(Storage::read_alarms(alarms, alarm_type_assignement));
+    Time::set_alarms(alarms);
+
 }
 
 int navigation = 0;
+char time_string[9];
+
 void action_handler()
 {
     if (navigation == 0)
     {
-        navigation = GUI::check_menu();
+        navigation = GUI::menu();
     }
     else if (navigation == 1)
     {
+
+        Time::get_current_timestring(time_string);
+
+        Time::get_alarms_strings(alarm_strings);
+        navigation = GUI::timeplan(time_string, alarm_strings);
+
+
         // Zeitplan
     }
     else if (navigation == 2)
@@ -101,7 +116,7 @@ void action_handler()
 }
 
 void loop()
-{
+{    
     if (GUI::display_action())
     {
         action_handler();

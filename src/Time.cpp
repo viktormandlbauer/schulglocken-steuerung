@@ -126,6 +126,37 @@ void get_timestring(int hour, int minute, int second, char time_string[9])
         time_string[7] = second % 10 + '0';
     }
 }
+void get_timestring(int hour, int minute, char time_string[6])
+{
+    /**
+     * Funktion zur Formatierung der Stunde, Minute & Sekunde in das "HH:MM" Format
+     */
+
+    // Konviertung der Stunde
+    if (hour < 10)
+    {
+        time_string[0] = '0';
+        time_string[1] = hour + '0';
+    }
+    else
+    {
+        time_string[0] = (char)hour / 10 + '0';
+        time_string[1] = hour % 10 + '0';
+    }
+
+    // Konvertierung der Minute
+    time_string[2] = ':';
+    if (minute < 10)
+    {
+        time_string[3] = '0';
+        time_string[4] = minute + '0';
+    }
+    else
+    {
+        time_string[3] = (char)minute / 10 + '0';
+        time_string[4] = minute % 10 + '0';
+    }
+}
 
 uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
 {
@@ -133,10 +164,10 @@ uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
     return hour * 60 + minute;
 }
 
-void convert_alarm_to_timestring(uint16_t alarm, char time_string[9])
+void convert_alarm_to_timestring(uint16_t alarm, char time_string[6])
 {
     // Schreibt einen Alarm in ein character array.
-    get_timestring(alarm / 60, alarm % 60, 0, time_string);
+    get_timestring(alarm / 60, alarm % 60, time_string);
 }
 
 void Time::get_current_timestring(char time_string[9])
@@ -165,7 +196,7 @@ uint8_t Time::remove_alarm_at_index(uint8_t index)
     return alarm_count;
 }
 
-uint8_t Time::get_alarms_strings(char time_string[][9])
+uint8_t Time::get_alarms_strings(char time_string[][6])
 {
     // Füllt ein zweidimensionales character array mit den formatierten Alarmzeiten und gibt die Anzahl der Alarme zurück.
     for (int i = 0; i < alarm_count; i++)
@@ -198,6 +229,11 @@ uint8_t *Time::get_alarm_assignements()
 void Time::set_alarm_count(uint8_t count)
 {
     alarm_count = count;
+}
+
+void Time::set_alarms(uint16_t *alarms_ptr)
+{
+    memcpy(&alarms, alarms_ptr, sizeof(uint16_t) * alarm_count);
 }
 
 uint16_t Time::get_minutes_passed()

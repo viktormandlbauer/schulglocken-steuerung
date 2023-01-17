@@ -14,7 +14,12 @@ Adafruit_GFX &tft = Waveshield;
 TSPoint p;
 
 // Menu buttons
-Adafruit_GFX_Button plan, time, sys, network;
+Adafruit_GFX_Button button_plan, button_time, button_sys, button_network;
+
+// Zeitplan buttons
+Adafruit_GFX_Button button_menu, button_pause;
+
+int drawn;
 
 void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
 {
@@ -32,7 +37,7 @@ void draw_menu()
 
     tft.setFont(&FreeMono24pt7b);
     tft.setCursor(50, Y_DIM / 8);
-    tft.setTextColor(COLOR_BLACK, 0x5acb);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
     tft.setTextSize(1);
     tft.print("Einstellungen");
     tft.setFont();
@@ -59,21 +64,57 @@ void draw_menu()
                  (back_arrow_height - text_height_px) / 3,
                  COLOR_WHITE);
 
-    plan.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 3, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
-    time.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 5, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
-    sys.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 7, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
-    network.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 9, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Netzwerk", 3);
+    button_plan.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 3, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
+    button_time.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 5, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
+    button_sys.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 7, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
+    button_network.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 9, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Netzwerk", 3);
 
-    plan.drawButton(true);
-    time.drawButton(true);
-    sys.drawButton(true);
-    network.drawButton(true);
+    button_plan.drawButton(true);
+    button_time.drawButton(true);
+    button_sys.drawButton(true);
+    button_network.drawButton(true);
+
+    drawn = 0;
+}
+// zeichne upcoming event liste
+#define list_start_x 110
+#define list_start_y 90
+#define list_width X_DIM / 1.5
+#define list_element_height 50
+#define list_elements 5
+#define list_line_tickness 3
+
+void refresh_timeplan(char time_string[9], char alarms[5][6])
+{
+    // Draw Clock
+    tft.setFont(&FreeMono24pt7b);
+    tft.setCursor(X_DIM / 2 - 50, 40);
+    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
+    tft.setTextSize(1);
+    tft.print(time_string);
+    // tft.setFont(&FreeMono12pt7b);
+    // tft.setCursor(150, 40);
+    // tft.setTextSize(1);
+    // tft.print("20");
+    tft.setFont();
+
+    for (byte y_offset = 0; y_offset < list_elements; y_offset++)
+    {
+        // draw thick rectangle
+        for (byte z = list_line_tickness; z > 0; z--)
+        {
+            tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
+        }
+
+        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
+        tft.print(&alarms[y_offset][6]);
+    }
 }
 
-void draw_zeitplan()
+void draw_timeplan(char time_string[9], char alarms[][6])
 {
     // Draw Backround
-    Waveshield.fillScreen(0x5acb);
+    Waveshield.fillScreen(COLOR_BACKGROUND);
 
 // Pause Symbol
 #define playbausesize 40
@@ -85,17 +126,15 @@ void draw_zeitplan()
 
     // Draw Clock
     tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(10, 40);
-    tft.setTextColor(COLOR_WHITE, 0x5acb);
+    tft.setCursor(X_DIM / 2 - 50, 40);
+    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
     tft.setTextSize(1);
-    tft.print("22:00");
-    tft.setFont(&FreeMono12pt7b);
-
-    tft.setCursor(150, 40);
-    tft.setTextSize(1);
-    tft.print("20");
+    tft.print(time_string);
+    //tft.setFont(&FreeMono12pt7b);
+    //tft.setCursor(150, 40);
+    //tft.setTextSize(1);
+    //tft.print("20");
     tft.setFont();
-// tft.setTextColor(COLOR_WHITE,0x5acb);
 
 // draw menue symbol
 #define drawmenuesymbx 10
@@ -110,27 +149,6 @@ void draw_zeitplan()
     tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 3, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
     tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 5, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
 
-    tft.setCursor(drawmenuesymbx + 18, drawmenuesymby + drawmenuesymbsize - 15);
-    tft.setTextSize(1);
-    tft.print("Men");
-
-    // ü zeichnen
-    tft.cp437(true);
-    tft.drawChar(drawmenuesymbx + 36, drawmenuesymby + drawmenuesymbsize - 15, 0x97, COLOR_WHITE, 0x5acb, 1); // zeichnet kleines ü nach cp437 zeichensatz
-
-// zeichne upcoming event liste
-#define list_start_x 110
-#define list_start_y 90
-#define list_width X_DIM / 1.5
-#define list_element_height 50
-#define list_elements 5
-#define list_line_tickness 3
-
-    char listcontent[5][2][10] = {{"13:00", "11 OCT 22"},
-                                  {"13:15", "11 OCT 22"},
-                                  {"15:00", "11 OCT 22"},
-                                  {"15:15", "11 OCT 22"},
-                                  {"18:00", "11 OCT 22"}};
     tft.setTextSize(3);
 
     for (byte y_offset = 0; y_offset < list_elements; y_offset++)
@@ -140,17 +158,17 @@ void draw_zeitplan()
         {
             tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
         }
-        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&listcontent[y_offset][0][0]);
 
-        tft.setCursor(list_start_x + 150, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&listcontent[y_offset][1][0]);
+        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
+        tft.print(&alarms[y_offset][6]);
     }
 
     // Status text
     tft.setCursor(120, 70);
     tft.setTextSize(2);
     tft.print("Zeitplan AKTIV");
+
+    drawn = 1;
 }
 
 void GUI::init_display()
@@ -177,30 +195,51 @@ bool check_button_pressed(Adafruit_GFX_Button button)
     return false;
 }
 
-uint8_t GUI::check_menu()
+uint8_t GUI::timeplan(char time_string[9], char alarms[][6])
+{
+    if (drawn != 1)
+    {
+        draw_timeplan(time_string, alarms);
+    }
+    else
+    {
+        refresh_timeplan(time_string, alarms);
+    }
+
+    if (check_button_pressed(button_menu))
+    {
+        return 0;
+    }
+    else if (check_button_pressed(button_pause))
+    {
+
+    }
+    return -1;
+}
+
+uint8_t GUI::menu()
 {
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Check Menü");
 #endif
 
-    if (check_button_pressed(plan))
+    if (check_button_pressed(button_plan))
     {
 
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Zeitplan");
 #endif
-        draw_zeitplan();
         return 1;
     }
-    else if (check_button_pressed(time))
+    else if (check_button_pressed(button_time))
     {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Uhrzeit");
 #endif
-        // draw_uhrzeit();
+
         return 2;
     }
-    else if (check_button_pressed(sys))
+    else if (check_button_pressed(button_sys))
     {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) System");
@@ -208,7 +247,7 @@ uint8_t GUI::check_menu()
         // draw_system();
         return 3;
     }
-    else if (check_button_pressed(network))
+    else if (check_button_pressed(button_network))
     {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Netzwerk");
@@ -216,6 +255,8 @@ uint8_t GUI::check_menu()
         // draw_network
         return 4;
     }
+
+    return -1;
 }
 
 bool GUI::display_action()
