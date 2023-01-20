@@ -3,8 +3,8 @@
 
 namespace Storage
 {
-    void save_alarms(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t count);
-    uint8_t read_alarms(uint16_t *alarms, uint8_t *alarms_type_assignment);
+    void save_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[], uint8_t count);
+    uint8_t read_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[]);
 
     void save_alarm_types(uint64_t *alarm_types, uint8_t count);
     uint8_t read_alarm_types(uint64_t *alarm_types);

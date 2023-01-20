@@ -19,20 +19,11 @@ using namespace Time;
 // RTC Objekt aus der RTClib
 RTC_DS3231 rtc;
 
-// Array mit den Alarmzeiten
-uint16_t alarms[MAXIMUM_AMOUNT_ALARMS];
-
-// Array mit Alarmtypzuweisung
-uint8_t alarms_type_assignment[MAXIMUM_AMOUNT_ALARMS];
-
-// Anzahl der Alarme
-uint8_t alarm_count = 0;
-
 // Array mit Alarmtypen
 uint32_t alarm_types[MAXIMUM_AMOUNT_ALARM_TYPES];
 
 // 64 bit Wert für die Abhandlung der Alarme
-uint64_t triggered;
+static uint64_t triggered;
 
 // Anzahl der Ausnahmen
 uint8_t exception_count;
@@ -125,8 +116,9 @@ void get_timestring(int hour, int minute, int second, char time_string[9])
         time_string[6] = (char)second / 10 + '0';
         time_string[7] = second % 10 + '0';
     }
+    time_string[8] = '\0';
 }
-void get_timestring(int hour, int minute, char time_string[6])
+void get_timestring(int hour, int minute, char *buf)
 {
     /**
      * Funktion zur Formatierung der Stunde, Minute & Sekunde in das "HH:MM" Format
@@ -135,39 +127,34 @@ void get_timestring(int hour, int minute, char time_string[6])
     // Konviertung der Stunde
     if (hour < 10)
     {
-        time_string[0] = '0';
-        time_string[1] = hour + '0';
+        buf[0] = '0';
+        buf[1] = hour + '0';
     }
     else
     {
-        time_string[0] = (char)hour / 10 + '0';
-        time_string[1] = hour % 10 + '0';
+        buf[0] = (char)hour / 10 + '0';
+        buf[1] = hour % 10 + '0';
     }
 
     // Konvertierung der Minute
-    time_string[2] = ':';
+    buf[2] = ':';
     if (minute < 10)
     {
-        time_string[3] = '0';
-        time_string[4] = minute + '0';
+        buf[3] = '0';
+        buf[4] = minute + '0';
     }
     else
     {
-        time_string[3] = (char)minute / 10 + '0';
-        time_string[4] = minute % 10 + '0';
-    }
+        buf[3] = (char)minute / 10 + '0';
+        buf[4] = minute % 10 + '0';
+   }
+    buf[5] = '\0';
 }
 
 uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
 {
     // Interne Funtkion für die Konvertierung von Stunden und Minuten in vergehende Minuten von 00:00:00 weg
-    return hour * 60 + minute;
-}
-
-void convert_alarm_to_timestring(uint16_t alarm, char time_string[6])
-{
-    // Schreibt einen Alarm in ein character array.
-    get_timestring(alarm / 60, alarm % 60, time_string);
+    return hour * 60ul + minute;
 }
 
 void Time::get_current_timestring(char time_string[9])
@@ -176,15 +163,22 @@ void Time::get_current_timestring(char time_string[9])
     get_timestring(hour(), minute(), second(), time_string);
 }
 
-uint8_t Time::add_alarm(uint8_t hour, uint8_t minute, uint8_t alarm_type)
+uint8_t Time::add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
     alarms[alarm_count] = convert_time_to_alarm(hour, minute);
     alarms_type_assignment[alarm_count] = alarm_type;
-    alarm_count += 1;
-    return alarm_count;
+#ifdef DEBUG
+    Serial.print("[Info] (Time) Added alarm: ");
+    Serial.println(alarms[alarm_count]);
+
+    Serial.print("[Info] (Time) with alarm type: ");
+    Serial.println(alarms_type_assignment[alarm_count]);
+
+#endif
+    return alarm_count += 1;
 }
 
-uint8_t Time::remove_alarm_at_index(uint8_t index)
+uint8_t Time::remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index)
 {
     // Entfernt einen Alarm und den Typ am bestimmten Index
     for (int i = index; i < alarm_count - 1; i++)
@@ -196,45 +190,21 @@ uint8_t Time::remove_alarm_at_index(uint8_t index)
     return alarm_count;
 }
 
-uint8_t Time::get_alarms_strings(char time_string[][6])
+void Time::get_alarms_strings(uint16_t alarms[], uint8_t alarm_count, char output[][6])
 {
+
     // Füllt ein zweidimensionales character array mit den formatierten Alarmzeiten und gibt die Anzahl der Alarme zurück.
     for (int i = 0; i < alarm_count; i++)
     {
-        convert_alarm_to_timestring(alarms[i], time_string[i]);
+        Serial.println(alarms[i]);
+        get_timestring(alarms[i] / 60, alarms[i] % 60, output[i]);
+        Serial.println(output[i]);
     }
-    return alarm_count;
 }
 
 /*
 Setter und Getter für Alarme
 */
-
-uint8_t Time::get_alarm_count()
-{
-    // Gibt die Anzahl der aktuell eingestellten Alarme zurück
-    return alarm_count;
-}
-
-uint16_t *Time::get_alarms()
-{
-    return alarms;
-}
-
-uint8_t *Time::get_alarm_assignements()
-{
-    return alarms_type_assignment;
-}
-
-void Time::set_alarm_count(uint8_t count)
-{
-    alarm_count = count;
-}
-
-void Time::set_alarms(uint16_t *alarms_ptr)
-{
-    memcpy(&alarms, alarms_ptr, sizeof(uint16_t) * alarm_count);
-}
 
 uint16_t Time::get_minutes_passed()
 {
@@ -261,7 +231,7 @@ uint32_t position = 0;
 bool finished = true;
 
 // Allgemeine Überprüfung eines Alarms
-bool Time::check_alarm()
+bool Time::check_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count)
 {
     // Testet ob Alarm aktiv ist
     if (!finished)
@@ -275,17 +245,9 @@ bool Time::check_alarm()
     {
         // Holt sich die aktuelle Zeit in Minuten nach 00:00
         uint16_t current_time = get_minutes_passed();
-#ifdef DEBUG
-        Serial.print("[Info] Current time: ");
-        Serial.println(current_time);
-#endif
         // Vergleicht die aktuellen Zeiten mit den Alarmzeiten
         for (uint8_t i = 0; i < alarm_count; i++)
         {
-#ifdef DEBUG
-            Serial.print("[Info] Active alarm: ");
-            Serial.println(alarms[i]);
-#endif
             if (!is_triggered(i))
             {
                 if (current_time == alarms[i])

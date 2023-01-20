@@ -10,6 +10,73 @@
 #include "Network.h"
 #include "Storage.h"
 
+char time_strings[64][9];
+
+// Array mit den Alarmzeiten
+static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
+
+// Array mit Alarmtypzuweisung
+static uint8_t alarms_type_assignment[MAXIMUM_AMOUNT_ALARMS] = {0};
+
+// Anzahl der Alarme
+static uint8_t alarm_count = 0;
+
+void test1()
+{
+    // Alarmtypes
+    Time::set_alarm_types(0, 0xAAAAAAAA);
+    Time::set_alarm_types(1, 0xF0F0F0F0);
+    Time::set_alarm_types(2, 0xAF00FF0A);
+
+    // Problem bei mehr als 5 Alarmen
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 1, 1);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 2, 0);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 3, 1);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 9, 6, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 10, 7, 0);
+
+    Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
+    alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
+
+    char time_string[10][6];
+    Time::get_alarms_strings(alarms, alarm_count, time_string);
+
+    Serial.println("Timestrings: ");
+    for (int i = 0; i < alarm_count; i++)
+    {
+        Serial.println(time_string[i]);
+    }
+}
+
+int navigation = 0;
+
+char time_string[9];
+
+void action_handler()
+{
+    if (navigation == 0)
+    {
+        navigation = GUI::menu();
+    }
+    else if (navigation == 1)
+    {
+        // Zeitplan
+    }
+    else if (navigation == 2)
+    {
+        // Uhrzeit
+    }
+    else if (navigation == 3)
+    {
+        // Systeminfo
+    }
+    else if (navigation == 4)
+    {
+        // Netzwerk
+    }
+}
+
 void setup()
 {
     Serial.begin(57600);
@@ -29,97 +96,18 @@ void setup()
     Serial.println("[Info] (Main) Display wurde aktiviert.");
 #endif
 
-
-    
-
     // Beeper
     pinMode(A2, OUTPUT);
-}
-
-char time_strings[64][9];
-char alarm_strings[5][6];
-
-void print_time_info()
-{
-    // Function for debuggin purpose
-    Serial.println("Current time:");
-    Time::get_current_timestring(time_strings[0]);
-    Serial.println(time_strings[0]);
-
-    Serial.println("Current alarms:");
-    uint8_t alarm_count = Time::get_alarms_strings(alarm_strings);
-    for (int i = 0; i < alarm_count; i++)
-    {
-        Serial.println(time_strings[i]);
-    }
-}
-
-void test1()
-{
-    Time::set_alarm_types(0, 0xAAAAAAAA);
-    Time::set_alarm_types(1, 0xF0F0F0F0);
-    Time::set_alarm_types(2, 0xAF00FF0A);
-
-    // Add alarm
-    // Time::add_alarm(0, 1, 2);
-    // Time::add_alarm(0, 10, 0);
-    // Time::add_alarm(23, 59, 1);
-    // Time::add_alarm(21, 0, 2);
-    // Time::add_alarm(21, 0, 0);
-    // Time::add_alarm(21, 0, 1);
-    // Time::add_alarm(21, 0, 2);
-
-    uint16_t *alarms;
-    uint8_t *alarm_type_assignement;
-
-    alarms = Time::get_alarms();
-    alarm_type_assignement = Time::get_alarm_assignements();
-
-    // Storage::save_alarms(alarms, alarm_type_assignement, Time::get_alarm_count());
-    Time::set_alarm_count(Storage::read_alarms(alarms, alarm_type_assignement));
-    Time::set_alarms(alarms);
-
-}
-
-int navigation = 0;
-char time_string[9];
-
-void action_handler()
-{
-    if (navigation == 0)
-    {
-        navigation = GUI::menu();
-    }
-    else if (navigation == 1)
-    {
-
-        Time::get_current_timestring(time_string);
-
-        Time::get_alarms_strings(alarm_strings);
-        navigation = GUI::timeplan(time_string, alarm_strings);
 
 
-        // Zeitplan
-    }
-    else if (navigation == 2)
-    {
-        // Uhrzeit
-    }
-    else if (navigation == 3)
-    {
-        // Systeminfo
-    }
-    else if (navigation == 4)
-    {
-        // Netzwerk
-    }
+    test1();
 }
 
 void loop()
-{    
+{
     if (GUI::display_action())
     {
         action_handler();
     }
-    Time::check_alarm();
+    Time::check_alarm(alarms, alarms_type_assignment, alarm_count);
 }

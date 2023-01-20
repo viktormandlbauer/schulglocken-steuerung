@@ -29,7 +29,7 @@ using namespace Storage;
 // #define ALARMS_ASSIGNMENT_START 258
 // #define ALARM_TYPES_START 322
 
-void Storage::save_alarms(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t count)
+void Storage::save_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[], uint8_t count)
 {
     /**
      * Speichern der Alarme und die Alarmtypzuweisung vom RAM in den EEPROM.
@@ -60,7 +60,7 @@ void Storage::save_alarms(uint16_t *alarms, uint8_t *alarms_type_assignment, uin
     }
 }
 
-uint8_t Storage::read_alarms(uint16_t *alarms, uint8_t *alarms_type_assignment)
+uint8_t Storage::read_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[])
 {
     /**
      * Auslesen der gespeicherten Alarme aus dem EEPROM.

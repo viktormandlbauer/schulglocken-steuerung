@@ -84,7 +84,7 @@ void draw_menu()
 #define list_elements 5
 #define list_line_tickness 3
 
-void refresh_timeplan(char time_string[9], char alarms[5][6])
+void refresh_timeplan(char *time_string, char **alarms)
 {
     // Draw Clock
     tft.setFont(&FreeMono24pt7b);
@@ -111,7 +111,7 @@ void refresh_timeplan(char time_string[9], char alarms[5][6])
     }
 }
 
-void draw_timeplan(char time_string[9], char alarms[][6])
+void draw_timeplan(char *time_string, char **alarms)
 {
     // Draw Backround
     Waveshield.fillScreen(COLOR_BACKGROUND);
@@ -195,7 +195,7 @@ bool check_button_pressed(Adafruit_GFX_Button button)
     return false;
 }
 
-uint8_t GUI::timeplan(char time_string[9], char alarms[][6])
+uint8_t GUI::timeplan(char time_string[9], char **alarms)
 {
     if (drawn != 1)
     {
