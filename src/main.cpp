@@ -28,7 +28,6 @@ void test1()
     Time::set_alarm_types(1, 0xF0F0F0F0);
     Time::set_alarm_types(2, 0xAF00FF0A);
 
-    // Problem bei mehr als 5 Alarmen
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 2);
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 1, 1);
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 2, 0);
