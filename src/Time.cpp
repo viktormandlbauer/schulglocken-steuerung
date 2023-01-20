@@ -73,7 +73,7 @@ bool Time::init_rtc_module()
     }
 }
 
-void get_timestring(int hour, int minute, int second, char time_string[9])
+void get_timestring(int hour, int minute, int second, char *buf)
 {
     /**
      * Funktion zur Formatierung der Stunde, Minute & Sekunde in das "HH:MM:SS" Format
@@ -82,41 +82,41 @@ void get_timestring(int hour, int minute, int second, char time_string[9])
     // Konviertung der Stunde
     if (hour < 10)
     {
-        time_string[0] = '0';
-        time_string[1] = hour + '0';
+        buf[0] = '0';
+        buf[1] = hour + '0';
     }
     else
     {
-        time_string[0] = (char)hour / 10 + '0';
-        time_string[1] = hour % 10 + '0';
+        buf[0] = (char)hour / 10 + '0';
+        buf[1] = hour % 10 + '0';
     }
 
     // Konvertierung der Minute
-    time_string[2] = ':';
+    buf[2] = ':';
     if (minute < 10)
     {
-        time_string[3] = '0';
-        time_string[4] = minute + '0';
+        buf[3] = '0';
+        buf[4] = minute + '0';
     }
     else
     {
-        time_string[3] = (char)minute / 10 + '0';
-        time_string[4] = minute % 10 + '0';
+        buf[3] = (char)minute / 10 + '0';
+        buf[4] = minute % 10 + '0';
     }
 
     // Konvertierung der Sekunden
-    time_string[5] = ':';
+    buf[5] = ':';
     if (second < 10)
     {
-        time_string[6] = '0';
-        time_string[7] = second + '0';
+        buf[6] = '0';
+        buf[7] = second + '0';
     }
     else
     {
-        time_string[6] = (char)second / 10 + '0';
-        time_string[7] = second % 10 + '0';
+        buf[6] = (char)second / 10 + '0';
+        buf[7] = second % 10 + '0';
     }
-    time_string[8] = '\0';
+    buf[8] = '\0';
 }
 void get_timestring(int hour, int minute, char *buf)
 {
