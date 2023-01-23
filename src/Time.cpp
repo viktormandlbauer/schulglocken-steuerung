@@ -196,9 +196,7 @@ void Time::get_alarms_strings(uint16_t alarms[], uint8_t alarm_count, char outpu
     // Füllt ein zweidimensionales character array mit den formatierten Alarmzeiten und gibt die Anzahl der Alarme zurück.
     for (int i = 0; i < alarm_count; i++)
     {
-        Serial.println(alarms[i]);
         get_timestring(alarms[i] / 60, alarms[i] % 60, output[i]);
-        Serial.println(output[i]);
     }
 }
 
@@ -212,15 +210,6 @@ uint16_t Time::get_minutes_passed()
     return convert_time_to_alarm(hour(), minute());
 }
 
-time_t alarm_start_time = 0;
-time_t alarm_end_time = 0;
-
-time_t get_alarm_end_time()
-{
-    //  5 Sekunden Alarm für Tests
-    // TODO: Verschiedene Arten von Alarmen (Rhytmus usw.)
-    return alarm_start_time + 5;
-}
 
 // Funktionen zur Überprüfung des Status eines Alarms
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
@@ -283,9 +272,7 @@ void Time::set_alarm_types(uint8_t index, uint32_t ring_type)
     // ring_types[2] = 0xAA0F0AAA;
 }
 
-void Time::init_alarm_interrupt()
-{
-    /*
+void Time::init_alarm_interrupt()    /*
     Maximale Läutzeit - 8 Sekunden
     32 bit: 32 x 250 Millisekunden definierbar
     Clockspeed 16 Mhz
@@ -294,6 +281,8 @@ void Time::init_alarm_interrupt()
     Compare Register with prescaler of 64:
     (0,25/(1/16 000 000))/64 = 62 500
     */
+
+{
 
     // Reset Timer1
     TCCR1A = 0;
@@ -310,7 +299,7 @@ void Time::init_alarm_interrupt()
     TCNT1 = 0;
     OCR1A = 62500;
 
-    // Enable Timer1 compare interrupt
+    // Enable Timer1 compare interrupt ~ interrupts every 0.25 seconds
     TIMSK1 = (1 << OCIE1A);
 
     // Enable global interrupts

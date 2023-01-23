@@ -28,12 +28,12 @@ void test1()
     Time::set_alarm_types(1, 0xF0F0F0F0);
     Time::set_alarm_types(2, 0xAF00FF0A);
 
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 1, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 2, 0);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 3, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 9, 6, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 10, 7, 0);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 6, 1);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 7, 0);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 8, 1);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 9, 9, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 10, 10, 0);
 
     Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
     alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
@@ -80,7 +80,7 @@ void setup()
 {
     Serial.begin(57600);
 
-    // Time::init_rtc_module();
+    Time::init_rtc_module();
 #ifdef DEBUG
     Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
 #endif
