@@ -52,6 +52,7 @@ bool Time::init_rtc_module()
 
     // Set system time as rtc time
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    Serial.println(__TIME__);
 
     // Konfiguration der Synchronisation mit dem RTC Modul
     setSyncProvider(time_provider);
@@ -60,14 +61,14 @@ bool Time::init_rtc_module()
     if (timeStatus() != timeSet)
     {
 #ifdef DEBUG
-        Serial.println("[Error] Time not synced!");
+        Serial.println("[Error] (Time) Time not synced!");
 #endif
         return false;
     }
     else
     {
 #ifdef DEBUG
-        Serial.println("[Info] Time synced!");
+        Serial.println("[Info] (Time) Time synced!");
 #endif
         return true;
     }
@@ -147,7 +148,7 @@ void get_timestring(int hour, int minute, char *buf)
     {
         buf[3] = (char)minute / 10 + '0';
         buf[4] = minute % 10 + '0';
-   }
+    }
     buf[5] = '\0';
 }
 
@@ -157,10 +158,10 @@ uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
     return hour * 60ul + minute;
 }
 
-void Time::get_current_timestring(char time_string[9])
+void Time::get_current_timestring(char output[9])
 {
     // Schreibt die in "HH:MM:SS" formatierte Zeit in ein character array der länge 9
-    get_timestring(hour(), minute(), second(), time_string);
+    get_timestring(hour(), minute(), second(), output);
 }
 
 uint8_t Time::add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
@@ -209,7 +210,6 @@ uint16_t Time::get_minutes_passed()
     // Gibt die Minuten nach 00:00 als Ganzzahl zurück
     return convert_time_to_alarm(hour(), minute());
 }
-
 
 // Funktionen zur Überprüfung des Status eines Alarms
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
@@ -272,15 +272,15 @@ void Time::set_alarm_types(uint8_t index, uint32_t ring_type)
     // ring_types[2] = 0xAA0F0AAA;
 }
 
-void Time::init_alarm_interrupt()    /*
-    Maximale Läutzeit - 8 Sekunden
-    32 bit: 32 x 250 Millisekunden definierbar
-    Clockspeed 16 Mhz
-    Intervall: 0,0000000625 -> 62,5 ns
+void Time::init_alarm_interrupt() /*
+ Maximale Läutzeit - 8 Sekunden
+ 32 bit: 32 x 250 Millisekunden definierbar
+ Clockspeed 16 Mhz
+ Intervall: 0,0000000625 -> 62,5 ns
 
-    Compare Register with prescaler of 64:
-    (0,25/(1/16 000 000))/64 = 62 500
-    */
+ Compare Register with prescaler of 64:
+ (0,25/(1/16 000 000))/64 = 62 500
+ */
 
 {
 
