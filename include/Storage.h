@@ -9,8 +9,8 @@ namespace Storage
     void save_alarm_types(uint64_t *alarm_types, uint8_t count);
     uint8_t read_alarm_types(uint64_t *alarm_types);
 
-    void save_network_settings(uint8_t *myip, uint8_t *mygw, uint8_t *mydns);
-    void read_network_settings(uint8_t *myip, uint8_t *mygw, uint8_t *mydns);
+    void save_network_settings(uint8_t *ip, uint8_t *gw, uint8_t *dns, uint8_t prefix);
+    void read_network_settings(uint8_t *ip, uint8_t *gw, uint8_t *dns, uint8_t *prefix);
 
     void save_network_time_settings(char *myntp_name, uint8_t *myntp_adr);
     void read_network_time_settings(char *myntp_name, uint8_t *myntp_adr);

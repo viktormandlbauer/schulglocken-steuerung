@@ -15,24 +15,35 @@ using namespace Network;
 bool Network::init_ethernet()
 {
 #ifdef DEBUG
-    Serial.println("[Info] Activate ethernet ...");
+    Serial.println("[Info] (Network) Activate ethernet ...");
 #endif
-    if (ether.begin(sizeof Ethernet::buffer, mac_address, CHIP_SELECT) == 0)
+
+    uint8_t vers = ether.begin(sizeof Ethernet::buffer, mac_address, CHIP_SELECT);
+    if (vers == 0)
     {
-        return false;
 #ifdef DEBUG
-        Serial.println("[Error] Failed to active ethernet.");
+        Serial.println("[Error] (Network) Failed to active ethernet.");
 #endif
+        return false;
     }
 #ifdef DEBUG
-    Serial.println("[Info] Ethernet activated.");
+    Serial.println("[Info] (Network) Ethernet activated.");
 #endif
     return true;
 }
 
-bool Network::init_static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm[4])
+bool Network::static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
 {
-    ether.staticSetup(ip, gw, dns, snm);
+    uint8_t netmask[4];
+
+    // Konvertierung von Prefix Notation in Subnetzmaske
+    unsigned long mask = (0xFFFFFFFF << (32 - prefix)) & 0xFFFFFFFF;
+    netmask[0] = mask >> 24;
+    netmask[1] = (mask >> 16) & 0xFF;
+    netmask[2] = (mask >> 8) & 0xFF;
+    netmask[3] = mask & 0xFF;
+
+    ether.staticSetup(ip, gw, dns, netmask);
 
 #ifdef DEBUG
     Serial.println(F("[Info] Network Static-IP Setup"));
@@ -43,20 +54,20 @@ bool Network::init_static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], ui
 #endif
 }
 
-bool Network::init_dhcp_setup()
+bool Network::dhcp_setup()
 {
     if (!ether.dhcpSetup())
     {
 
 #ifdef DEBUG
-        Serial.println("[Error] DHCP failed.");
+        Serial.println("[Error] (Network) DHCP failed.");
 #endif
 
         return false;
     }
 
 #ifdef DEBUG
-    Serial.println(F("[Info] Network DHCP Setup"));
+    Serial.println("[Info] (Network) DHCP Setup");
     ether.printIp("[Info] IP:   ", ether.myip);
     ether.printIp("[Info] GW:   ", ether.gwip);
     ether.printIp("[Info] DNS:  ", ether.dnsip);
@@ -170,11 +181,6 @@ bool Network::http_response(byte day, byte month, byte year, byte hour, byte min
     }
 }
 
-bool set_warning(int type)
-{
-    // Set warning on html site
-}
-
 #ifdef DEBUG
 // Print networking config - only for debugging
 bool Network::print_networking_config()
@@ -185,3 +191,23 @@ bool Network::print_networking_config()
     ether.printIp(ether.netmask);
 }
 #endif
+
+uint8_t *Network::get_ip()
+{
+    return ether.myip;
+}
+
+uint8_t *Network::get_gw()
+{
+    return ether.gwip;
+}
+
+uint8_t *Network::get_dns()
+{
+    return ether.dnsip;
+}
+
+uint8_t *Network::get_snm()
+{
+    return ether.netmask;
+}
