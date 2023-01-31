@@ -1,6 +1,6 @@
 /**
  * Programmdefinitionen
-*/
+ */
 
 // Maximal möglich einstellbare Alarme
 #define MAXIMUM_AMOUNT_ALARMS 64
@@ -21,6 +21,16 @@
 #define COLOR_SECONDARY 0x02F2
 #define COLOR_BACKGROUND 0xC6DD
 
+// Color definitions
+#define BLACK 0x0000
+#define BLUE 0x001F
+#define RED 0xF800
+#define GREEN 0x07E0
+#define CYAN 0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW 0xFFE0
+#define WHITE 0xFFFF
+
 // Displaydimension
 #define X_DIM 480
 #define Y_DIM 320
@@ -28,11 +38,11 @@
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
  * Durch das Aktivieren werden über serial.print Statusinformation ausgegeben.
- * 
- * Achtung: 
- * Das Aktivieren der Optionen führt zu langsameren Programmablauf 
+ *
+ * Achtung:
+ * Das Aktivieren der Optionen führt zu langsameren Programmablauf
  * und sollte nur in der Entwicklung oder im Troubleshooting verwenden werden.
-*/
+ */
 
 // Aktivieren/Deaktivieren mittels Auskommentieren
 #define DEBUG_MAIN

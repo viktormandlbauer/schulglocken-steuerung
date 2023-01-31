@@ -19,14 +19,28 @@ Adafruit_GFX_Button button_plan, button_time, button_sys, button_network;
 // Zeitplan buttons
 Adafruit_GFX_Button button_menu, button_pause;
 
-int drawn;
-
 void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
 {
     // Waveshield.setRotation(1);
     button.initButton(&tft, x_pos, y_pos, xsize, ysize, outlinecolor, textcolor, innercolor, textarr, textsize);
     // button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
     button.drawButton(true);
+}
+
+bool check_button_pressed(Adafruit_GFX_Button button)
+{
+    // #ifdef DEBUG
+    //     Serial.print("[Info] (GUI) Check button pressed for coordinates: x");
+    //     Serial.print(p.x);
+    //     Serial.print(" y");
+    //     Serial.println(p.y);
+    // #endif
+
+    if (button.contains(p.x, p.y))
+    {
+        return true;
+    }
+    return false;
 }
 
 void draw_menu()
@@ -73,102 +87,6 @@ void draw_menu()
     button_time.drawButton(true);
     button_sys.drawButton(true);
     button_network.drawButton(true);
-
-    drawn = 0;
-}
-// zeichne upcoming event liste
-#define list_start_x 110
-#define list_start_y 90
-#define list_width X_DIM / 1.5
-#define list_element_height 50
-#define list_elements 5
-#define list_line_tickness 3
-
-void refresh_timeplan(char *time_string, char **alarms)
-{
-    // Draw Clock
-    tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(X_DIM / 2 - 50, 40);
-    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
-    tft.setTextSize(1);
-    tft.print(time_string);
-    // tft.setFont(&FreeMono12pt7b);
-    // tft.setCursor(150, 40);
-    // tft.setTextSize(1);
-    // tft.print("20");
-    tft.setFont();
-
-    for (byte y_offset = 0; y_offset < list_elements; y_offset++)
-    {
-        // draw thick rectangle
-        for (byte z = list_line_tickness; z > 0; z--)
-        {
-            tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
-        }
-
-        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&alarms[y_offset][6]);
-    }
-}
-
-void draw_timeplan(char *time_string, char **alarms)
-{
-    // Draw Backround
-    Waveshield.fillScreen(COLOR_BACKGROUND);
-
-// Pause Symbol
-#define playbausesize 40
-#define playpauseposx X_DIM - 90
-#define playpauseposy 10
-    tft.drawRoundRect(playpauseposx, playpauseposy, 60, 60, 20, COLOR_WHITE);
-    tft.fillRect(playpauseposx + 18, playpauseposy + 18, 8, 25, COLOR_WHITE);
-    tft.fillRect(playpauseposx + 16 + 18, playpauseposy + 18, 8, 25, COLOR_WHITE);
-
-    // Draw Clock
-    tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(X_DIM / 2 - 50, 40);
-    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
-    tft.setTextSize(1);
-    tft.print(time_string);
-    //tft.setFont(&FreeMono12pt7b);
-    //tft.setCursor(150, 40);
-    //tft.setTextSize(1);
-    //tft.print("20");
-    tft.setFont();
-
-// draw menue symbol
-#define drawmenuesymbx 10
-#define drawmenuesymby Y_DIM - drawmenuesymbsize - 10
-#define drawmenuesymbsize 60
-#define drawmenuesymbtext "Menü"
-#define drawmenuesymbxtextsize 1
-
-    tft.drawRoundRect(drawmenuesymbx, drawmenuesymby, drawmenuesymbsize, drawmenuesymbsize, 20, COLOR_WHITE);
-
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + drawmenuesymbsize / 8, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 3, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 5, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-
-    tft.setTextSize(3);
-
-    for (byte y_offset = 0; y_offset < list_elements; y_offset++)
-    {
-        // draw thick rectangle
-        for (byte z = list_line_tickness; z > 0; z--)
-        {
-            tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
-        }
-
-        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&alarms[y_offset][6]);
-    }
-
-    // Status text
-    tft.setCursor(120, 70);
-    tft.setTextSize(2);
-    tft.print("Zeitplan AKTIV");
-
-    drawn = 1;
 }
 
 void GUI::init_display()
@@ -179,42 +97,98 @@ void GUI::init_display()
     draw_menu();
 }
 
-bool check_button_pressed(Adafruit_GFX_Button button)
+void draw_time(char *time_string)
 {
-#ifdef DEBUG
-    Serial.print("[Info] (GUI) Check button pressed for coordinates: x");
-    Serial.print(p.x);
-    Serial.print(" y");
-    Serial.println(p.y);
-#endif
-
-    if (button.contains(p.x, p.y))
+    for (uint8_t i = 0; i < 8; i++)
     {
-        return true;
+        tft.drawChar(0.4 * Y_DIM + 30 * i, Y_DIM * 0.05, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
     }
-    return false;
 }
 
-uint8_t GUI::timeplan(char time_string[9], char **alarms)
+Adafruit_GFX_Button button_alarm[5], button_up, button_down, button_add;
+uint8_t alarm_list_position = 0;
+
+void draw_alarms(char alarm_strings[][6])
 {
-    if (drawn != 1)
+
+#ifdef DEBUG
+    Serial.print("[Info] (GUI) Alarm list position: ");
+    Serial.println(alarm_list_position);
+#endif
+
+    button_alarm[0].initButton(&tft, X_DIM / 2, (Y_DIM * 0.3), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[0 + alarm_list_position], 3);
+    button_alarm[1].initButton(&tft, X_DIM / 2, (Y_DIM * 0.45), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[1 + alarm_list_position], 3);
+    button_alarm[2].initButton(&tft, X_DIM / 2, (Y_DIM * 0.6), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[2 + alarm_list_position], 3);
+    button_alarm[3].initButton(&tft, X_DIM / 2, (Y_DIM * 0.75), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[3 + alarm_list_position], 3);
+
+    button_alarm[0].drawButton(true);
+    button_alarm[1].drawButton(true);
+    button_alarm[2].drawButton(true);
+    button_alarm[3].drawButton(true);
+}
+
+bool alarms_drawn = false;
+bool timeplan_drawn = false;
+
+uint8_t GUI::timeplan(char time_string[9], char alarm_strings[][6])
+{
+    if (!timeplan_drawn)
     {
-        draw_timeplan(time_string, alarms);
-    }
-    else
-    {
-        refresh_timeplan(time_string, alarms);
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        tft.setFont(&FreeMono24pt7b);
+        tft.setCursor(150, Y_DIM * 0.125);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(1);
+        tft.print("Zeitplan");
+        tft.setFont();
+
+        button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+        button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+        button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "+", 5);
+
+        button_down.drawButton(true);
+        button_up.drawButton(true);
+        button_add.drawButton(true);
+        timeplan_drawn = true;
     }
 
-    if (check_button_pressed(button_menu))
+    if (check_button_pressed(button_up))
     {
-        return 0;
+        if (alarm_list_position > 0)
+        {
+            alarm_list_position -= 1;
+            alarms_drawn = false;
+#ifdef DEBUG
+            Serial.println("[Info] (GUI) Zeitplan button down");
+#endif
+        }
     }
-    else if (check_button_pressed(button_pause))
+    else if (check_button_pressed(button_down))
     {
+        if (alarm_list_position < MAXIMUM_AMOUNT_ALARMS)
+        {
+            alarm_list_position += 1;
+            alarms_drawn = false;
+#ifdef DEBUG
+            Serial.println("[Info] (GUI) Zeitplan button up");
+#endif
+        }
+    }
 
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        if (check_button_pressed(button_alarm[i]))
+        {
+        }
     }
-    return -1;
+
+    if (!alarms_drawn)
+    {
+        draw_alarms(alarm_strings);
+        alarms_drawn = true;
+    }
+
+    return 1;
 }
 
 uint8_t GUI::menu()
@@ -225,10 +199,10 @@ uint8_t GUI::menu()
 
     if (check_button_pressed(button_plan))
     {
-
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Zeitplan");
 #endif
+        alarms_drawn = false;
         return 1;
     }
     else if (check_button_pressed(button_time))
@@ -244,7 +218,6 @@ uint8_t GUI::menu()
 #ifdef DEBUG
         Serial.println("[Info] (GUI) System");
 #endif
-        // draw_system();
         return 3;
     }
     else if (check_button_pressed(button_network))
@@ -252,7 +225,6 @@ uint8_t GUI::menu()
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Netzwerk");
 #endif
-        // draw_network
         return 4;
     }
 
@@ -273,15 +245,4 @@ bool GUI::display_action()
         return true;
     }
     return false;
-}
-
-void GUI::draw_time(String timestring)
-{
-    uint8_t size = 5;
-    uint8_t y = 0;
-    uint8_t x = 50;
-    for (uint8_t i = 0; i < timestring.length(); i++)
-    {
-        tft.drawChar(x + 30 * i, y, timestring[i], COLOR_WHITE, COLOR_BLACK, size);
-    }
 }
