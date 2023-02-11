@@ -37,7 +37,6 @@ void test1()
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 21, 5, 2);
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 22, 5, 2);
 
-
     // Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
     // alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
 }
@@ -76,7 +75,6 @@ void setup()
     Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
 #endif
 
-
     Network::init_ethernet();
 #ifdef DEBUG
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
@@ -90,61 +88,94 @@ void setup()
 }
 
 int navigation = 0;
+int last_navigation = 0;
+int selection = 0;
 char time_string[9];
 char alarm_string[64][6];
 
-void on_change()
-{
-}
-
 void action_handler()
 {
+#ifdef DEBUG
+    Serial.print("[Info] (Main) Action Handler - Current Navigation ID: ");
+    Serial.println(navigation);
+#endif
     if (navigation == 0)
     {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Menu");
+#endif
+
+        // Display Action is needed after navigation changed!
         navigation = GUI::menu();
     }
     else if (navigation == 1)
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Main) Timeplan ");
+        Serial.println("[Info] (Main) Timeplan");
 #endif
         Time::get_current_timestring(time_string);
         Time::get_alarms_strings(alarms, alarm_count, alarm_string);
-        navigation = GUI::timeplan(time_string, alarm_string);
+        selection = GUI::timeplan(time_string, alarm_string);
+
+        if (selection < MAXIMUM_AMOUNT_ALARMS)
+        {
+            navigation = 5;
+        }
+        else if (selection == 253)
+        {
+            navigation = 1;
+        }
+        else if (selection == 254)
+        {
+            // back
+            navigation = 6;
+        }
+        else if (selection == 255)
+        {
+            // Add Alarm
+            navigation = 0;
+        }
     }
     else if (navigation == 2)
     {
-
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Time");
+#endif
         // Uhrzeit
     }
     else if (navigation == 3)
     {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) System");
+#endif
         // Systeminfo
     }
     else if (navigation == 4)
     {
-        // Netzwerk
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Network ");
+#endif
     }
-}
-
-void refresh_handler()
-{
-    if (navigation == 0)
+    else if (navigation == 5)
     {
+        Time::get_alarm_string(alarms[selection], time_string);
+        navigation = GUI::alarm_config(time_string, &alarms[selection], &alarms_type_assignment[selection]);
     }
-    else if (navigation == 1)
+    else if (navigation == 6)
     {
-        Time::get_current_timestring(time_string);
-        Time::get_alarms_strings(alarms, alarm_count, alarm_string);
+        navigation = GUI::alarm_config("00:00", &alarms[selection], &alarms_type_assignment[selection]);
     }
 }
 
 void loop()
 {
-    if (GUI::display_action())
+    if (GUI::display_action() || (last_navigation != navigation))
     {
         action_handler();
+        last_navigation = navigation;
     }
 
     Time::check_alarm(alarms, alarms_type_assignment, alarm_count);
+
+    // Check Network
 }
