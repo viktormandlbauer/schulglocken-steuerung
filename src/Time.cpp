@@ -50,9 +50,8 @@ bool Time::init_rtc_module()
     while (!rtc.begin())
         ;
 
-    // Set system time as rtc time
+    // Set flash time as system time
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    Serial.println(__TIME__);
 
     // Konfiguration der Synchronisation mit dem RTC Modul
     setSyncProvider(time_provider);
@@ -164,6 +163,11 @@ void Time::get_current_timestring(char output[9])
     get_timestring(hour(), minute(), second(), output);
 }
 
+void Time::get_alarm_string(uint16_t alarm, char output[6])
+{
+    get_timestring(alarm / 60, alarm % 60, output);
+}
+
 uint8_t Time::add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
     alarms[alarm_count] = convert_time_to_alarm(hour, minute);
@@ -272,16 +276,7 @@ void Time::set_alarm_types(uint8_t index, uint32_t ring_type)
     // ring_types[2] = 0xAA0F0AAA;
 }
 
-void Time::init_alarm_interrupt() /*
- Maximale Läutzeit - 8 Sekunden
- 32 bit: 32 x 250 Millisekunden definierbar
- Clockspeed 16 Mhz
- Intervall: 0,0000000625 -> 62,5 ns
-
- Compare Register with prescaler of 64:
- (0,25/(1/16 000 000))/64 = 62 500
- */
-
+void Time::init_alarm_interrupt()
 {
 
     // Reset Timer1

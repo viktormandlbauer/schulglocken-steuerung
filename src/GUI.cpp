@@ -13,14 +13,6 @@ Waveshare_ILI9486 Waveshield;
 Adafruit_GFX &tft = Waveshield;
 TSPoint p;
 
-// Menu buttons
-Adafruit_GFX_Button button_plan, button_time, button_sys, button_network;
-
-// Zeitplan buttons
-Adafruit_GFX_Button button_menu, button_pause;
-
-int drawn;
-
 void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
 {
     // Waveshield.setRotation(1);
@@ -28,6 +20,21 @@ void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, in
     // button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
     button.drawButton(true);
 }
+
+bool check_button_pressed(Adafruit_GFX_Button button)
+{
+    if (button.contains(p.x, p.y))
+    {
+        return true;
+    }
+    return false;
+}
+
+// Menu buttons
+Adafruit_GFX_Button button_plan, button_time, button_sys, button_network;
+
+// Zeitplan buttons
+Adafruit_GFX_Button button_menu, button_pause;
 
 void draw_menu()
 {
@@ -42,28 +49,6 @@ void draw_menu()
     tft.print("Einstellungen");
     tft.setFont();
 
-#define backarrow_top_left_bound_x 5
-#define backarrow_top_left_bound_y Y_DIM - 55
-#define back_arrow_with 50
-#define back_arrow_height 50
-#define distance_to_outline_px 5
-#define text_height_px 15
-#define textplacement_offset_x 8
-#define textplacement_offset_y 35
-    tft.drawRoundRect(backarrow_top_left_bound_x, backarrow_top_left_bound_y, back_arrow_with, back_arrow_height, 10, COLOR_WHITE);
-
-    // fost ist left most point next is top right most then bottom right most
-    tft.fillTriangle(backarrow_top_left_bound_x + distance_to_outline_px, backarrow_top_left_bound_y + back_arrow_height / 2 - text_height_px / 2,
-                     backarrow_top_left_bound_x + back_arrow_with / 2, backarrow_top_left_bound_y + distance_to_outline_px,
-                     backarrow_top_left_bound_x + back_arrow_with / 2, backarrow_top_left_bound_y + back_arrow_height - distance_to_outline_px - text_height_px,
-                     COLOR_WHITE);
-
-    tft.fillRect(backarrow_top_left_bound_x + back_arrow_with / 2,
-                 backarrow_top_left_bound_y + distance_to_outline_px + (back_arrow_height - text_height_px) / 4,
-                 back_arrow_with / 2 - distance_to_outline_px,
-                 (back_arrow_height - text_height_px) / 3,
-                 COLOR_WHITE);
-
     button_plan.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 3, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
     button_time.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 5, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
     button_sys.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 7, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
@@ -73,191 +58,262 @@ void draw_menu()
     button_time.drawButton(true);
     button_sys.drawButton(true);
     button_network.drawButton(true);
-
-    drawn = 0;
-}
-// zeichne upcoming event liste
-#define list_start_x 110
-#define list_start_y 90
-#define list_width X_DIM / 1.5
-#define list_element_height 50
-#define list_elements 5
-#define list_line_tickness 3
-
-void refresh_timeplan(char *time_string, char **alarms)
-{
-    // Draw Clock
-    tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(X_DIM / 2 - 50, 40);
-    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
-    tft.setTextSize(1);
-    tft.print(time_string);
-    // tft.setFont(&FreeMono12pt7b);
-    // tft.setCursor(150, 40);
-    // tft.setTextSize(1);
-    // tft.print("20");
-    tft.setFont();
-
-    for (byte y_offset = 0; y_offset < list_elements; y_offset++)
-    {
-        // draw thick rectangle
-        for (byte z = list_line_tickness; z > 0; z--)
-        {
-            tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
-        }
-
-        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&alarms[y_offset][6]);
-    }
 }
 
-void draw_timeplan(char *time_string, char **alarms)
-{
-    // Draw Backround
-    Waveshield.fillScreen(COLOR_BACKGROUND);
-
-// Pause Symbol
-#define playbausesize 40
-#define playpauseposx X_DIM - 90
-#define playpauseposy 10
-    tft.drawRoundRect(playpauseposx, playpauseposy, 60, 60, 20, COLOR_WHITE);
-    tft.fillRect(playpauseposx + 18, playpauseposy + 18, 8, 25, COLOR_WHITE);
-    tft.fillRect(playpauseposx + 16 + 18, playpauseposy + 18, 8, 25, COLOR_WHITE);
-
-    // Draw Clock
-    tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(X_DIM / 2 - 50, 40);
-    tft.setTextColor(COLOR_WHITE, COLOR_BACKGROUND);
-    tft.setTextSize(1);
-    tft.print(time_string);
-    //tft.setFont(&FreeMono12pt7b);
-    //tft.setCursor(150, 40);
-    //tft.setTextSize(1);
-    //tft.print("20");
-    tft.setFont();
-
-// draw menue symbol
-#define drawmenuesymbx 10
-#define drawmenuesymby Y_DIM - drawmenuesymbsize - 10
-#define drawmenuesymbsize 60
-#define drawmenuesymbtext "Menü"
-#define drawmenuesymbxtextsize 1
-
-    tft.drawRoundRect(drawmenuesymbx, drawmenuesymby, drawmenuesymbsize, drawmenuesymbsize, 20, COLOR_WHITE);
-
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + drawmenuesymbsize / 8, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 3, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-    tft.fillRect(drawmenuesymbx + drawmenuesymbsize / 4, drawmenuesymby + (drawmenuesymbsize / 8) * 5, drawmenuesymbsize / 2, drawmenuesymbsize / 8, COLOR_WHITE);
-
-    tft.setTextSize(3);
-
-    for (byte y_offset = 0; y_offset < list_elements; y_offset++)
-    {
-        // draw thick rectangle
-        for (byte z = list_line_tickness; z > 0; z--)
-        {
-            tft.drawRect(list_start_x + z, (y_offset * (list_element_height - list_line_tickness * 2)) + list_start_y + z, list_width - z * 2, list_element_height - z * 2, COLOR_BLACK);
-        }
-
-        tft.setCursor(list_start_x + 10, list_start_y + 15 /*testheight offset in px*/ + ((list_element_height - list_line_tickness * 2) * y_offset));
-        tft.print(&alarms[y_offset][6]);
-    }
-
-    // Status text
-    tft.setCursor(120, 70);
-    tft.setTextSize(2);
-    tft.print("Zeitplan AKTIV");
-
-    drawn = 1;
-}
-
+bool menu_drawn = false;
 void GUI::init_display()
 {
     SPI.begin();
     Waveshield.begin();
     Waveshield.setRotation(1);
+
     draw_menu();
+    menu_drawn = true;
 }
 
-bool check_button_pressed(Adafruit_GFX_Button button)
+void draw_time(char *time_string)
+{
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        tft.drawChar(0.4 * Y_DIM + 30 * i, Y_DIM * 0.05, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+    }
+}
+
+void draw_alarm_field(char *time_string)
+{
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        tft.drawChar(0.4 * Y_DIM + 30 * i, Y_DIM * 0.05, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+    }
+}
+
+Adafruit_GFX_Button button_back;
+void draw_back_button(uint16_t BACKARROW_POS_X, uint16_t BACKARROW_POS_Y, uint8_t BACKARROW_WIDTH, uint8_t BACKARROW_HEIGHT)
+{
+
+    button_back.initButton(&tft, BACKARROW_POS_X, BACKARROW_POS_Y, BACKARROW_WIDTH, BACKARROW_HEIGHT,
+                           COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 0);
+    button_back.drawButton(true);
+
+    tft.fillTriangle(BACKARROW_POS_X - BACKARROW_WIDTH * 0.5 + 5,
+                     BACKARROW_POS_Y,
+                     BACKARROW_POS_X,
+                     BACKARROW_POS_Y + BACKARROW_HEIGHT * 0.5 - 10,
+                     BACKARROW_POS_X,
+                     BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.5 + 10,
+                     COLOR_BLACK);
+
+    tft.fillRect(BACKARROW_POS_X,
+                 BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.125,
+                 BACKARROW_WIDTH * 0.5 - 5,
+                 BACKARROW_HEIGHT * 0.25,
+                 COLOR_BLACK);
+}
+
+Adafruit_GFX_Button button_alarm[4], button_up, button_down, button_add;
+
+void draw_alarms(char alarm_strings[][6], uint8_t alarm_list_position)
+{
+    button_alarm[0].initButton(&tft, X_DIM / 2, (Y_DIM * 0.3), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[0 + alarm_list_position], 3);
+    button_alarm[1].initButton(&tft, X_DIM / 2, (Y_DIM * 0.45), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[1 + alarm_list_position], 3);
+    button_alarm[2].initButton(&tft, X_DIM / 2, (Y_DIM * 0.6), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[2 + alarm_list_position], 3);
+    button_alarm[3].initButton(&tft, X_DIM / 2, (Y_DIM * 0.75), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[3 + alarm_list_position], 3);
+    button_alarm[0].drawButton(true);
+    button_alarm[1].drawButton(true);
+    button_alarm[2].drawButton(true);
+    button_alarm[3].drawButton(true);
+}
+
+uint8_t alarm_list_position = 0;
+
+void GUI::draw_alarm_list(char alarm_strings[][6])
+{
+    button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+    button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+    button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "+", 5);
+
+    button_down.drawButton(true);
+    button_up.drawButton(true);
+    button_add.drawButton(true);
+
+    draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+    draw_alarms(alarm_strings, alarm_list_position);
+}
+void GUI::timeplan(char alarm_strings[][6])
 {
 #ifdef DEBUG
-    Serial.print("[Info] (GUI) Check button pressed for coordinates: x");
-    Serial.print(p.x);
-    Serial.print(" y");
-    Serial.println(p.y);
+    Serial.println("[Info] (GUI) Draw Timeplan");
 #endif
 
-    if (button.contains(p.x, p.y))
-    {
-        return true;
-    }
-    return false;
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    tft.setFont(&FreeMono24pt7b);
+    tft.setCursor(150, Y_DIM * 0.125);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setTextSize(1);
+    tft.print("Zeitplan");
+    tft.setFont();
+    draw_alarm_list(alarm_strings);
 }
 
-uint8_t GUI::timeplan(char time_string[9], char **alarms)
+uint8_t GUI::check_timeplan()
 {
-    if (drawn != 1)
+
+    if (check_button_pressed(button_up))
     {
-        draw_timeplan(time_string, alarms);
+        if (alarm_list_position > 0)
+        {
+            alarm_list_position -= 1;
+            return 252;
+#ifdef DEBUG
+            Serial.println("[Info] (GUI) Zeitplan button up");
+#endif
+        }
     }
-    else
+    else if (check_button_pressed(button_down))
     {
-        refresh_timeplan(time_string, alarms);
+        if (alarm_list_position < MAXIMUM_AMOUNT_ALARMS)
+        {
+            alarm_list_position += 1;
+            return 252;
+#ifdef DEBUG
+            Serial.println("[Info] (GUI) Zeitplan button down");
+#endif
+        }
+    }
+    else if (check_button_pressed(button_add))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Add button pressed");
+#endif
+        return 253;
+    }
+    else if (check_button_pressed(button_back))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Back Button pressed");
+#endif
+        return 254;
     }
 
-    if (check_button_pressed(button_menu))
+    for (uint8_t i = 0; i < 4; i++)
     {
-        return 0;
+        if (check_button_pressed(button_alarm[i]))
+        {
+#ifdef DEBUG
+            Serial.print("[Info] (GUI) Alarm ");
+            Serial.print(i + alarm_list_position);
+            Serial.println(" is pressed");
+#endif
+            button_alarm[i].drawButton(false);
+            return i + alarm_list_position;
+        }
     }
-    else if (check_button_pressed(button_pause))
-    {
-
-    }
-    return -1;
+    return 255;
 }
 
-uint8_t GUI::menu()
+bool alarm_config_drawn = false;
+
+void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
 {
+#ifdef DEBUG
+    Serial.println("[Info] (GUI) Alarm config");
+#endif
+    if (!alarm_config_drawn)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Drawing alarm config");
+#endif
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        draw_alarm_field(alarm_time);
+
+        alarm_config_drawn = true;
+    }
+}
+
+uint8_t GUI::check_alarm_config()
+{
+
+    if (check_button_pressed(button_back))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Back Button pressed");
+#endif
+        alarm_config_drawn = false;
+        return 1;
+    }
+    else if (0)
+    {
+#ifdef DEBUG
+        alarm_config_drawn = false;
+        Serial.println("[Info] (Main) Alarm config changed");
+#endif
+        return 1;
+    }
+    return 5;
+}
+
+void GUI::menu()
+{
+    if (!menu_drawn)
+    {
+        draw_menu();
+        menu_drawn = true;
+    }
+}
+
+uint8_t GUI::check_menu()
+{
+
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Check Menü");
 #endif
 
     if (check_button_pressed(button_plan))
     {
-
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) Zeitplan");
+        Serial.println("[Info] (GUI) Timeplan pressed");
 #endif
+        button_plan.drawButton(false);
+        menu_drawn = false;
         return 1;
     }
     else if (check_button_pressed(button_time))
     {
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) Uhrzeit");
+        Serial.println("[Info] (GUI) Time pressed");
 #endif
-
+        button_time.drawButton(false);
+        menu_drawn = false;
         return 2;
     }
     else if (check_button_pressed(button_sys))
     {
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) System");
+        Serial.println("[Info] (GUI) Sytem pressed");
 #endif
-        // draw_system();
+        button_sys.drawButton(false);
+        menu_drawn = false;
         return 3;
     }
     else if (check_button_pressed(button_network))
     {
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) Netzwerk");
+        Serial.println("[Info] (GUI) Network pressed");
 #endif
-        // draw_network
+        button_network.drawButton(false);
+        menu_drawn = false;
         return 4;
     }
 
-    return -1;
+    return 0;
 }
+
+// Sometimes the touch display doesn't work properly and sets the "released" value to true
+// Therefore it has to recognize it multiple times as "released"
+int released;
+#define THRESHOLD_RELEASED 100
 
 bool GUI::display_action()
 {
@@ -265,23 +321,26 @@ bool GUI::display_action()
     p = Waveshield.getPoint();
     Waveshield.normalizeTsPoint(p);
 
-    if (p.z > 0)
+    if (p.z > 10)
     {
+        if (THRESHOLD_RELEASED == released)
+        {
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) Display wird bedient.");
+            Serial.println("[Info] (GUI) Display Action");
 #endif
-        return true;
+            released = 0;
+            return true;
+        }
+#ifdef DEBUG
+        else
+        {
+            Serial.println("[Info] (GUI) Display Action - not released");
+        }
+#endif
+    }
+    else if (released < THRESHOLD_RELEASED)
+    {
+        released += 1;
     }
     return false;
-}
-
-void GUI::draw_time(String timestring)
-{
-    uint8_t size = 5;
-    uint8_t y = 0;
-    uint8_t x = 50;
-    for (uint8_t i = 0; i < timestring.length(); i++)
-    {
-        tft.drawChar(x + 30 * i, y, timestring[i], COLOR_WHITE, COLOR_BLACK, size);
-    }
 }

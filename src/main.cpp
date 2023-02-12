@@ -26,26 +26,19 @@ void test1()
     Time::set_alarm_types(1, 0xF0F0F0F0);
     Time::set_alarm_types(2, 0xAF00FF0A);
 
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 6, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 7, 0);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 6, 1);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 2, 7, 0);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 5, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 3, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 10, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 19, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 20, 5, 2);
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 21, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 22, 5, 2);
 
-    Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
+    // Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
     // alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
-
-    char full_time_string[9];
-    Time::get_current_timestring(full_time_string);
-    Serial.print("Current time:");
-    Serial.println(full_time_string);
-
-    char time_string[10][6];
-    Time::get_alarms_strings(alarms, alarm_count, time_string);
-
-    Serial.println("Timestrings: ");
-    for (int i = 0; i < alarm_count; i++)
-    {
-        Serial.println(time_string[i]);
-    }
 }
 
 void test2()
@@ -63,37 +56,14 @@ void test2()
     Storage::read_network_settings(ip, dns, gw, &prefix);
 }
 
-int navigation = 0;
-
-char time_string[9];
-
-void action_handler()
-{
-    if (navigation == 0)
-    {
-        navigation = GUI::menu();
-    }
-    else if (navigation == 1)
-    {
-        // Zeitplan
-    }
-    else if (navigation == 2)
-    {
-        // Uhrzeit
-    }
-    else if (navigation == 3)
-    {
-        // Systeminfo
-    }
-    else if (navigation == 4)
-    {
-        // Netzwerk
-    }
-}
-
 void setup()
 {
     Serial.begin(57600);
+
+    GUI::init_display();
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Display wurde aktiviert.");
+#endif
 
     Time::init_rtc_module();
 #ifdef DEBUG
@@ -105,28 +75,160 @@ void setup()
     Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
 #endif
 
-    GUI::init_display();
-#ifdef DEBUG
-    Serial.println("[Info] (Main) Display wurde aktiviert.");
-#endif
-
     Network::init_ethernet();
 #ifdef DEBUG
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
 #endif
 
-        // Beeper
-        pinMode(A2, OUTPUT);
+    // Beeper
+    pinMode(A2, OUTPUT);
 
     test1();
     test2();
+}
+
+int navigation = 0;
+int last_navigation = 0;
+bool refresh = false;
+int selection = 0;
+
+char time_string[9];
+char alarm_string[64][6];
+
+bool navigation_handler()
+{
+    if (navigation == 0)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Menu");
+#endif
+        navigation = GUI::check_menu();
+    }
+    else if (navigation == 1)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Timeplan");
+#endif
+
+        selection = GUI::check_timeplan();
+
+        if (selection < MAXIMUM_AMOUNT_ALARMS)
+        {
+            navigation = 5;
+        }
+        else if (selection == 252)
+        {
+            GUI::draw_alarm_list(alarm_string);
+        }
+        else if (selection == 253)
+        {
+            // back
+            navigation = 6;
+        }
+        else if (selection == 254)
+        {
+            // Add Alarm
+            navigation = 0;
+        }
+        else if (selection == 255)
+        {
+            navigation = 1;
+        }
+    }
+    else if (navigation == 2)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Time");
+#endif
+        // Uhrzeit
+    }
+    else if (navigation == 3)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) System");
+#endif
+        // Systeminfo
+    }
+    else if (navigation == 4)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Network ");
+#endif
+    }
+    else if (navigation == 5)
+    {
+
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Active alarm setting");
+#endif
+
+        navigation = GUI::check_alarm_config();
+    }
+    else if (navigation == 6)
+    {
+        navigation = GUI::check_alarm_config();
+    }
+
+    // Eine Aktualisierung des Bildschirm ist nur notwendig,
+    // wenn sich die Navigation geändert hat oder die Komponente Updates benötigt.
+    if (navigation != last_navigation)
+    {
+#ifdef DEBUG
+        Serial.print("[Info] (Main) Action Handler - Last Navigation ID: ");
+        Serial.println(last_navigation);
+        Serial.print("[Info] (Main) Action Handler - New Navigation ID: ");
+        Serial.println(navigation);
+#endif
+        last_navigation = navigation;
+        refresh = true;
+    }
+}
+
+void refresh_handler()
+{
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Refresh GUI");
+#endif
+
+    switch (navigation)
+    {
+    case 0:
+        GUI::menu();
+        refresh = false;
+        break;
+
+    case 1:
+        Time::get_alarms_strings(alarms, alarm_count, alarm_string);
+        GUI::timeplan(alarm_string);
+        refresh = false;
+        break;
+
+    case 5:
+        Time::get_alarm_string(alarms[selection], time_string);
+        GUI::alarm_config(time_string, &alarms_type_assignment[selection]);
+        refresh = false;
+        break;
+
+    case 6:
+        GUI::alarm_config("00:00", &alarms_type_assignment[selection]);
+        refresh = false;
+        break;
+    }
 }
 
 void loop()
 {
     if (GUI::display_action())
     {
-        action_handler();
+        navigation_handler();
     }
+
+    if (refresh)
+    {
+        refresh_handler();
+    }
+
     Time::check_alarm(alarms, alarms_type_assignment, alarm_count);
+
+    // Check Network
 }
