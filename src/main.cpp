@@ -89,51 +89,50 @@ void setup()
 
 int navigation = 0;
 int last_navigation = 0;
+bool refresh = false;
 int selection = 0;
+
 char time_string[9];
 char alarm_string[64][6];
 
-void action_handler()
+bool navigation_handler()
 {
-#ifdef DEBUG
-    Serial.print("[Info] (Main) Action Handler - Current Navigation ID: ");
-    Serial.println(navigation);
-#endif
     if (navigation == 0)
     {
 #ifdef DEBUG
         Serial.println("[Info] (Main) Menu");
 #endif
-
-        // Display Action is needed after navigation changed!
-        navigation = GUI::menu();
+        navigation = GUI::check_menu();
     }
     else if (navigation == 1)
     {
 #ifdef DEBUG
         Serial.println("[Info] (Main) Timeplan");
 #endif
-        Time::get_current_timestring(time_string);
-        Time::get_alarms_strings(alarms, alarm_count, alarm_string);
-        selection = GUI::timeplan(time_string, alarm_string);
+
+        selection = GUI::check_timeplan();
 
         if (selection < MAXIMUM_AMOUNT_ALARMS)
         {
             navigation = 5;
         }
-        else if (selection == 253)
+        else if (selection == 252)
         {
-            navigation = 1;
+            GUI::draw_alarm_list(alarm_string);
         }
-        else if (selection == 254)
+        else if (selection == 253)
         {
             // back
             navigation = 6;
         }
-        else if (selection == 255)
+        else if (selection == 254)
         {
             // Add Alarm
             navigation = 0;
+        }
+        else if (selection == 255)
+        {
+            navigation = 1;
         }
     }
     else if (navigation == 2)
@@ -158,21 +157,75 @@ void action_handler()
     }
     else if (navigation == 5)
     {
-        Time::get_alarm_string(alarms[selection], time_string);
-        navigation = GUI::alarm_config(time_string, &alarms[selection], &alarms_type_assignment[selection]);
+
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Active alarm setting");
+#endif
+
+        navigation = GUI::check_alarm_config();
     }
     else if (navigation == 6)
     {
-        navigation = GUI::alarm_config("00:00", &alarms[selection], &alarms_type_assignment[selection]);
+        navigation = GUI::check_alarm_config();
+    }
+
+    // Eine Aktualisierung des Bildschirm ist nur notwendig,
+    // wenn sich die Navigation geändert hat oder die Komponente Updates benötigt.
+    if (navigation != last_navigation)
+    {
+#ifdef DEBUG
+        Serial.print("[Info] (Main) Action Handler - Last Navigation ID: ");
+        Serial.println(last_navigation);
+        Serial.print("[Info] (Main) Action Handler - New Navigation ID: ");
+        Serial.println(navigation);
+#endif
+        last_navigation = navigation;
+        refresh = true;
+    }
+}
+
+void refresh_handler()
+{
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Refresh GUI");
+#endif
+
+    switch (navigation)
+    {
+    case 0:
+        GUI::menu();
+        refresh = false;
+        break;
+
+    case 1:
+        Time::get_alarms_strings(alarms, alarm_count, alarm_string);
+        GUI::timeplan(alarm_string);
+        refresh = false;
+        break;
+
+    case 5:
+        Time::get_alarm_string(alarms[selection], time_string);
+        GUI::alarm_config(time_string, &alarms_type_assignment[selection]);
+        refresh = false;
+        break;
+
+    case 6:
+        GUI::alarm_config("00:00", &alarms_type_assignment[selection]);
+        refresh = false;
+        break;
     }
 }
 
 void loop()
 {
-    if (GUI::display_action() || (last_navigation != navigation))
+    if (GUI::display_action())
     {
-        action_handler();
-        last_navigation = navigation;
+        navigation_handler();
+    }
+
+    if (refresh)
+    {
+        refresh_handler();
     }
 
     Time::check_alarm(alarms, alarms_type_assignment, alarm_count);

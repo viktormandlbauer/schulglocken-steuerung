@@ -110,7 +110,7 @@ void draw_back_button(uint16_t BACKARROW_POS_X, uint16_t BACKARROW_POS_Y, uint8_
                  COLOR_BLACK);
 }
 
-Adafruit_GFX_Button button_alarm[5], button_up, button_down, button_add;
+Adafruit_GFX_Button button_alarm[4], button_up, button_down, button_add;
 
 void draw_alarms(char alarm_strings[][6], uint8_t alarm_list_position)
 {
@@ -124,43 +124,46 @@ void draw_alarms(char alarm_strings[][6], uint8_t alarm_list_position)
     button_alarm[3].drawButton(true);
 }
 
-bool alarms_drawn = false;
-bool timeplan_drawn = false;
 uint8_t alarm_list_position = 0;
 
-uint8_t GUI::timeplan(char time_string[9], char alarm_strings[][6])
+void GUI::draw_alarm_list(char alarm_strings[][6])
 {
-    if (!timeplan_drawn)
-    {
-        Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setFont(&FreeMono24pt7b);
-        tft.setCursor(150, Y_DIM * 0.125);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setTextSize(1);
-        tft.print("Zeitplan");
-        tft.setFont();
+    button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+    button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
+    button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "+", 5);
 
-        button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
-        button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
-        button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "+", 5);
+    button_down.drawButton(true);
+    button_up.drawButton(true);
+    button_add.drawButton(true);
 
-        button_down.drawButton(true);
-        button_up.drawButton(true);
-        button_add.drawButton(true);
-        timeplan_drawn = true;
+    draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+    draw_alarms(alarm_strings, alarm_list_position);
+}
+void GUI::timeplan(char alarm_strings[][6])
+{
+#ifdef DEBUG
+    Serial.println("[Info] (GUI) Draw Timeplan");
+#endif
 
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-        draw_alarms(alarm_strings, alarm_list_position);
-    }
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    tft.setFont(&FreeMono24pt7b);
+    tft.setCursor(150, Y_DIM * 0.125);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setTextSize(1);
+    tft.print("Zeitplan");
+    tft.setFont();
+    draw_alarm_list(alarm_strings);
+}
+
+uint8_t GUI::check_timeplan()
+{
 
     if (check_button_pressed(button_up))
     {
         if (alarm_list_position > 0)
         {
-            button_up.drawButton(false);
             alarm_list_position -= 1;
-            draw_alarms(alarm_strings, alarm_list_position);
-            button_up.drawButton(true);
+            return 252;
 #ifdef DEBUG
             Serial.println("[Info] (GUI) Zeitplan button up");
 #endif
@@ -170,10 +173,8 @@ uint8_t GUI::timeplan(char time_string[9], char alarm_strings[][6])
     {
         if (alarm_list_position < MAXIMUM_AMOUNT_ALARMS)
         {
-            button_down.drawButton(false);
             alarm_list_position += 1;
-            draw_alarms(alarm_strings, alarm_list_position);
-            button_down.drawButton(true);
+            return 252;
 #ifdef DEBUG
             Serial.println("[Info] (GUI) Zeitplan button down");
 #endif
@@ -184,21 +185,17 @@ uint8_t GUI::timeplan(char time_string[9], char alarm_strings[][6])
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Add button pressed");
 #endif
-        timeplan_drawn = false;
-        alarms_drawn = false;
-        return 254;
+        return 253;
     }
     else if (check_button_pressed(button_back))
     {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Back Button pressed");
 #endif
-        timeplan_drawn = false;
-        alarms_drawn = false;
-        return 255;
+        return 254;
     }
 
-    for (uint8_t i = 0; i < 5; i++)
+    for (uint8_t i = 0; i < 4; i++)
     {
         if (check_button_pressed(button_alarm[i]))
         {
@@ -207,18 +204,16 @@ uint8_t GUI::timeplan(char time_string[9], char alarm_strings[][6])
             Serial.print(i + alarm_list_position);
             Serial.println(" is pressed");
 #endif
-            alarms_drawn = false;
-            timeplan_drawn = false;
+            button_alarm[i].drawButton(false);
             return i + alarm_list_position;
         }
     }
-
-    return 253;
+    return 255;
 }
 
 bool alarm_config_drawn = false;
 
-uint8_t GUI::alarm_config(char *alarm_time, uint16_t *alarm, uint8_t *alarm_type)
+void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
 {
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
@@ -235,6 +230,10 @@ uint8_t GUI::alarm_config(char *alarm_time, uint16_t *alarm, uint8_t *alarm_type
 
         alarm_config_drawn = true;
     }
+}
+
+uint8_t GUI::check_alarm_config()
+{
 
     if (check_button_pressed(button_back))
     {
@@ -255,13 +254,17 @@ uint8_t GUI::alarm_config(char *alarm_time, uint16_t *alarm, uint8_t *alarm_type
     return 5;
 }
 
-uint8_t GUI::menu()
+void GUI::menu()
 {
     if (!menu_drawn)
     {
         draw_menu();
         menu_drawn = true;
     }
+}
+
+uint8_t GUI::check_menu()
+{
 
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Check Menü");
@@ -307,7 +310,10 @@ uint8_t GUI::menu()
     return 0;
 }
 
-bool released = false;
+// Sometimes the touch display doesn't work properly and sets the "released" value to true
+// Therefore it has to recognize it multiple times as "released"
+int released;
+#define THRESHOLD_RELEASED 100
 
 bool GUI::display_action()
 {
@@ -315,14 +321,14 @@ bool GUI::display_action()
     p = Waveshield.getPoint();
     Waveshield.normalizeTsPoint(p);
 
-    if (p.z > 0)
+    if (p.z > 10)
     {
-        if (released)
+        if (THRESHOLD_RELEASED == released)
         {
 #ifdef DEBUG
             Serial.println("[Info] (GUI) Display Action");
 #endif
-            released = false;
+            released = 0;
             return true;
         }
 #ifdef DEBUG
@@ -332,9 +338,9 @@ bool GUI::display_action()
         }
 #endif
     }
-    else
+    else if (released < THRESHOLD_RELEASED)
     {
-        released = true;
+        released += 1;
     }
     return false;
 }
