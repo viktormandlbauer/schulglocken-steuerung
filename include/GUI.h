@@ -17,5 +17,4 @@ namespace GUI
 
     void alarm_config(char *alarm_time, uint8_t *alarm_type);
     uint8_t check_alarm_config();
-
 }

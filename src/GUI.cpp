@@ -213,13 +213,49 @@ uint8_t GUI::check_timeplan()
 
 bool alarm_config_drawn = false;
 
+Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
+
+// For Testing
+void draw_numeric_keyboard()
+{
+    buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "0", 4);
+    buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "1", 4);
+    buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "2", 4);
+    buttons_keys[3].initButton(&tft, 168, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "3", 4);
+    buttons_keys[4].initButton(&tft, 216, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "4", 4);
+    buttons_keys[5].initButton(&tft, 24, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "5", 4);
+    buttons_keys[6].initButton(&tft, 72, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "6", 4);
+    buttons_keys[7].initButton(&tft, 120, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "7", 4);
+    buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "8", 4);
+    buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "9", 4);
+
+    button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Links", 3);
+    button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Rechts", 3);
+    button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Sichern", 3);
+    button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Entfernen", 2);
+
+    buttons_keys[0].drawButton(true);
+    buttons_keys[1].drawButton(true);
+    buttons_keys[2].drawButton(true);
+    buttons_keys[3].drawButton(true);
+    buttons_keys[4].drawButton(true);
+    buttons_keys[5].drawButton(true);
+    buttons_keys[6].drawButton(true);
+    buttons_keys[7].drawButton(true);
+    buttons_keys[8].drawButton(true);
+    buttons_keys[9].drawButton(true);
+
+    button_right.drawButton(true);
+    button_left.drawButton(true);
+    button_accept.drawButton(true);
+    button_delete.drawButton(true);
+}
+
 void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
 {
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
 #endif
-    if (!alarm_config_drawn)
-    {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Drawing alarm config");
 #endif
@@ -227,9 +263,7 @@ void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
 
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
         draw_alarm_field(alarm_time);
-
-        alarm_config_drawn = true;
-    }
+        draw_numeric_keyboard();
 }
 
 uint8_t GUI::check_alarm_config()
@@ -240,13 +274,11 @@ uint8_t GUI::check_alarm_config()
 #ifdef DEBUG
         Serial.println("[Info] (Main) Back Button pressed");
 #endif
-        alarm_config_drawn = false;
         return 1;
     }
     else if (0)
     {
 #ifdef DEBUG
-        alarm_config_drawn = false;
         Serial.println("[Info] (Main) Alarm config changed");
 #endif
         return 1;

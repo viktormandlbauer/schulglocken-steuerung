@@ -87,10 +87,10 @@ void setup()
     test2();
 }
 
-int navigation = 0;
-int last_navigation = 0;
+int navigation;
+int last_navigation;
+int selection;
 bool refresh = false;
-int selection = 0;
 
 char time_string[9];
 char alarm_string[64][6];
