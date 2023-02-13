@@ -168,10 +168,26 @@ void Time::get_alarm_string(uint16_t alarm, char output[6])
     get_timestring(alarm / 60, alarm % 60, output);
 }
 
+int compare(const void *a, const void *b)
+{
+    int int_a = *((int *)a);
+    int int_b = *((int *)b);
+
+    if (int_a == int_b)
+        return 0;
+    else if (int_a < int_b)
+        return -1;
+    else
+        return 1;
+}
+
 uint8_t Time::add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
+
     alarms[alarm_count] = convert_time_to_alarm(hour, minute);
     alarms_type_assignment[alarm_count] = alarm_type;
+    qsort(alarms, alarm_count + 1, sizeof(int), compare);
+
 #ifdef DEBUG
     Serial.print("[Info] (Time) Added alarm: ");
     Serial.println(alarms[alarm_count]);

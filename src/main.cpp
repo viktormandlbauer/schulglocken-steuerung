@@ -27,15 +27,8 @@ void test1()
     Time::set_alarm_types(2, 0xAF00FF0A);
 
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 6, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 2, 7, 0);
     alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 5, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 3, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 10, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 19, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 20, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 21, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 22, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 2, 7, 0);
 
     // Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
     // alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
@@ -162,12 +155,12 @@ bool navigation_handler()
         Serial.println("[Info] (Main) Active alarm setting");
 #endif
 
-        navigation = GUI::check_alarm_config();
-        
+        navigation = GUI::check_alarm_config(&alarms[selection]);
     }
     else if (navigation == 6)
     {
-        navigation = GUI::check_alarm_config();
+        alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 0);
+        navigation = GUI::check_alarm_config(&alarms[alarm_count]);
     }
 
     // Eine Aktualisierung des Bildschirm ist nur notwendig,

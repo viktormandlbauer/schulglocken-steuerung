@@ -219,8 +219,8 @@ void draw_numeric_keyboard()
     buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "8", 4);
     buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "9", 4);
 
-    button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Links", 3);
-    button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Rechts", 3);
+    button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "<", 3);
+    button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, ">", 3);
     button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Sichern", 3);
     button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, "Entfernen", 2);
 
@@ -358,13 +358,19 @@ void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
     draw_numeric_keyboard();
 }
 
-uint8_t GUI::check_alarm_config()
+uint16_t string_to_time(char *alarm_string)
+{
+    return ((int)(alarm_string[0] - '0') * 10 + (int)(alarm_string[1] - '0')) * 60 +
+           ((int)(alarm_string[3] - '0') * 10 + (int)(alarm_string[4] - '0'));
+}
+
+uint8_t GUI::check_alarm_config(uint16_t *alarms)
 {
     uint8_t input = check_numeric_keyboard();
 
     if (input < 10)
     {
-        if ((alarm_list_position == 0 && input > 2) || (alarm_list_position == 3 && input > 5))
+        if ((alarm_string_position == 0 && input > 2) || (alarm_string_position == 1 && input > 3) || (alarm_string_position == 3 && input > 5))
         {
 #ifdef DEBUG
             Serial.println("[Error] (GUI) Invalid input");
@@ -374,6 +380,10 @@ uint8_t GUI::check_alarm_config()
         }
 
         alarm_setting[alarm_string_position] = input + '0';
+
+        *alarms = string_to_time(alarm_setting);
+        Serial.println(*alarms);
+
         draw_modified_alarm(alarm_setting);
         return 5;
     }
@@ -421,11 +431,12 @@ uint8_t GUI::check_alarm_config()
         break;
     case 255:
         // Accept/Seave setting
-        return 255;
+        return 1;
     default:
-        return 255;
+        return 5;
         break;
     }
+    return 5;
 }
 
 void GUI::menu()

@@ -16,5 +16,5 @@ namespace GUI
     uint8_t check_timeplan();
 
     void alarm_config(char *alarm_time, uint8_t *alarm_type);
-    uint8_t check_alarm_config();
+    uint8_t check_alarm_config(uint16_t *alarm);
 }
