@@ -163,6 +163,7 @@ bool navigation_handler()
 #endif
 
         navigation = GUI::check_alarm_config();
+        
     }
     else if (navigation == 6)
     {

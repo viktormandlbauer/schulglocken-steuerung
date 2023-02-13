@@ -79,14 +79,6 @@ void draw_time(char *time_string)
     }
 }
 
-void draw_alarm_field(char *time_string)
-{
-    for (uint8_t i = 0; i < 5; i++)
-    {
-        tft.drawChar(0.4 * Y_DIM + 30 * i, Y_DIM * 0.05, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
-    }
-}
-
 Adafruit_GFX_Button button_back;
 void draw_back_button(uint16_t BACKARROW_POS_X, uint16_t BACKARROW_POS_Y, uint8_t BACKARROW_WIDTH, uint8_t BACKARROW_HEIGHT)
 {
@@ -211,8 +203,6 @@ uint8_t GUI::check_timeplan()
     return 255;
 }
 
-bool alarm_config_drawn = false;
-
 Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
 
 // For Testing
@@ -232,7 +222,7 @@ void draw_numeric_keyboard()
     button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Links", 3);
     button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Rechts", 3);
     button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Sichern", 3);
-    button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Entfernen", 2);
+    button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, "Entfernen", 2);
 
     buttons_keys[0].drawButton(true);
     buttons_keys[1].drawButton(true);
@@ -251,39 +241,191 @@ void draw_numeric_keyboard()
     button_delete.drawButton(true);
 }
 
+uint8_t check_numeric_keyboard()
+{
+    if (check_button_pressed(button_right))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Right-Button pressed");
+#endif
+        return 252;
+    }
+    else if (check_button_pressed(button_left))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Left-Button pressed");
+#endif
+
+        return 253;
+    }
+    else if (check_button_pressed(button_delete))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Delete-Button pressed");
+#endif
+
+        return 254;
+    }
+    else if (check_button_pressed(button_accept))
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (GUI) Accept-Button pressed");
+#endif
+
+        return 255;
+    }
+
+    for (uint8_t i = 0; i < 10; i++)
+    {
+        if (check_button_pressed(buttons_keys[i]))
+        {
+#ifdef DEBUG
+            Serial.print("[Info] (GUI) Keyboard: ");
+            Serial.println(i);
+#endif
+            buttons_keys[i].drawButton(false);
+            buttons_keys[i].drawButton(true);
+            return i;
+        }
+    }
+    return 255;
+}
+
+char *alarm_setting;
+uint8_t alarm_string_position;
+
+void draw_modified_alarm(char *time_string)
+{
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        if (i == alarm_string_position)
+        {
+            tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_WHITE, 5);
+        }
+        else
+        {
+            tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+        }
+    }
+}
+
+void update_keyboard()
+{
+    if (alarm_list_position == 0)
+    {
+        buttons_keys[3].drawButton(false);
+        buttons_keys[4].drawButton(false);
+        buttons_keys[5].drawButton(false);
+        buttons_keys[6].drawButton(false);
+        buttons_keys[7].drawButton(false);
+        buttons_keys[8].drawButton(false);
+        buttons_keys[9].drawButton(false);
+    }
+    else if (alarm_list_position == 3)
+    {
+        buttons_keys[6].drawButton(false);
+        buttons_keys[7].drawButton(false);
+        buttons_keys[8].drawButton(false);
+        buttons_keys[9].drawButton(false);
+    }
+    else
+    {
+        buttons_keys[2].drawButton(true);
+        buttons_keys[3].drawButton(true);
+        buttons_keys[4].drawButton(true);
+        buttons_keys[5].drawButton(true);
+        buttons_keys[6].drawButton(true);
+        buttons_keys[7].drawButton(true);
+        buttons_keys[8].drawButton(true);
+        buttons_keys[9].drawButton(true);
+    }
+}
+
 void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
 {
+    alarm_setting = alarm_time;
+
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
 #endif
 #ifdef DEBUG
-        Serial.println("[Info] (GUI) Drawing alarm config");
+    Serial.println("[Info] (GUI) Drawing alarm config");
 #endif
-        Waveshield.fillScreen(COLOR_BACKGROUND);
+    Waveshield.fillScreen(COLOR_BACKGROUND);
 
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-        draw_alarm_field(alarm_time);
-        draw_numeric_keyboard();
+    draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+    draw_modified_alarm(alarm_setting);
+    draw_numeric_keyboard();
 }
 
 uint8_t GUI::check_alarm_config()
 {
+    uint8_t input = check_numeric_keyboard();
 
-    if (check_button_pressed(button_back))
+    if (input < 10)
     {
+        if ((alarm_list_position == 0 && input > 2) || (alarm_list_position == 3 && input > 5))
+        {
 #ifdef DEBUG
-        Serial.println("[Info] (Main) Back Button pressed");
+            Serial.println("[Error] (GUI) Invalid input");
 #endif
-        return 1;
+            // Prüfung ob Input unmöglich an aktueller Position
+            return 5;
+        }
+
+        alarm_setting[alarm_string_position] = input + '0';
+        draw_modified_alarm(alarm_setting);
+        return 5;
     }
-    else if (0)
+
+    switch (input)
     {
-#ifdef DEBUG
-        Serial.println("[Info] (Main) Alarm config changed");
-#endif
-        return 1;
+    case 252:
+        // Go Right
+        if (alarm_string_position == 1)
+        {
+            alarm_string_position += 2;
+        }
+        else if (alarm_string_position == 4)
+        {
+            return 5;
+        }
+        else
+        {
+            alarm_string_position += 1;
+        }
+        draw_modified_alarm(alarm_setting);
+        return 5;
+        break;
+
+    case 253:
+        // Go left
+        if (alarm_string_position == 3)
+        {
+            alarm_string_position -= 2;
+        }
+        else if (alarm_string_position == 0)
+        {
+            return 5;
+        }
+        else
+        {
+            alarm_string_position -= 1;
+        }
+        draw_modified_alarm(alarm_setting);
+        return 5;
+        break;
+    case 254:
+        // Delete setting
+        return 254;
+        break;
+    case 255:
+        // Accept/Seave setting
+        return 255;
+    default:
+        return 255;
+        break;
     }
-    return 5;
 }
 
 void GUI::menu()
