@@ -181,20 +181,22 @@ int compare(const void *a, const void *b)
         return 1;
 }
 
-uint8_t Time::add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
+uint8_t Time::add_alarm(Alarm alarms[], uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
+    alarms[alarm_count].hour = hour;
+    alarms[alarm_count].minute = minute;
+    alarms[alarm_count].type = alarm_type;
 
-    alarms[alarm_count] = convert_time_to_alarm(hour, minute);
-    alarms_type_assignment[alarm_count] = alarm_type;
-    qsort(alarms, alarm_count + 1, sizeof(int), compare);
+    // Sorting
+    // qsort(alarms, alarm_count + 1, sizeof(int), compare);
 
 #ifdef DEBUG
-    Serial.print("[Info] (Time) Added alarm: ");
-    Serial.println(alarms[alarm_count]);
-
-    Serial.print("[Info] (Time) with alarm type: ");
-    Serial.println(alarms_type_assignment[alarm_count]);
-
+    Serial.print("[Info] (Time) Added alarm ");
+    Serial.print(hour);
+    Serial.print(":");
+    Serial.print(minute);
+    Serial.print(" with Type ");
+    Serial.println(alarm_type);
 #endif
     return alarm_count += 1;
 }

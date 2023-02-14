@@ -29,7 +29,7 @@ namespace Time
 
     bool check_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count);
 
-    uint8_t add_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type);
+    uint8_t add_alarm(Alarm alarms[], uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type);
 
     uint8_t remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index);
 

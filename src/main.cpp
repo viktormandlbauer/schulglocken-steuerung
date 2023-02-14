@@ -11,10 +11,9 @@
 #include "Storage.h"
 
 // Array mit den Alarmzeiten
-static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
+// static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
 
-// Array mit Alarmtypzuweisung
-static uint8_t alarms_type_assignment[MAXIMUM_AMOUNT_ALARMS] = {0};
+static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
 
 // Anzahl der Alarme
 static uint8_t alarm_count = 0;
@@ -26,9 +25,9 @@ void test1()
     Time::set_alarm_types(1, 0xF0F0F0F0);
     Time::set_alarm_types(2, 0xAF00FF0A);
 
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 6, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 5, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 2, 7, 0);
+    alarm_count = Time::add_alarm(alarms, alarm_count, 1, 6, 1);
+    alarm_count = Time::add_alarm(alarms, alarm_count, 5, 5, 2);
+    alarm_count = Time::add_alarm(alarms, alarm_count, 2, 7, 0);
 
     // Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
     // alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
@@ -161,7 +160,7 @@ bool navigation_handler()
     {
         Time::Alarm new_alarm = {0, 0, 0};
 
-        alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 0);
+        alarm_count = Time::add_alarm(alarms, alarm_count, 0, 0, 0);
         navigation = GUI::check_alarm_config(&alarms[alarm_count]);
 
         // Prevents refreshing GUI, because its the same interface as navigation 5
