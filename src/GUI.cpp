@@ -367,10 +367,12 @@ uint16_t text_to_time(char *alarm_string)
 uint8_t GUI::check_alarm_config(uint16_t *alarms)
 {
     uint8_t input = check_numeric_keyboard();
-    Serial.println(input);
     if (input < 10)
     {
-        if ((alarm_string_position == 0 && input > 2) || (alarm_string_position == 1 && input > 3) || (alarm_string_position == 3 && input > 5))
+        if ((alarm_string_position == 0 && input > 2) ||
+            (alarm_string_position == 1 && input > 3 && alarm_setting[0] - '0' == 2) ||
+            (alarm_string_position == 3 && input > 5) ||
+            (alarm_setting[1] - '0' > 3 && alarm_string_position == 0 && input > 1))
         {
 #ifdef DEBUG
             Serial.println("[Error] (GUI) Invalid input");

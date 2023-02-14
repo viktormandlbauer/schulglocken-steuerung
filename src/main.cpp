@@ -11,28 +11,12 @@
 #include "Storage.h"
 
 // Array mit den Alarmzeiten
-static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
+// static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
 
-// Array mit Alarmtypzuweisung
-static uint8_t alarms_type_assignment[MAXIMUM_AMOUNT_ALARMS] = {0};
+static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS + 1];
 
 // Anzahl der Alarme
 static uint8_t alarm_count = 0;
-
-void test1()
-{
-    // Alarmtypes
-    Time::set_alarm_types(0, 0xAAAAAAAA);
-    Time::set_alarm_types(1, 0xF0F0F0F0);
-    Time::set_alarm_types(2, 0xAF00FF0A);
-
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 1, 6, 1);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 5, 5, 2);
-    alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 2, 7, 0);
-
-    // Storage::save_alarms(alarms, alarms_type_assignment, alarm_count);
-    // alarm_count = Storage::read_alarms(alarms, alarms_type_assignment);
-}
 
 void test2()
 {
@@ -73,11 +57,13 @@ void setup()
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
 #endif
 
+    // Alarmtypes
+    Time::set_alarm_types(0, 0xAAAAAAAA);
+    Time::set_alarm_types(1, 0xF0F0F0F0);
+    Time::set_alarm_types(2, 0xAF00FF0A);
+
     // Beeper
     pinMode(A2, OUTPUT);
-
-    test1();
-    test2();
 }
 
 int navigation;
@@ -155,18 +141,17 @@ bool navigation_handler()
         Serial.println("[Info] (Main) Active alarm setting");
 #endif
 
-        navigation = GUI::check_alarm_config(&alarms[selection]);
+        navigation = GUI::check_alarm_config(&alarms[selection].minutes);
     }
     else if (navigation == 6)
     {
-        Time::Alarm new_alarm = {0, 0, 0};
-
-        alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 0);
-        navigation = GUI::check_alarm_config(&alarms[alarm_count]);
+        navigation = GUI::check_alarm_config(&alarms[alarm_count - 1].minutes);
 
         // Prevents refreshing GUI, because its the same interface as navigation 5
-        last_navigation = 5;
-        navigation = 5;
+        if (navigation == 5)
+        {
+            navigation = 6;
+        }
     }
 
     // Eine Aktualisierung des Bildschirm ist nur notwendig,
@@ -198,19 +183,21 @@ void refresh_handler()
         break;
 
     case 1:
+        Time::sort_alarms(alarms, alarm_count);
         Time::get_alarms_strings(alarms, alarm_count, alarm_string);
         GUI::timeplan(alarm_string);
         refresh = false;
         break;
 
     case 5:
-        Time::get_alarm_string(alarms[selection], time_string);
-        GUI::alarm_config(time_string, &alarms_type_assignment[selection]);
+        Time::get_alarm_string(alarms[selection].minutes, time_string);
+        GUI::alarm_config(time_string, &alarms[selection].type);
         refresh = false;
         break;
 
     case 6:
-        GUI::alarm_config("00:00", &alarms_type_assignment[selection]);
+        alarm_count = Time::add_alarm(alarms, alarm_count, 25, 61, 0);
+        GUI::alarm_config("??:??", &alarms[alarm_count].type);
         refresh = false;
         break;
     }
@@ -228,7 +215,7 @@ void loop()
         refresh_handler();
     }
 
-    Time::check_alarm(alarms, alarms_type_assignment, alarm_count);
+    Time::check_alarms(alarms, alarm_count);
 
     // Check Network
 }
