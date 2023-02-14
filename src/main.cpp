@@ -159,8 +159,14 @@ bool navigation_handler()
     }
     else if (navigation == 6)
     {
+        Time::Alarm new_alarm = {0, 0, 0};
+
         alarm_count = Time::add_alarm(alarms, alarms_type_assignment, alarm_count, 0, 0, 0);
         navigation = GUI::check_alarm_config(&alarms[alarm_count]);
+
+        // Prevents refreshing GUI, because its the same interface as navigation 5
+        last_navigation = 5;
+        navigation = 5;
     }
 
     // Eine Aktualisierung des Bildschirm ist nur notwendig,

@@ -42,17 +42,17 @@ void draw_menu()
     // Einstallungs Menü
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
-    tft.setFont(&FreeMono24pt7b);
-    tft.setCursor(50, Y_DIM / 8);
-    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    tft.setTextSize(1);
-    tft.print("Einstellungen");
-    tft.setFont();
+    // tft.setFont(&FreeMono24pt7b);
+    // tft.setCursor(50, Y_DIM / 8);
+    // tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    // tft.setTextSize(1);
+    // tft.print("Einstellungen");
+    // tft.setFont();
 
-    button_plan.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 3, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
-    button_time.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 5, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
-    button_sys.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 7, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
-    button_network.initButton(&tft, X_DIM / 2, (Y_DIM / 10) * 9, X_DIM / 2, Y_DIM / 8, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Netzwerk", 3);
+    button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
+    button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
+    button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
+    button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Netzwerk", 3);
 
     button_plan.drawButton(true);
     button_time.drawButton(true);
@@ -288,7 +288,7 @@ uint8_t check_numeric_keyboard()
             return i;
         }
     }
-    return 255;
+    return 251;
 }
 
 char *alarm_setting;
@@ -358,7 +358,7 @@ void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
     draw_numeric_keyboard();
 }
 
-uint16_t string_to_time(char *alarm_string)
+uint16_t text_to_time(char *alarm_string)
 {
     return ((int)(alarm_string[0] - '0') * 10 + (int)(alarm_string[1] - '0')) * 60 +
            ((int)(alarm_string[3] - '0') * 10 + (int)(alarm_string[4] - '0'));
@@ -367,7 +367,7 @@ uint16_t string_to_time(char *alarm_string)
 uint8_t GUI::check_alarm_config(uint16_t *alarms)
 {
     uint8_t input = check_numeric_keyboard();
-
+    Serial.println(input);
     if (input < 10)
     {
         if ((alarm_string_position == 0 && input > 2) || (alarm_string_position == 1 && input > 3) || (alarm_string_position == 3 && input > 5))
@@ -381,15 +381,16 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
 
         alarm_setting[alarm_string_position] = input + '0';
 
-        *alarms = string_to_time(alarm_setting);
-        Serial.println(*alarms);
-
+        *alarms = text_to_time(alarm_setting);
         draw_modified_alarm(alarm_setting);
         return 5;
     }
 
     switch (input)
     {
+    case 251:
+        return 5;
+        break;
     case 252:
         // Go Right
         if (alarm_string_position == 1)

@@ -13,6 +13,14 @@
  */
 namespace Time
 {
+    struct Alarm
+    {
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t type;
+    };
+    
+
     bool init_rtc_module();
 
     void get_current_timestring(char time_string[9]);
