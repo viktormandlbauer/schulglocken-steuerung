@@ -15,11 +15,9 @@ namespace Time
 {
     struct Alarm
     {
-        uint8_t hour;
-        uint8_t minute;
+        uint16_t minutes;
         uint8_t type;
     };
-    
 
     bool init_rtc_module();
 
@@ -27,13 +25,16 @@ namespace Time
 
     uint16_t get_minutes_passed();
 
-    bool check_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count);
+    bool check_alarms(Alarm *alarms, uint8_t alarm_count);
+
 
     uint8_t add_alarm(Alarm alarms[], uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type);
+    bool alarm_exists(Alarm alarms[], uint8_t minutes, uint8_t alarm_count);
+    void sort_alarms(Alarm alarms[], uint8_t alarm_count);
 
     uint8_t remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index);
 
-    void get_alarms_strings(uint16_t alarms[], uint8_t alarm_count, char output[][6]);
+    void get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6]);
 
     void init_alarm_interrupt();
 

@@ -168,37 +168,69 @@ void Time::get_alarm_string(uint16_t alarm, char output[6])
     get_timestring(alarm / 60, alarm % 60, output);
 }
 
-int compare(const void *a, const void *b)
+int compare(const void *s1, const void *s2)
 {
-    int int_a = *((int *)a);
-    int int_b = *((int *)b);
+    struct Alarm *a1 = (struct Alarm *)s1;
+    struct Alarm *a2 = (struct Alarm *)s2;
 
-    if (int_a == int_b)
-        return 0;
-    else if (int_a < int_b)
+    if (a1->minutes < a2->minutes)
+    {
         return -1;
+    }
+    else if (a1->minutes > a2->minutes)
+    {
+        return +1;
+    }
     else
-        return 1;
+    {
+        return 0;
+    }
+}
+
+void Time::sort_alarms(Alarm alarms[], uint8_t alarm_count)
+{
+
+    qsort(alarms, alarm_count, sizeof(Alarm), compare);
+}
+
+bool Time::alarm_exists(Alarm alarms[], uint8_t minutes, uint8_t alarm_count)
+{
+    for (uint8_t i = 0; i < alarm_count; i++)
+    {
+        if (alarms[i].minutes == minutes)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 uint8_t Time::add_alarm(Alarm alarms[], uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
 {
-    alarms[alarm_count].hour = hour;
-    alarms[alarm_count].minute = minute;
-    alarms[alarm_count].type = alarm_type;
-
-    // Sorting
-    // qsort(alarms, alarm_count + 1, sizeof(int), compare);
-
+    uint16_t minutes = hour * 60 + minute;
+    if (!alarm_exists(alarms, minutes, alarm_count))
+    {
+        alarms[alarm_count].minutes = minutes;
+        alarms[alarm_count].type = alarm_type;
+        alarm_count += 1;
 #ifdef DEBUG
-    Serial.print("[Info] (Time) Added alarm ");
-    Serial.print(hour);
-    Serial.print(":");
-    Serial.print(minute);
-    Serial.print(" with Type ");
-    Serial.println(alarm_type);
+        Serial.print("[Info] (Time) Added alarm ");
+        Serial.print(hour);
+        Serial.print(":");
+        Serial.print(minute);
+        Serial.print(" with Type ");
+        Serial.println(alarm_type);
 #endif
-    return alarm_count += 1;
+    }
+    else
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Time) Alarm already exists");
+#endif
+        return alarm_count;
+    }
+
+    return alarm_count;
 }
 
 uint8_t Time::remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index)
@@ -213,13 +245,13 @@ uint8_t Time::remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assig
     return alarm_count;
 }
 
-void Time::get_alarms_strings(uint16_t alarms[], uint8_t alarm_count, char output[][6])
+void Time::get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6])
 {
 
     // Füllt ein zweidimensionales character array mit den formatierten Alarmzeiten und gibt die Anzahl der Alarme zurück.
     for (int i = 0; i < alarm_count; i++)
     {
-        get_timestring(alarms[i] / 60, alarms[i] % 60, output[i]);
+        get_timestring(alarms[i].minutes / 60, alarms[i].minutes % 60, output[i]);
     }
 }
 
@@ -242,7 +274,7 @@ uint32_t position = 0;
 bool finished = true;
 
 // Allgemeine Überprüfung eines Alarms
-bool Time::check_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count)
+bool Time::check_alarms(Alarm *alarms, uint8_t alarm_count)
 {
     // Testet ob Alarm aktiv ist
     if (!finished)
@@ -261,16 +293,16 @@ bool Time::check_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_
         {
             if (!is_triggered(i))
             {
-                if (current_time == alarms[i])
+                if (current_time == alarms[i].minutes)
                 {
                     // Flag um ein erneutes Läuten in der selben Minute zu verhindern
 
                     set_triggered(i);
-                    current_alarm_type = alarms_type_assignment[i];
+                    current_alarm_type = alarms[i].type;
                     finished = false;
 #ifdef DEBUG
                     Serial.print("[Info] Alarm triggered: ");
-                    Serial.println(alarms[i]);
+                    Serial.println(alarms[i].minutes);
 #endif
                     return true;
                 }
