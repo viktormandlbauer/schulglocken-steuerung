@@ -42,13 +42,6 @@ void draw_menu()
     // Einstallungs Menü
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
-    // tft.setFont(&FreeMono24pt7b);
-    // tft.setCursor(50, Y_DIM / 8);
-    // tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    // tft.setTextSize(1);
-    // tft.print("Einstellungen");
-    // tft.setFont();
-
     button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
     button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
     button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
@@ -155,7 +148,7 @@ uint8_t GUI::check_timeplan()
         if (alarm_list_position > 0)
         {
             alarm_list_position -= 1;
-            return 252;
+            return BUTTON_UP;
 #ifdef DEBUG
             Serial.println("[Info] (GUI) Zeitplan button up");
 #endif
@@ -166,7 +159,7 @@ uint8_t GUI::check_timeplan()
         if (alarm_list_position < MAXIMUM_AMOUNT_ALARMS)
         {
             alarm_list_position += 1;
-            return 252;
+            return BUTTON_DOWN;
 #ifdef DEBUG
             Serial.println("[Info] (GUI) Zeitplan button down");
 #endif
@@ -177,14 +170,14 @@ uint8_t GUI::check_timeplan()
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Add button pressed");
 #endif
-        return 253;
+        return BUTTON_ADD;
     }
     else if (check_button_pressed(button_back))
     {
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Back Button pressed");
 #endif
-        return 254;
+        return BUTTON_BACK;
     }
 
     for (uint8_t i = 0; i < 4; i++)
@@ -200,7 +193,7 @@ uint8_t GUI::check_timeplan()
             return i + alarm_list_position;
         }
     }
-    return 255;
+    return NO_CHANGE;
 }
 
 Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
@@ -241,6 +234,8 @@ void draw_numeric_keyboard()
     button_delete.drawButton(true);
 }
 
+
+
 uint8_t check_numeric_keyboard()
 {
     if (check_button_pressed(button_right))
@@ -248,7 +243,7 @@ uint8_t check_numeric_keyboard()
 #ifdef DEBUG
         Serial.println("[Info] (GUI) Right-Button pressed");
 #endif
-        return 252;
+        return BUTTON_RIGH;
     }
     else if (check_button_pressed(button_left))
     {
@@ -256,7 +251,7 @@ uint8_t check_numeric_keyboard()
         Serial.println("[Info] (GUI) Left-Button pressed");
 #endif
 
-        return 253;
+        return BUTTON_LEFT;
     }
     else if (check_button_pressed(button_delete))
     {
@@ -264,7 +259,7 @@ uint8_t check_numeric_keyboard()
         Serial.println("[Info] (GUI) Delete-Button pressed");
 #endif
 
-        return 254;
+        return BUTTON_DELETE;
     }
     else if (check_button_pressed(button_accept))
     {
@@ -272,7 +267,7 @@ uint8_t check_numeric_keyboard()
         Serial.println("[Info] (GUI) Accept-Button pressed");
 #endif
 
-        return 255;
+        return BUTTON_ACCEPT;
     }
 
     for (uint8_t i = 0; i < 10; i++)
@@ -364,6 +359,9 @@ uint16_t text_to_time(char *alarm_string)
            ((int)(alarm_string[3] - '0') * 10 + (int)(alarm_string[4] - '0'));
 }
 
+
+
+
 uint8_t GUI::check_alarm_config(uint16_t *alarms)
 {
     uint8_t input = check_numeric_keyboard();
@@ -378,40 +376,36 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
             Serial.println("[Error] (GUI) Invalid input");
 #endif
             // Prüfung ob Input unmöglich an aktueller Position
-            return 5;
+            return ALARM_CONFIG;
         }
 
         alarm_setting[alarm_string_position] = input + '0';
 
         *alarms = text_to_time(alarm_setting);
         draw_modified_alarm(alarm_setting);
-        return 5;
+        return ALARM_CONFIG;
     }
 
     switch (input)
     {
-    case 251:
-        return 5;
-        break;
-    case 252:
-        // Go Right
+    case BUTTON_RIGH:
         if (alarm_string_position == 1)
         {
             alarm_string_position += 2;
         }
         else if (alarm_string_position == 4)
         {
-            return 5;
+            return ALARM_CONFIG;
         }
         else
         {
             alarm_string_position += 1;
         }
         draw_modified_alarm(alarm_setting);
-        return 5;
+        return ALARM_CONFIG;
         break;
 
-    case 253:
+    case BUTTON_LEFT:
         // Go left
         if (alarm_string_position == 3)
         {
@@ -419,27 +413,27 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
         }
         else if (alarm_string_position == 0)
         {
-            return 5;
+            return ALARM_CONFIG;
         }
         else
         {
             alarm_string_position -= 1;
         }
         draw_modified_alarm(alarm_setting);
-        return 5;
+        return ALARM_CONFIG;
         break;
-    case 254:
-        // Delete setting
-        return 254;
+    case BUTTON_DELETE:
+        // @todo: Alarm löschen
+        return BUTTON_DELETE;
         break;
-    case 255:
+    case BUTTON_ACCEPT:
         // Accept/Seave setting
-        return 1;
+        return TIMEPLAN;
     default:
-        return 5;
+        return ALARM_CONFIG;
         break;
     }
-    return 5;
+    return ALARM_CONFIG;
 }
 
 void GUI::menu()
@@ -450,6 +444,8 @@ void GUI::menu()
         menu_drawn = true;
     }
 }
+
+
 
 uint8_t GUI::check_menu()
 {
@@ -465,7 +461,7 @@ uint8_t GUI::check_menu()
 #endif
         button_plan.drawButton(false);
         menu_drawn = false;
-        return 1;
+        return TIMEPLAN;
     }
     else if (check_button_pressed(button_time))
     {
@@ -474,7 +470,7 @@ uint8_t GUI::check_menu()
 #endif
         button_time.drawButton(false);
         menu_drawn = false;
-        return 2;
+        return TIME;
     }
     else if (check_button_pressed(button_sys))
     {
@@ -483,7 +479,7 @@ uint8_t GUI::check_menu()
 #endif
         button_sys.drawButton(false);
         menu_drawn = false;
-        return 3;
+        return SYSTEM;
     }
     else if (check_button_pressed(button_network))
     {
@@ -492,10 +488,10 @@ uint8_t GUI::check_menu()
 #endif
         button_network.drawButton(false);
         menu_drawn = false;
-        return 4;
+        return NETWORK;
     }
 
-    return 0;
+    return MENU;
 }
 
 // Sometimes the touch display doesn't work properly and sets the "released" value to true

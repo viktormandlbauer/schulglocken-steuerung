@@ -50,3 +50,21 @@
 // #define DEBUG_STORAGE
 #define DEBUG_GUI
 // #define DEBUG_NETWORK
+
+// Definitionen für "return codes"
+#define MENU 0
+#define TIMEPLAN 1
+#define TIME 2
+#define SYSTEM 3
+#define NETWORK 4 
+#define ALARM_CONFIG 5
+#define NEW_ALARM_CONFIG 6
+#define NO_CHANGE 247
+#define BUTTON_BACK 248
+#define BUTTON_ADD 249
+#define BUTTON_UP 250
+#define BUTTON_DOWN 251
+#define BUTTON_RIGH 252
+#define BUTTON_LEFT 253
+#define BUTTON_DELETE 254
+#define BUTTON_ACCEPT 255
