@@ -10,12 +10,9 @@
 #include "Network.h"
 #include "Storage.h"
 
-// Array mit den Alarmzeiten
-// static uint16_t alarms[MAXIMUM_AMOUNT_ALARMS] = {0};
-
-static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS + 1];
-
-// Anzahl der Alarme
+// Alarme
+static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
+static Time::Alarm alarm;
 static uint8_t alarm_count = 0;
 
 void test2()
@@ -74,22 +71,23 @@ bool refresh = false;
 char time_string[9];
 char alarm_string[64][6];
 
-bool navigation_handler()
+void navigation_handler()
 {
-    if (navigation == MENU)
+
+    switch (navigation)
     {
+    case MENU:
 #ifdef DEBUG
         Serial.println("[Info] (Main) Menu");
 #endif
         navigation = GUI::check_menu();
-    }
-    else if (navigation == TIMEPLAN)
-    {
+        break;
+
+    case TIMEPLAN:
 #ifdef DEBUG
         Serial.println("[Info] (Main) Timeplan");
 #endif
-
-        selection = GUI::check_timeplan();
+        selection = GUI::check_timeplan(alarm_count);
 
         if (selection < MAXIMUM_AMOUNT_ALARMS)
         {
@@ -111,45 +109,79 @@ bool navigation_handler()
         {
             navigation = TIMEPLAN;
         }
-    }
-    else if (navigation == TIME)
-    {
-#ifdef DEBUG
-        Serial.println("[Info] (Main) Time");
-#endif
-        // Uhrzeit
-    }
-    else if (navigation == SYSTEM)
-    {
-#ifdef DEBUG
-        Serial.println("[Info] (Main) System");
-#endif
-        // Systeminfo
-    }
-    else if (navigation == NETWORK)
-    {
-#ifdef DEBUG
-        Serial.println("[Info] (Main) Network ");
-#endif
-    }
-    else if (navigation == ALARM_CONFIG)
-    {
+        break;
 
+    case TIME:
+        break;
+
+    case SYSTEM:
+        break;
+
+    case NETWORK:
+        break;
+
+    case ALARM_CONFIG:
 #ifdef DEBUG
         Serial.println("[Info] (Main) Active alarm setting");
 #endif
 
-        navigation = GUI::check_alarm_config(&alarms[selection].minutes);
-    }
-    else if (navigation == NEW_ALARM_CONFIG)
-    {
-        navigation = GUI::check_alarm_config(&alarms[alarm_count - 1].minutes);
-
-        // Prevents refreshing GUI, because its the same interface as navigation 5
-        if (navigation == ALARM_CONFIG)
+        navigation = GUI::check_alarm_config(&alarm.minutes, &alarm.type, false);
+        if (navigation == BUTTON_ACCEPT)
         {
-            navigation = NEW_ALARM_CONFIG;
+            if (alarm.minutes == alarms[selection].minutes && alarm.type == alarms[selection].type)
+            {
+
+#ifdef DEBUG
+                Serial.println("[Info] (Main) Alarm didn't change.");
+#endif
+                navigation = TIMEPLAN;
+            }
+            else
+            {
+                if (Time::alarm_exists(alarms, alarm.minutes, alarm_count))
+                {
+#ifdef DEBUG
+                    Serial.println("[Error] (Main) Can't update alarm because timeframe already exists.");
+#endif
+                    navigation = ALARM_CONFIG;
+                }
+                else
+                {
+                    alarms[selection].minutes = alarm.minutes;
+                    alarms[selection].type = alarm.type;
+#ifdef DEBUG
+                    Serial.println("[Info] (Main) Successfully updated alarm.");
+#endif
+                    navigation = TIMEPLAN;
+                }
+            }
         }
+        break;
+
+    case NEW_ALARM_CONFIG:
+        navigation = GUI::check_alarm_config(&alarm.minutes, &alarm.type, true);
+
+        if (navigation == BUTTON_ACCEPT)
+        {
+            if (Time::add_alarm(alarms, &alarm_count, alarm.minutes, alarm.type))
+            {
+#ifdef DEBUG
+                Serial.println("[Info] (Main) Successfully added new alarm!");
+#endif
+                navigation = TIMEPLAN;
+            }
+            else
+            {
+#ifdef DEBUG
+                Serial.println("[Error] (Main) Failed adding new alarm, because timeframe alarm already exists!");
+#endif
+                navigation = NEW_ALARM_CONFIG;
+            }
+        }
+        break;
+
+    default:
+        break;
     }
 
     // Eine Aktualisierung des Bildschirm ist nur notwendig,
@@ -169,6 +201,7 @@ bool navigation_handler()
 
 void refresh_handler()
 {
+    refresh = false;
 #ifdef DEBUG
     Serial.println("[Info] (Main) Refresh GUI");
 #endif
@@ -177,32 +210,30 @@ void refresh_handler()
     {
     case MENU:
         GUI::menu();
-        refresh = false;
         break;
 
     case TIMEPLAN:
         Time::sort_alarms(alarms, alarm_count);
         Time::get_alarms_strings(alarms, alarm_count, alarm_string);
         GUI::timeplan(alarm_string);
-        refresh = false;
         break;
 
     case ALARM_CONFIG:
-        Time::get_alarm_string(alarms[selection].minutes, time_string);
-        GUI::alarm_config(time_string, &alarms[selection].type);
-        refresh = false;
+        alarm.minutes = alarms[selection].minutes;
+        alarm.type = alarms[selection].type;
+        Serial.println(alarms[selection].minutes);
+        Time::get_alarm_string(alarm.minutes, time_string);
+        GUI::alarm_config(time_string, alarm.type);
         break;
 
     case NEW_ALARM_CONFIG:
-        alarm_count = Time::add_alarm(alarms, alarm_count, 25, 61, 255);
-        GUI::alarm_config("??:??", &alarms[alarm_count].type);
-        refresh = false;
+        GUI::alarm_config((char *)"??:??", alarm.type);
         break;
     }
 }
 
 void loop()
-{   
+{
     if (GUI::display_action())
     {
         navigation_handler();

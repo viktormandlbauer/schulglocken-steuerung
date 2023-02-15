@@ -4,8 +4,6 @@
 #endif
 
 #include <GUI.h>
-#include <Fonts/FreeMono24pt7b.h>
-#include <Fonts/FreeMono12pt7b.h>
 
 using namespace GUI;
 
@@ -131,16 +129,15 @@ void GUI::timeplan(char alarm_strings[][6])
 #endif
 
     Waveshield.fillScreen(COLOR_BACKGROUND);
-    tft.setFont(&FreeMono24pt7b);
     tft.setCursor(150, Y_DIM * 0.125);
     tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    tft.setTextSize(1);
+    tft.setTextSize(4);
     tft.print("Zeitplan");
     tft.setFont();
     draw_alarm_list(alarm_strings);
 }
 
-uint8_t GUI::check_timeplan()
+uint8_t GUI::check_timeplan(uint8_t alarm_count)
 {
 
     if (check_button_pressed(button_up))
@@ -156,7 +153,7 @@ uint8_t GUI::check_timeplan()
     }
     else if (check_button_pressed(button_down))
     {
-        if (alarm_list_position < MAXIMUM_AMOUNT_ALARMS)
+        if (alarm_list_position + 4 < alarm_count)
         {
             alarm_list_position += 1;
             return BUTTON_DOWN;
@@ -182,7 +179,7 @@ uint8_t GUI::check_timeplan()
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        if (check_button_pressed(button_alarm[i]))
+        if (check_button_pressed(button_alarm[i]) && alarm_count > alarm_list_position + i)
         {
 #ifdef DEBUG
             Serial.print("[Info] (GUI) Alarm ");
@@ -198,7 +195,6 @@ uint8_t GUI::check_timeplan()
 
 Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
 
-// For Testing
 void draw_numeric_keyboard()
 {
     buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "0", 4);
@@ -233,8 +229,6 @@ void draw_numeric_keyboard()
     button_accept.drawButton(true);
     button_delete.drawButton(true);
 }
-
-
 
 uint8_t check_numeric_keyboard()
 {
@@ -286,10 +280,10 @@ uint8_t check_numeric_keyboard()
     return 251;
 }
 
-char *alarm_setting;
+char alarm_setting[6];
 uint8_t alarm_string_position;
 
-void draw_modified_alarm(char *time_string)
+void draw_alarm(char *time_string)
 {
     for (uint8_t i = 0; i < 5; i++)
     {
@@ -336,9 +330,9 @@ void update_keyboard()
     }
 }
 
-void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
+void GUI::alarm_config(char alarm_time[6], uint8_t alarm_type)
 {
-    alarm_setting = alarm_time;
+    memcpy(alarm_setting, alarm_time, 6);
 
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
@@ -349,7 +343,7 @@ void GUI::alarm_config(char *alarm_time, uint8_t *alarm_type)
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
     draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-    draw_modified_alarm(alarm_setting);
+    draw_alarm(alarm_setting);
     draw_numeric_keyboard();
 }
 
@@ -359,10 +353,7 @@ uint16_t text_to_time(char *alarm_string)
            ((int)(alarm_string[3] - '0') * 10 + (int)(alarm_string[4] - '0'));
 }
 
-
-
-
-uint8_t GUI::check_alarm_config(uint16_t *alarms)
+uint8_t GUI::check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new)
 {
     uint8_t input = check_numeric_keyboard();
     if (input < 10)
@@ -370,20 +361,22 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
         if ((alarm_string_position == 0 && input > 2) ||
             (alarm_string_position == 1 && input > 3 && alarm_setting[0] - '0' == 2) ||
             (alarm_string_position == 3 && input > 5) ||
-            (alarm_setting[1] - '0' > 3 && alarm_string_position == 0 && input > 1))
+            ((alarm_setting[1] - '0' > 3 && alarm_setting[1] != '?') && alarm_string_position == 0 && input > 1))
         {
 #ifdef DEBUG
             Serial.println("[Error] (GUI) Invalid input");
 #endif
-            // Prüfung ob Input unmöglich an aktueller Position
-            return ALARM_CONFIG;
+            return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
 
         alarm_setting[alarm_string_position] = input + '0';
 
-        *alarms = text_to_time(alarm_setting);
-        draw_modified_alarm(alarm_setting);
-        return ALARM_CONFIG;
+        *alarm = text_to_time(alarm_setting);
+
+        // @todo: set alarm type
+
+        draw_alarm(alarm_setting);
+        return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
     }
 
     switch (input)
@@ -395,14 +388,14 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
         }
         else if (alarm_string_position == 4)
         {
-            return ALARM_CONFIG;
+            return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
         else
         {
             alarm_string_position += 1;
         }
-        draw_modified_alarm(alarm_setting);
-        return ALARM_CONFIG;
+        draw_alarm(alarm_setting);
+        return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
 
     case BUTTON_LEFT:
@@ -413,27 +406,30 @@ uint8_t GUI::check_alarm_config(uint16_t *alarms)
         }
         else if (alarm_string_position == 0)
         {
-            return ALARM_CONFIG;
+            return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
         else
         {
             alarm_string_position -= 1;
         }
-        draw_modified_alarm(alarm_setting);
-        return ALARM_CONFIG;
+        draw_alarm(alarm_setting);
+        return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
     case BUTTON_DELETE:
         // @todo: Alarm löschen
         return BUTTON_DELETE;
         break;
     case BUTTON_ACCEPT:
-        // Accept/Seave setting
-        return TIMEPLAN;
+        if (alarm_setting[0] == '?' ||
+            alarm_setting[1] == '?' ||
+            alarm_setting[3] == '?' ||
+            alarm_setting[4] == '?')
+            return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
+        return BUTTON_ACCEPT;
     default:
-        return ALARM_CONFIG;
+        return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
     }
-    return ALARM_CONFIG;
 }
 
 void GUI::menu()
@@ -444,8 +440,6 @@ void GUI::menu()
         menu_drawn = true;
     }
 }
-
-
 
 uint8_t GUI::check_menu()
 {

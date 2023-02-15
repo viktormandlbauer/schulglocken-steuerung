@@ -193,10 +193,12 @@ void Time::sort_alarms(Alarm alarms[], uint8_t alarm_count)
     qsort(alarms, alarm_count, sizeof(Alarm), compare);
 }
 
-bool Time::alarm_exists(Alarm alarms[], uint8_t minutes, uint8_t alarm_count)
+bool Time::alarm_exists(Alarm alarms[], uint16_t minutes, uint8_t alarm_count)
 {
+    Serial.println(minutes);
     for (uint8_t i = 0; i < alarm_count; i++)
     {
+        Serial.println(alarms[i].minutes);
         if (alarms[i].minutes == minutes)
         {
             return true;
@@ -205,32 +207,31 @@ bool Time::alarm_exists(Alarm alarms[], uint8_t minutes, uint8_t alarm_count)
     return false;
 }
 
-uint8_t Time::add_alarm(Alarm alarms[], uint8_t alarm_count, uint8_t hour, uint8_t minute, uint8_t alarm_type)
+bool Time::add_alarm(Alarm alarms[], uint8_t *alarm_count, uint16_t minutes, uint8_t alarm_type)
 {
-    uint16_t minutes = hour * 60 + minute;
-    if (!alarm_exists(alarms, minutes, alarm_count))
+    if (!alarm_exists(alarms, minutes, *alarm_count))
     {
-        alarms[alarm_count].minutes = minutes;
-        alarms[alarm_count].type = alarm_type;
-        alarm_count += 1;
+        alarms[*alarm_count].minutes = minutes;
+        alarms[*alarm_count].type = alarm_type;
+        *alarm_count += 1;
 #ifdef DEBUG
-        Serial.print("[Info] (Time) Added alarm ");
-        Serial.print(hour);
-        Serial.print(":");
-        Serial.print(minute);
-        Serial.print(" with Type ");
+        Serial.print("[Info] (Time) Added new alarm ");
+        Serial.print(minutes);
+        Serial.print(" with type: ");
         Serial.println(alarm_type);
+        Serial.print("[Info] (Time) Alarm count: ");
+        Serial.println(*alarm_count);
 #endif
     }
     else
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Time) Alarm already exists");
+        Serial.println("[Error] (Time) Alarm already exists");
 #endif
-        return alarm_count;
+        return false;
     }
 
-    return alarm_count;
+    return true;
 }
 
 uint8_t Time::remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index)

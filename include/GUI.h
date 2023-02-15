@@ -13,8 +13,8 @@ namespace GUI
 
     void timeplan(char alarm_strings[][6]);
     void draw_alarm_list(char alarm_strings[][6]);
-    uint8_t check_timeplan();
+    uint8_t check_timeplan(uint8_t alarm_count);
 
-    void alarm_config(char *alarm_time, uint8_t *alarm_type);
-    uint8_t check_alarm_config(uint16_t *alarm);
+    void alarm_config(char alarm_time[6], uint8_t alarm_type);
+    uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new);
 }
