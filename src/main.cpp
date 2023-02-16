@@ -54,6 +54,12 @@ void setup()
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
 #endif
 
+    alarm_count = Storage::read_alarm_count();
+    for (uint8_t i = 0; i < alarm_count; i++)
+    {
+        Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
+    }
+
     // Alarmtypes
     Time::set_alarm_types(0, 0xAAAAAAAA);
     Time::set_alarm_types(1, 0xF0F0F0F0);
@@ -149,12 +155,29 @@ void navigation_handler()
                 {
                     alarms[selection].minutes = alarm.minutes;
                     alarms[selection].type = alarm.type;
+                    for (uint8_t i = 0; i < alarm_count; i++)
+                    {
+                        Storage::save_alarm(alarms[i].minutes, alarms[i].type, i);
+                    }
+                    Storage::save_alarm_count(alarm_count);
+
 #ifdef DEBUG
                     Serial.println("[Info] (Main) Successfully updated alarm.");
 #endif
                     navigation = TIMEPLAN;
                 }
             }
+        }
+        else if (navigation == BUTTON_DELETE)
+        {
+            alarm_count = Time::remove_alarm_at_index(alarms, alarm_count, selection);
+
+            for (uint8_t i = 0; i < alarm_count; i++)
+            {
+                Storage::save_alarm(alarms[i].minutes, alarms[i].type, i);
+            }
+            Storage::save_alarm_count(alarm_count);
+            navigation = TIMEPLAN;
         }
         break;
 
@@ -165,6 +188,11 @@ void navigation_handler()
         {
             if (Time::add_alarm(alarms, &alarm_count, alarm.minutes, alarm.type))
             {
+                for (uint8_t i = 0; i < alarm_count; i++)
+                {
+                    Storage::save_alarm(alarms[i].minutes, alarms[i].type, i);
+                }
+                Storage::save_alarm_count(alarm_count);
 #ifdef DEBUG
                 Serial.println("[Info] (Main) Successfully added new alarm!");
 #endif
@@ -203,7 +231,7 @@ void refresh_handler()
 {
     refresh = false;
 #ifdef DEBUG
-    Serial.println("[Info] (Main) Refresh GUI");
+    Serial.println("[Info] (Main) Refresh Handler");
 #endif
 
     switch (navigation)
@@ -215,13 +243,12 @@ void refresh_handler()
     case TIMEPLAN:
         Time::sort_alarms(alarms, alarm_count);
         Time::get_alarms_strings(alarms, alarm_count, alarm_string);
-        GUI::timeplan(alarm_string);
+        GUI::timeplan(alarm_string, alarm_count);
         break;
 
     case ALARM_CONFIG:
         alarm.minutes = alarms[selection].minutes;
         alarm.type = alarms[selection].type;
-        Serial.println(alarms[selection].minutes);
         Time::get_alarm_string(alarm.minutes, time_string);
         GUI::alarm_config(time_string, alarm.type);
         break;

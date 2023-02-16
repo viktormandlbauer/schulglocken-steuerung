@@ -234,16 +234,20 @@ bool Time::add_alarm(Alarm alarms[], uint8_t *alarm_count, uint16_t minutes, uin
     return true;
 }
 
-uint8_t Time::remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index)
+uint8_t Time::remove_alarm_at_index(Alarm alarms[], uint8_t alarm_count, uint8_t index)
 {
-    // Entfernt einen Alarm und den Typ am bestimmten Index
     for (int i = index; i < alarm_count - 1; i++)
     {
         alarms[i] = alarms[i + 1];
-        alarms_type_assignment[i] = alarms_type_assignment[i + 1];
     }
-    alarm_count -= 1;
-    return alarm_count;
+#ifdef DEBUG
+    Serial.print("[Info] (GUI) Removed alarm at index: ");
+    Serial.println(index);
+    Serial.print("[Info] (GUI) New alarm count: ");
+    Serial.println(alarm_count - 1);
+#endif
+
+    return alarm_count - 1;
 }
 
 void Time::get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6])

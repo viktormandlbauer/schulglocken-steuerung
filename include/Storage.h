@@ -2,9 +2,12 @@
 // 4 KB (4096 bytes) on the ATmega1280 and ATmega2560
 
 namespace Storage
-{
-    void save_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[], uint8_t count);
-    uint8_t read_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[]);
+{   
+    uint8_t read_alarm_count();
+    void read_alarm(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t index);
+    
+    void save_alarm_count(uint8_t alarm_count);
+    void save_alarm(uint16_t alarm, uint8_t alarms_type_assignment, uint8_t index);
 
     void save_alarm_types(uint64_t *alarm_types, uint8_t count);
     uint8_t read_alarm_types(uint64_t *alarm_types);

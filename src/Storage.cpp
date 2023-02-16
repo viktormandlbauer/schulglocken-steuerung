@@ -29,65 +29,51 @@ using namespace Storage;
 // #define ALARMS_ASSIGNMENT_START 258
 // #define ALARM_TYPES_START 322
 
-void Storage::save_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[], uint8_t count)
+void Storage::save_alarm_count(uint8_t alarm_count)
 {
-    /**
-     * Speichern der Alarme und die Alarmtypzuweisung vom RAM in den EEPROM.
-     * Maximal 64 Alarme sind möglich.
-     */
-
+    EEPROM.put(ALARMS_START, alarm_count);
 #ifdef DEBUG
-    Serial.print("[Info] (Storage) Anzahl der Alarme: ");
-    Serial.println(count);
+    Serial.print("[Info] (Storage) Saved alarm count: ");
+    Serial.println(alarm_count);
 #endif
-
-    // Speichere Anzahl der Alarme
-    EEPROM.put(ALARMS_START, count);
-
-    // Speichere Alarme
-    for (int i = 0; i < count; i++)
-    {
-
-#ifdef DEBUG
-        Serial.print("[Info] (Storage) Alarm wird gespeichert: ");
-        Serial.println(alarms[i]);
-        Serial.print("[Info] (Storage) Alarmtyp wird gespeichert: ");
-        Serial.println(alarms_type_assignment[i]);
-#endif
-
-        EEPROM.put(1 + ALARMS_START + sizeof(uint16_t) * i, alarms[i]);
-        EEPROM.put(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * i, alarms_type_assignment[i]);
-    }
 }
 
-uint8_t Storage::read_alarms(uint16_t alarms[], uint8_t alarms_type_assignment[])
+void Storage::save_alarm(uint16_t alarm, uint8_t alarms_type_assignment, uint8_t index)
 {
-    /**
-     * Auslesen der gespeicherten Alarme aus dem EEPROM.
-     * Der Rückgabewert ist die Anzahl der gespeicherten Alarme.
-     */
-
-    uint8_t count = EEPROM.read(ALARMS_START);
+    EEPROM.put(1 + ALARMS_START + sizeof(uint16_t) * index, alarm);
+    EEPROM.put(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, alarms_type_assignment);
 
 #ifdef DEBUG
-    Serial.print("[Info] (Storage) Anzahl der Alarme: ");
-    Serial.println(count);
+    Serial.print("[Info] (Storage) Saved alarm: ");
+    Serial.println(alarm);
+    Serial.print("[Info] (Storage) Saved alarm type assignment: ");
+    Serial.println(alarms_type_assignment);
 #endif
+}
 
-    for (int i = 0; i < count; i++)
-    {
-        EEPROM.get(1 + ALARMS_START + sizeof(uint16_t) * i, alarms[i]);
-        EEPROM.get(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * i, alarms_type_assignment[i]);
-
+uint8_t Storage::read_alarm_count()
+{
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Alarm wurde ausgelesen: ");
-        Serial.println(alarms[i]);
-        Serial.print("[Info] (Storage) Alarmtyp wurde ausgelesen: ");
-        Serial.println(alarms_type_assignment[i]);
+    uint8_t alarm_count = EEPROM.read(ALARMS_START);
+    Serial.print("[Info] (Storage) Read alarm count : ");
+    Serial.println(alarm_count);
+    return alarm_count;
 #endif
-    }
+    return EEPROM.read(ALARMS_START);
+}
 
-    return count;
+void Storage::read_alarm(uint16_t *alarm, uint8_t *alarms_type_assignment, uint8_t index)
+{
+    EEPROM.get(1 + ALARMS_START + sizeof(uint16_t) * index, *alarm);
+    EEPROM.get(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, *alarms_type_assignment);
+#ifdef DEBUG
+    Serial.print("[Info] (Storage) Read alarm: ");
+    Serial.print(*alarm);
+    Serial.print(" with type: ");
+    Serial.print(*alarms_type_assignment);
+    Serial.print(" at index: ");
+    Serial.println(index);
+#endif
 }
 
 void Storage::save_alarm_types(uint64_t *alarm_types, uint8_t count)

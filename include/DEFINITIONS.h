@@ -47,9 +47,9 @@
 // Aktivieren/Deaktivieren mittels Auskommentieren
 #define DEBUG_MAIN
 #define DEBUG_TIME
-// #define DEBUG_STORAGE
+#define DEBUG_STORAGE
 #define DEBUG_GUI
-// #define DEBUG_NETWORK
+#define DEBUG_NETWORK
 
 // Definitionen für "return codes"
 #define MENU 0

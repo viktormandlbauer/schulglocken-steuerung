@@ -31,7 +31,7 @@ namespace Time
     bool alarm_exists(Alarm alarms[], uint16_t minutes, uint8_t alarm_count);
     void sort_alarms(Alarm alarms[], uint8_t alarm_count);
 
-    uint8_t remove_alarm_at_index(uint16_t *alarms, uint8_t *alarms_type_assignment, uint8_t alarm_count, uint8_t index);
+    uint8_t remove_alarm_at_index(Alarm alarms[], uint8_t alarm_count, uint8_t index);
 
     void get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6]);
 

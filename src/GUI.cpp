@@ -122,7 +122,7 @@ void GUI::draw_alarm_list(char alarm_strings[][6])
     draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
     draw_alarms(alarm_strings, alarm_list_position);
 }
-void GUI::timeplan(char alarm_strings[][6])
+void GUI::timeplan(char alarm_strings[][6], uint8_t alarm_count)
 {
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Draw Timeplan");
@@ -134,6 +134,9 @@ void GUI::timeplan(char alarm_strings[][6])
     tft.setTextSize(4);
     tft.print("Zeitplan");
     tft.setFont();
+
+    *alarm_strings[alarm_count] = '\0';
+
     draw_alarm_list(alarm_strings);
 }
 
@@ -196,7 +199,7 @@ uint8_t GUI::check_timeplan(uint8_t alarm_count)
 Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
 
 void draw_numeric_keyboard()
-{
+{   
     buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "0", 4);
     buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "1", 4);
     buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "2", 4);
@@ -277,7 +280,6 @@ uint8_t check_numeric_keyboard()
             return i;
         }
     }
-    return 251;
 }
 
 char alarm_setting[6];
@@ -333,6 +335,7 @@ void update_keyboard()
 void GUI::alarm_config(char alarm_time[6], uint8_t alarm_type)
 {
     memcpy(alarm_setting, alarm_time, 6);
+    alarm_string_position = 0;
 
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
@@ -416,7 +419,6 @@ uint8_t GUI::check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_ne
         return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
     case BUTTON_DELETE:
-        // @todo: Alarm löschen
         return BUTTON_DELETE;
         break;
     case BUTTON_ACCEPT:

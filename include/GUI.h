@@ -11,7 +11,7 @@ namespace GUI
     void menu();
     uint8_t check_menu();
 
-    void timeplan(char alarm_strings[][6]);
+    void timeplan(char alarm_strings[][6], uint8_t alarm_count);
     void draw_alarm_list(char alarm_strings[][6]);
     uint8_t check_timeplan(uint8_t alarm_count);
 
