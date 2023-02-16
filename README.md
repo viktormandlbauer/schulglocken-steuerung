@@ -2,11 +2,9 @@
 
 ## Libraries
 
-* [Time](https://github.com/PaulStoffregen/Time)
-* [DS3231SN](https://github.com/adafruit/RTClib)
-* [ENC28J69](https://github.com/njh/EtherCard/)
-* [TaskScheduling](https://github.com/arkhipenko/TaskScheduler)
-* https://www.waveshare.com/wiki/4inch_TFT_Touch_Shield
-
-Google Drive Project:    
-https://drive.google.com/drive/folders/1yu67mSQ9u2VfD9QC0o6wKGEjTrWiLxPo?usp=sharing
+* [Time Library](https://github.com/PaulStoffregen/Time)
+* [RTC Library](https://github.com/adafruit/RTClib)
+* [Ethernet Library](https://github.com/njh/EtherCard/)
+* [Graphics Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
+* [Display Documentation]https://www.waveshare.com/wiki/4inch_TFT_Touch_Shield
+* [Arduino Reference](https://reference.arduino.cc/reference/en/)
