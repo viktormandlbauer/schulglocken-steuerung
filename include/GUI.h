@@ -7,7 +7,7 @@ namespace GUI
     void init_display();
     bool display_action();
     bool check_input();
-    
+
     void menu();
     uint8_t check_menu();
 
@@ -17,4 +17,8 @@ namespace GUI
 
     void alarm_config(char alarm_time[6], uint8_t alarm_type);
     uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new);
+
+    void update_time_setting(bool update);
+    void time_setting(char time_string[9]);
+    uint8_t check_time_setting();
 }

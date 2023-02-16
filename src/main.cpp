@@ -15,21 +15,6 @@ static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
 static Time::Alarm alarm;
 static uint8_t alarm_count = 0;
 
-void test2()
-{
-    // uint8_t ip[] = {192, 168, 0, 52};
-    // uint8_t dns[] = {192, 168, 0, 1};
-    // uint8_t gw[] = {192, 168, 0, 1};
-    // uint8_t prefix = 24;
-    // Network::static_setup(ip, gw, dns, prefix);
-    // Storage::save_network_settings(ip, gw, dns, prefix);
-    uint8_t ip[4];
-    uint8_t dns[4];
-    uint8_t gw[4];
-    uint8_t prefix;
-    Storage::read_network_settings(ip, dns, gw, &prefix);
-}
-
 void setup()
 {
     Serial.begin(57600);
@@ -66,15 +51,16 @@ void setup()
     Time::set_alarm_types(2, 0xAF00FF0A);
 
     // Beeper
-    pinMode(A2, OUTPUT);
+    pinMode(OUTPUT_PIN, OUTPUT);
 }
 
 int navigation;
 int last_navigation;
 int selection;
-bool refresh = false;
+bool refresh;
 
 char time_string[9];
+char compare_time_string[9];
 char alarm_string[64][6];
 
 void navigation_handler()
@@ -87,6 +73,11 @@ void navigation_handler()
         Serial.println("[Info] (Main) Menu");
 #endif
         navigation = GUI::check_menu();
+
+        if (navigation == TIME)
+        {
+            GUI::update_time_setting(false);
+        }
         break;
 
     case TIMEPLAN:
@@ -118,6 +109,11 @@ void navigation_handler()
         break;
 
     case TIME:
+        navigation = GUI::check_time_setting();
+        if (navigation != TIME)
+        {
+            GUI::update_time_setting(false);
+        }
         break;
 
     case SYSTEM:
@@ -244,6 +240,14 @@ void refresh_handler()
         Time::sort_alarms(alarms, alarm_count);
         Time::get_alarms_strings(alarms, alarm_count, alarm_string);
         GUI::timeplan(alarm_string, alarm_count);
+        break;
+
+    case TIME:
+        if (Time::get_current_timestring(time_string))
+        {
+            GUI::time_setting(time_string);
+        }
+        refresh = true;
         break;
 
     case ALARM_CONFIG:

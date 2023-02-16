@@ -21,7 +21,7 @@ namespace Time
 
     bool init_rtc_module();
 
-    void get_current_timestring(char time_string[9]);
+    bool get_current_timestring(char time_string[9]);
 
     uint16_t get_minutes_passed();
 

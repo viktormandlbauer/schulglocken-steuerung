@@ -14,6 +14,9 @@
 // MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
+
+#define OUTPUT_PIN 24
+
 // Farbeschema grafischen Benutzeroberfläche
 #define COLOR_BLACK 0x0000
 #define COLOR_WHITE 0xFFFF

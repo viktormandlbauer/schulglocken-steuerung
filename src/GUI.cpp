@@ -199,7 +199,7 @@ uint8_t GUI::check_timeplan(uint8_t alarm_count)
 Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
 
 void draw_numeric_keyboard()
-{   
+{
     buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "0", 4);
     buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "1", 4);
     buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "2", 4);
@@ -488,6 +488,37 @@ uint8_t GUI::check_menu()
     }
 
     return MENU;
+}
+
+bool time_setting_bg_drawn;
+void GUI::update_time_setting(bool update)
+{
+    time_setting_bg_drawn = update;
+}
+
+uint8_t GUI::check_time_setting()
+{
+    if (check_button_pressed(button_back))
+    {
+        return MENU;
+    }
+
+    return TIME;
+}
+
+void GUI::time_setting(char time_string[9])
+{
+    if (!time_setting_bg_drawn)
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        time_setting_bg_drawn = true;
+    }
+
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+    }
 }
 
 // Sometimes the touch display doesn't work properly and sets the "released" value to true

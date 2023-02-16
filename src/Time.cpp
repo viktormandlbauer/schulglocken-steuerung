@@ -50,9 +50,6 @@ bool Time::init_rtc_module()
     while (!rtc.begin())
         ;
 
-    // Set flash time as system time
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-
     // Konfiguration der Synchronisation mit dem RTC Modul
     setSyncProvider(time_provider);
     setSyncInterval(5);
@@ -157,10 +154,22 @@ uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
     return hour * 60ul + minute;
 }
 
-void Time::get_current_timestring(char output[9])
+char time_internal_timestring[9];
+
+bool Time::get_current_timestring(char output[9])
 {
     // Schreibt die in "HH:MM:SS" formatierte Zeit in ein character array der länge 9
     get_timestring(hour(), minute(), second(), output);
+
+    if (strcmp(output, time_internal_timestring) != 0)
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Time) HH:MM:SS changed");
+#endif
+        memcpy(time_internal_timestring, output, 9 * sizeof (*output));
+        return true;
+    }
+    return false;
 }
 
 void Time::get_alarm_string(uint16_t alarm, char output[6])
@@ -364,12 +373,12 @@ ISR(TIMER1_COMPA_vect)
         if (alarm_types[current_alarm_type] & (1ul << position))
         {
             // HIGH wenn bit von ring_types an position 1 ist.
-            analogWrite(A2, 1023);
+            digitalWrite(OUTPUT_PIN, HIGH);
         }
         else
         {
             // LOW wenn bit von ring_types an position 0 ist.
-            analogWrite(A2, LOW);
+            digitalWrite(OUTPUT_PIN, LOW);
         }
         if (position >= 32)
         {
