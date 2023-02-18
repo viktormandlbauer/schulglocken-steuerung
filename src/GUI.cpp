@@ -13,6 +13,7 @@ TSPoint p;
 
 void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
 {
+    tft.setFont();
     // Waveshield.setRotation(1);
     button.initButton(&tft, x_pos, y_pos, xsize, ysize, outlinecolor, textcolor, innercolor, textarr, textsize);
     // button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
@@ -84,13 +85,13 @@ void draw_back_button(uint16_t BACKARROW_POS_X, uint16_t BACKARROW_POS_Y, uint8_
                      BACKARROW_POS_Y + BACKARROW_HEIGHT * 0.5 - 10,
                      BACKARROW_POS_X,
                      BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.5 + 10,
-                     COLOR_BLACK);
+                     COLOR_WHITE);
 
     tft.fillRect(BACKARROW_POS_X,
                  BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.125,
                  BACKARROW_WIDTH * 0.5 - 5,
                  BACKARROW_HEIGHT * 0.25,
-                 COLOR_BLACK);
+                 COLOR_WHITE);
 }
 
 Adafruit_GFX_Button button_alarm[4], button_up, button_down, button_add;
@@ -517,7 +518,7 @@ void GUI::time_setting(char time_string[9])
 
     for (uint8_t i = 0; i < 8; i++)
     {
-        tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+        tft.drawChar(0.3 * X_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
     }
 }
 
