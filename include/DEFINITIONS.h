@@ -14,7 +14,6 @@
 // MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
-
 #define OUTPUT_PIN 24
 
 // Farbeschema grafischen Benutzeroberfläche
@@ -58,11 +57,13 @@
 #define MENU 0
 #define TIMEPLAN 1
 #define TIME 2
+#define TIME_SETTING 7
 #define SYSTEM 3
-#define NETWORK 4 
+#define NETWORK 4
 #define ALARM_CONFIG 5
 #define NEW_ALARM_CONFIG 6
 #define NO_CHANGE 247
+#define BUTTON_MODIFY 248
 #define BUTTON_BACK 248
 #define BUTTON_ADD 249
 #define BUTTON_UP 250

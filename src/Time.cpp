@@ -52,7 +52,7 @@ bool Time::init_rtc_module()
 
     // Konfiguration der Synchronisation mit dem RTC Modul
     setSyncProvider(time_provider);
-    setSyncInterval(5);
+    setSyncInterval(60);
 
     if (timeStatus() != timeSet)
     {
@@ -73,7 +73,7 @@ bool Time::init_rtc_module()
 void get_timestring(int hour, int minute, int second, char *buf)
 {
     /**
-     * Funktion zur Formatierung der Stunde, Minute & Sekunde in das "HH:MM:SS" Format
+     * Formatierung "HH:MM:SS" Format
      */
 
     // Konviertung der Stunde
@@ -118,10 +118,9 @@ void get_timestring(int hour, int minute, int second, char *buf)
 void get_timestring(int hour, int minute, char *buf)
 {
     /**
-     * Funktion zur Formatierung der Stunde, Minute & Sekunde in das "HH:MM" Format
+     * Formatierung "HH:MM" Format
      */
 
-    // Konviertung der Stunde
     if (hour < 10)
     {
         buf[0] = '0';
@@ -166,10 +165,34 @@ bool Time::get_current_timestring(char output[9])
 #ifdef DEBUG
         Serial.println("[Info] (Time) HH:MM:SS changed");
 #endif
-        memcpy(time_internal_timestring, output, 9 * sizeof (*output));
+        memcpy(time_internal_timestring, output, 9 * sizeof(*output));
         return true;
     }
     return false;
+}
+
+void Time::set_datetime(uint16_t new_year, uint8_t new_month, uint8_t new_day, uint8_t new_hour, uint8_t new_minute, uint8_t new_second)
+{
+    // rtc.adjust(DateTime(new_year, new_month, new_day, new_hour, new_minute, new_second));
+    
+    rtc.adjust(DateTime(new_year, new_month, new_day, new_hour, new_minute, new_second));
+    setTime(new_hour, new_minute, new_second, new_day, new_month, new_year);
+    now();
+#ifdef DEBUG
+    Serial.print("[Info] (Time) Time set: ");
+    Serial.print(new_hour);
+    Serial.print(":");
+    Serial.print(new_minute);
+    Serial.print(":");
+    Serial.println(new_second);
+#endif
+}
+
+void Time::timestring_to_timearray(char *time, uint8_t datetime_array[3])
+{
+    datetime_array[0] = (time[0] - '0') * 10 + (time[1] - '0');
+    datetime_array[1] = (time[3] - '0') * 10 + (time[4] - '0');
+    datetime_array[2] = (time[6] - '0') * 10 + (time[7] - '0');
 }
 
 void Time::get_alarm_string(uint16_t alarm, char output[6])
@@ -283,8 +306,8 @@ uint16_t Time::get_minutes_passed()
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
 void set_triggered(uint8_t index) { triggered |= 0b1 << index; }
 
-uint8_t current_alarm_type = 0;
-uint32_t position = 0;
+uint8_t current_alarm_type;
+uint32_t position;
 bool finished = true;
 
 // Allgemeine Überprüfung eines Alarms

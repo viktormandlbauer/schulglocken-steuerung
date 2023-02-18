@@ -23,6 +23,9 @@ namespace Time
 
     bool get_current_timestring(char time_string[9]);
 
+    void set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+    void timestring_to_timearray(char *time, uint8_t datetime_array[3]);
+
     uint16_t get_minutes_passed();
 
     bool check_alarms(Alarm *alarms, uint8_t alarm_count);

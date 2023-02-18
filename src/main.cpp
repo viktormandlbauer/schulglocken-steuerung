@@ -76,7 +76,7 @@ void navigation_handler()
 
         if (navigation == TIME)
         {
-            GUI::update_time_setting(false);
+            GUI::update_time(false);
         }
         break;
 
@@ -109,13 +109,28 @@ void navigation_handler()
         break;
 
     case TIME:
-        navigation = GUI::check_time_setting();
+        navigation = GUI::check_time();
         if (navigation != TIME)
         {
-            GUI::update_time_setting(false);
+            GUI::update_time(false);
+        }
+        if (navigation == BUTTON_MODIFY)
+        {
+            navigation = TIME_SETTING;
         }
         break;
 
+    case TIME_SETTING:
+        navigation = GUI::check_time_setting(time_string);
+
+        if (navigation == BUTTON_ACCEPT)
+        {
+            uint8_t timearray[3];
+            Time::timestring_to_timearray(time_string, timearray);
+            Time::set_datetime(23, 18, 2, timearray[0], timearray[1], timearray[2]);
+            navigation = TIME;
+        }
+        break;
     case SYSTEM:
         break;
 
@@ -245,9 +260,13 @@ void refresh_handler()
     case TIME:
         if (Time::get_current_timestring(time_string))
         {
-            GUI::time_setting(time_string);
+            GUI::time(time_string);
         }
         refresh = true;
+        break;
+
+    case TIME_SETTING:
+        GUI::time_setting(time_string);
         break;
 
     case ALARM_CONFIG:

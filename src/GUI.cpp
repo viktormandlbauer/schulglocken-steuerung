@@ -16,7 +16,6 @@ void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, in
     tft.setFont();
     // Waveshield.setRotation(1);
     button.initButton(&tft, x_pos, y_pos, xsize, ysize, outlinecolor, textcolor, innercolor, textarr, textsize);
-    // button.initButton(&tft, X_DIM / 2, 5 * Y_DIM / 6, 200, 60, BLUE_LIGHT, WHITE, BLUE_DARK, "Menu", 5);
     button.drawButton(true);
 }
 
@@ -61,14 +60,6 @@ void GUI::init_display()
 
     draw_menu();
     menu_drawn = true;
-}
-
-void draw_time(char *time_string)
-{
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        tft.drawChar(0.4 * Y_DIM + 30 * i, Y_DIM * 0.05, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
-    }
 }
 
 Adafruit_GFX_Button button_back;
@@ -281,16 +272,17 @@ uint8_t check_numeric_keyboard()
             return i;
         }
     }
+    return NO_CHANGE;
 }
 
 char alarm_setting[6];
-uint8_t alarm_string_position;
+uint8_t string_position;
 
-void draw_alarm(char *time_string)
+void draw_time(char *time_string, uint8_t size)
 {
-    for (uint8_t i = 0; i < 5; i++)
+    for (uint8_t i = 0; i < size; i++)
     {
-        if (i == alarm_string_position)
+        if (i == string_position)
         {
             tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_WHITE, 5);
         }
@@ -336,7 +328,7 @@ void update_keyboard()
 void GUI::alarm_config(char alarm_time[6], uint8_t alarm_type)
 {
     memcpy(alarm_setting, alarm_time, 6);
-    alarm_string_position = 0;
+    string_position = 0;
 
 #ifdef DEBUG
     Serial.println("[Info] (GUI) Alarm config");
@@ -347,7 +339,7 @@ void GUI::alarm_config(char alarm_time[6], uint8_t alarm_type)
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
     draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-    draw_alarm(alarm_setting);
+    draw_time(alarm_setting, 5);
     draw_numeric_keyboard();
 }
 
@@ -362,10 +354,10 @@ uint8_t GUI::check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_ne
     uint8_t input = check_numeric_keyboard();
     if (input < 10)
     {
-        if ((alarm_string_position == 0 && input > 2) ||
-            (alarm_string_position == 1 && input > 3 && alarm_setting[0] - '0' == 2) ||
-            (alarm_string_position == 3 && input > 5) ||
-            ((alarm_setting[1] - '0' > 3 && alarm_setting[1] != '?') && alarm_string_position == 0 && input > 1))
+        if ((string_position == 0 && input > 2) ||
+            (string_position == 1 && input > 3 && alarm_setting[0] - '0' == 2) ||
+            (string_position == 3 && input > 5) ||
+            ((alarm_setting[1] - '0' > 3 && alarm_setting[1] != '?') && string_position == 0 && input > 1))
         {
 #ifdef DEBUG
             Serial.println("[Error] (GUI) Invalid input");
@@ -373,50 +365,50 @@ uint8_t GUI::check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_ne
             return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
 
-        alarm_setting[alarm_string_position] = input + '0';
+        alarm_setting[string_position] = input + '0';
 
         *alarm = text_to_time(alarm_setting);
 
         // @todo: set alarm type
 
-        draw_alarm(alarm_setting);
+        draw_time(alarm_setting, 5);
         return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
     }
 
     switch (input)
     {
     case BUTTON_RIGH:
-        if (alarm_string_position == 1)
+        if (string_position == 1)
         {
-            alarm_string_position += 2;
+            string_position += 2;
         }
-        else if (alarm_string_position == 4)
+        else if (string_position == 4)
         {
             return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
         else
         {
-            alarm_string_position += 1;
+            string_position += 1;
         }
-        draw_alarm(alarm_setting);
+        draw_time(alarm_setting, 5);
         return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
 
     case BUTTON_LEFT:
         // Go left
-        if (alarm_string_position == 3)
+        if (string_position == 3)
         {
-            alarm_string_position -= 2;
+            string_position -= 2;
         }
-        else if (alarm_string_position == 0)
+        else if (string_position == 0)
         {
             return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         }
         else
         {
-            alarm_string_position -= 1;
+            string_position -= 1;
         }
-        draw_alarm(alarm_setting);
+        draw_time(alarm_setting, 5);
         return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
         break;
     case BUTTON_DELETE:
@@ -492,27 +484,116 @@ uint8_t GUI::check_menu()
 }
 
 bool time_setting_bg_drawn;
-void GUI::update_time_setting(bool update)
+void GUI::update_time(bool update)
 {
     time_setting_bg_drawn = update;
 }
 
-uint8_t GUI::check_time_setting()
+Adafruit_GFX_Button button_modify;
+
+uint8_t GUI::check_time_setting(char *time_string)
+{
+    uint8_t input = check_numeric_keyboard();
+    if (input < 10)
+    {
+        if ((string_position == 0 && input > 2) ||
+            (string_position == 1 && input > 3 && time_string[0] - '0' == 2) ||
+            (string_position == 3 && input > 5) ||
+            ((time_string[1] - '0' > 3 && time_string[1] != '?') && string_position == 0 && input > 1) ||
+            (string_position == 6 && input > 5))
+        {
+#ifdef DEBUG
+            Serial.println("[Error] (GUI) Invalid input");
+#endif
+            return TIME_SETTING;
+        }
+
+        time_string[string_position] = input + '0';
+        draw_time(time_string, 8);
+    }
+
+    switch (input)
+    {
+    case BUTTON_RIGH:
+        if (string_position == 1)
+        {
+            string_position += 2;
+        }
+        else if (string_position == 4)
+        {
+            string_position += 2;
+        }
+        else if (string_position == 7)
+        {
+            return TIME_SETTING;
+        }
+        else
+        {
+            string_position += 1;
+        }
+        draw_time(time_string, 8);
+        return TIME_SETTING;
+        break;
+
+    case BUTTON_LEFT:
+        if (string_position == 3)
+        {
+            string_position -= 2;
+        }
+        else if (string_position == 6)
+        {
+            string_position -= 2;
+        }
+        else if (string_position == 0)
+        {
+            return TIME_SETTING;
+        }
+        else
+        {
+            string_position -= 1;
+        }
+        draw_time(time_string, 8);
+        return TIME_SETTING;
+        break;
+    case BUTTON_DELETE:
+        return BUTTON_DELETE;
+        break;
+    case BUTTON_ACCEPT:
+        return BUTTON_ACCEPT;
+    default:
+        return TIME_SETTING;
+        break;
+    }
+}
+
+void GUI::time_setting(char *time_string)
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    draw_numeric_keyboard();
+    draw_time(time_string, 8);
+}
+
+uint8_t GUI::check_time()
 {
     if (check_button_pressed(button_back))
     {
         return MENU;
     }
-
+    else if (check_button_pressed(button_modify))
+    {
+        return BUTTON_MODIFY;
+    }
     return TIME;
 }
 
-void GUI::time_setting(char time_string[9])
+void GUI::time(char time_string[9])
 {
     if (!time_setting_bg_drawn)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        button_modify.initButton(&tft, 400, 30, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, "Modify", 3);
+        button_modify.drawButton();
         time_setting_bg_drawn = true;
     }
 
