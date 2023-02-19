@@ -15893,8 +15893,8 @@ Viktor Mandelbauer</text>
 <attribute name="VALUE" x="35.56" y="10.16" size="1.778" layer="96"/>
 </instance>
 <instance part="IC1" gate="CE" x="127" y="152.4" smashed="yes">
-<attribute name="VALUE" x="114.3" y="157.48" size="1.778" layer="96"/>
-<attribute name="NAME" x="114.3" y="160.02" size="1.778" layer="95"/>
+<attribute name="VALUE" x="116.84" y="157.48" size="1.778" layer="96"/>
+<attribute name="NAME" x="116.84" y="160.02" size="1.778" layer="95"/>
 </instance>
 <instance part="IC1" gate="LED" x="88.9" y="27.94" smashed="yes">
 <attribute name="NAME" x="86.36" y="25.4" size="1.778" layer="95" rot="R90"/>
@@ -16004,14 +16004,14 @@ Viktor Mandelbauer</text>
 <attribute name="NAME" x="145.288" y="171.958" size="1.778" layer="95"/>
 <attribute name="VALUE" x="144.526" y="175.133" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="SUPPLY4" gate="GND" x="109.22" y="147.32" smashed="yes">
-<attribute name="VALUE" x="107.315" y="144.145" size="1.778" layer="96"/>
+<instance part="SUPPLY4" gate="GND" x="93.98" y="147.32" smashed="yes">
+<attribute name="VALUE" x="92.075" y="144.145" size="1.778" layer="96"/>
 </instance>
 <instance part="SUPPLY5" gate="GND" x="190.5" y="106.68" smashed="yes">
 <attribute name="VALUE" x="188.595" y="103.505" size="1.778" layer="96"/>
 </instance>
-<instance part="P+5" gate="VCC" x="190.5" y="180.34" smashed="yes">
-<attribute name="VALUE" x="187.96" y="177.8" size="1.778" layer="96" rot="R90"/>
+<instance part="P+5" gate="VCC" x="190.5" y="177.8" smashed="yes">
+<attribute name="VALUE" x="187.96" y="175.26" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="R3" gate="1" x="226.06" y="147.32" smashed="yes" rot="R270">
 <attribute name="NAME" x="222.3516" y="146.05" size="1.778" layer="95" rot="R270"/>
@@ -16060,9 +16060,9 @@ Viktor Mandelbauer</text>
 <attribute name="NAME" x="176.53" y="135.6614" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="176.53" y="140.462" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="R8" gate="G$1" x="162.56" y="127" smashed="yes" rot="R270">
-<attribute name="NAME" x="164.0586" y="130.81" size="1.778" layer="95" rot="R270"/>
-<attribute name="VALUE" x="159.258" y="130.81" size="1.778" layer="96" rot="R270"/>
+<instance part="R8" gate="G$1" x="162.56" y="129.54" smashed="yes" rot="R270">
+<attribute name="NAME" x="164.0586" y="133.35" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="159.258" y="133.35" size="1.778" layer="96" rot="R270"/>
 </instance>
 <instance part="R9" gate="G$1" x="88.9" y="15.24" smashed="yes" rot="R270">
 <attribute name="NAME" x="90.3986" y="19.05" size="1.778" layer="95" rot="R270"/>
@@ -16169,7 +16169,7 @@ Viktor Mandelbauer</text>
 <wire x1="190.5" y1="172.72" x2="177.8" y2="172.72" width="0.1524" layer="91"/>
 <wire x1="177.8" y1="172.72" x2="177.8" y2="162.56" width="0.1524" layer="91"/>
 <pinref part="P+5" gate="VCC" pin="VCC"/>
-<wire x1="190.5" y1="172.72" x2="190.5" y2="177.8" width="0.1524" layer="91"/>
+<wire x1="190.5" y1="172.72" x2="190.5" y2="175.26" width="0.1524" layer="91"/>
 <junction x="190.5" y="172.72"/>
 </segment>
 </net>
@@ -16215,7 +16215,7 @@ Viktor Mandelbauer</text>
 <wire x1="190.5" y1="111.76" x2="190.5" y2="132.08" width="0.1524" layer="91"/>
 <junction x="190.5" y="111.76"/>
 <pinref part="R8" gate="G$1" pin="2"/>
-<wire x1="162.56" y1="121.92" x2="162.56" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="124.46" x2="162.56" y2="111.76" width="0.1524" layer="91"/>
 <junction x="162.56" y="111.76"/>
 </segment>
 <segment>
@@ -16231,8 +16231,8 @@ Viktor Mandelbauer</text>
 <segment>
 <pinref part="SUPPLY4" gate="GND" pin="GND"/>
 <pinref part="SV1" gate="-3" pin="S"/>
-<wire x1="109.22" y1="149.86" x2="109.22" y2="167.64" width="0.1524" layer="91"/>
-<wire x1="109.22" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="149.86" x2="93.98" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R9" gate="G$1" pin="2"/>
@@ -16504,7 +16504,7 @@ Viktor Mandelbauer</text>
 <wire x1="152.4" y1="137.16" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
 <pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="162.56" y1="137.16" x2="167.64" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="162.56" y1="132.08" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="134.62" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
 <junction x="162.56" y="137.16"/>
 <wire x1="152.4" y1="137.16" x2="137.16" y2="137.16" width="0.1524" layer="91"/>
 <junction x="152.4" y="137.16"/>

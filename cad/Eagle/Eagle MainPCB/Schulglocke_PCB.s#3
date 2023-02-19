@@ -15854,7 +15854,7 @@ DIN A4, landscape with extra doc field</description>
 <part name="FRAME1" library="frames" library_urn="urn:adsk.eagle:library:229" deviceset="DINA4_L" device=""/>
 <part name="IC2" library="optocoupler" library_urn="urn:adsk.eagle:library:320" deviceset="SFH6156" device="" package3d_urn="urn:adsk.eagle:package:21969/1"/>
 <part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="M1206" package3d_urn="urn:adsk.eagle:package:23566/2"/>
-<part name="SUPPLY11" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
+<part name="LED2" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -16063,9 +16063,9 @@ Viktor Mandelbauer</text>
 <attribute name="NAME" x="164.0586" y="133.35" size="1.778" layer="95" rot="R270"/>
 <attribute name="VALUE" x="159.258" y="133.35" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="R9" gate="G$1" x="88.9" y="15.24" smashed="yes" rot="R270">
-<attribute name="NAME" x="90.3986" y="19.05" size="1.778" layer="95" rot="R270"/>
-<attribute name="VALUE" x="85.598" y="19.05" size="1.778" layer="96" rot="R270"/>
+<instance part="R9" gate="G$1" x="88.9" y="17.78" smashed="yes" rot="R270">
+<attribute name="NAME" x="90.3986" y="21.59" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="85.598" y="21.59" size="1.778" layer="96" rot="R270"/>
 </instance>
 <instance part="SUPPLY7" gate="GND" x="88.9" y="5.08" smashed="yes">
 <attribute name="VALUE" x="86.995" y="1.905" size="1.778" layer="96"/>
@@ -16094,16 +16094,17 @@ Viktor Mandelbauer</text>
 <attribute name="SHEET" x="248.92" y="1.27" size="2.54" layer="94"/>
 <attribute name="DRAWING_NAME" x="180.34" y="19.05" size="2.54" layer="94"/>
 </instance>
-<instance part="IC2" gate="LED" x="111.76" y="152.4" smashed="yes">
-<attribute name="NAME" x="109.22" y="149.86" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="116.84" y="149.86" size="1.778" layer="96" rot="R90"/>
+<instance part="IC2" gate="LED" x="114.3" y="152.4" smashed="yes">
+<attribute name="NAME" x="124.46" y="147.32" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="127" y="144.78" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="R10" gate="G$1" x="101.6" y="154.94" smashed="yes" rot="R270">
-<attribute name="NAME" x="103.0986" y="158.75" size="1.778" layer="95" rot="R270"/>
-<attribute name="VALUE" x="98.298" y="158.75" size="1.778" layer="96" rot="R270"/>
+<instance part="R10" gate="G$1" x="101.6" y="152.4" smashed="yes" rot="R90">
+<attribute name="NAME" x="100.1014" y="148.59" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="104.902" y="148.59" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="SUPPLY11" gate="GND" x="101.6" y="144.78" smashed="yes">
-<attribute name="VALUE" x="99.695" y="141.605" size="1.778" layer="96"/>
+<instance part="LED2" gate="G$1" x="88.9" y="30.48" smashed="yes">
+<attribute name="NAME" x="92.456" y="25.908" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="94.615" y="25.908" size="1.778" layer="96" rot="R90"/>
 </instance>
 </instances>
 <busses>
@@ -16242,12 +16243,16 @@ Viktor Mandelbauer</text>
 <pinref part="SUPPLY4" gate="GND" pin="GND"/>
 <pinref part="SV1" gate="-3" pin="S"/>
 <wire x1="93.98" y1="149.86" x2="93.98" y2="167.64" width="0.1524" layer="91"/>
-<wire x1="93.98" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="167.64" x2="101.6" y2="167.64" width="0.1524" layer="91"/>
+<pinref part="R10" gate="G$1" pin="2"/>
+<wire x1="101.6" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="157.48" x2="101.6" y2="167.64" width="0.1524" layer="91"/>
+<junction x="101.6" y="167.64"/>
 </segment>
 <segment>
 <pinref part="R9" gate="G$1" pin="2"/>
 <pinref part="SUPPLY7" gate="GND" pin="GND"/>
-<wire x1="88.9" y1="10.16" x2="88.9" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="12.7" x2="88.9" y2="7.62" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U$3" gate="G$1" pin="GND3"/>
@@ -16279,11 +16284,6 @@ Viktor Mandelbauer</text>
 <wire x1="162.56" y1="53.34" x2="165.1" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="SUPPLY10" gate="GND" pin="GND"/>
 <wire x1="165.1" y1="53.34" x2="165.1" y2="50.8" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="R10" gate="G$1" pin="2"/>
-<pinref part="SUPPLY11" gate="GND" pin="GND"/>
-<wire x1="101.6" y1="149.86" x2="101.6" y2="147.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$4" class="0">
@@ -16538,12 +16538,14 @@ Viktor Mandelbauer</text>
 <pinref part="B1" gate="B1" pin="24"/>
 <wire x1="63.5" y1="50.8" x2="88.9" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="50.8" x2="88.9" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="A"/>
 </segment>
 </net>
 <net name="N$24" class="0">
 <segment>
 <pinref part="R9" gate="G$1" pin="1"/>
-<wire x1="88.9" y1="22.86" x2="88.9" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="C"/>
+<wire x1="88.9" y1="22.86" x2="88.9" y2="25.4" width="0.1524" layer="91" style="longdash"/>
 </segment>
 </net>
 <net name="LCD_CS" class="0">
@@ -16675,9 +16677,9 @@ Viktor Mandelbauer</text>
 <label x="129.54" y="55.88" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
-<wire x1="63.5" y1="48.26" x2="71.12" y2="48.26" width="0.1524" layer="91"/>
-<label x="71.12" y="48.26" size="1.778" layer="95"/>
-<pinref part="B1" gate="B1" pin="26"/>
+<wire x1="63.5" y1="45.72" x2="71.12" y2="45.72" width="0.1524" layer="91"/>
+<label x="71.12" y="45.72" size="1.778" layer="95"/>
+<pinref part="B1" gate="B1" pin="28"/>
 </segment>
 </net>
 <net name="N$16" class="0">
@@ -16689,10 +16691,27 @@ Viktor Mandelbauer</text>
 <wire x1="71.12" y1="53.34" x2="63.5" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$18" class="0">
+<net name="N$19" class="0">
 <segment>
 <pinref part="R10" gate="G$1" pin="1"/>
-<wire x1="101.6" y1="162.56" x2="101.6" y2="160.02" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="147.32" x2="101.6" y2="144.78" width="0.1524" layer="91"/>
+<pinref part="IC2" gate="LED" pin="K"/>
+<wire x1="101.6" y1="144.78" x2="114.3" y2="144.78" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="144.78" x2="114.3" y2="147.32" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="OPT_ISOL" class="0">
+<segment>
+<pinref part="B1" gate="B1" pin="26"/>
+<wire x1="63.5" y1="48.26" x2="71.12" y2="48.26" width="0.1524" layer="91"/>
+<label x="71.12" y="48.26" size="1.778" layer="95"/>
+</segment>
+<segment>
+<label x="106.68" y="162.56" size="1.778" layer="95" rot="R270"/>
+<pinref part="IC2" gate="LED" pin="A"/>
+<wire x1="114.3" y1="157.48" x2="114.3" y2="165.1" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="162.56" x2="106.68" y2="165.1" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="165.1" x2="114.3" y2="165.1" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
