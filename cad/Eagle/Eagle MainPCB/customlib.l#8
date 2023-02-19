@@ -248,16 +248,16 @@ Includes holes for ICSP header
 <wire x1="36.15" y1="31.43" x2="-60.16" y2="31.43" width="0.127" layer="51"/>
 </package>
 <package name="EMC_F">
-<pad name="EMC1" x="0" y="0" drill="1.016" shape="square"/>
-<pad name="EMC2" x="2.54" y="0" drill="1.016"/>
-<pad name="EMC3" x="2.54" y="-2.54" drill="1.016"/>
-<pad name="EMC4" x="0" y="-2.54" drill="1.016"/>
-<pad name="EMC5" x="0" y="-5.08" drill="1.016"/>
-<pad name="EMC6" x="2.54" y="-5.08" drill="1.016"/>
-<pad name="EMC7" x="2.54" y="-7.62" drill="1.016"/>
-<pad name="EMC8" x="0" y="-7.62" drill="1.016"/>
-<pad name="EMC9" x="0" y="-10.16" drill="1.016"/>
-<pad name="EMC10" x="2.54" y="-10.16" drill="1.016"/>
+<pad name="CLKOUT" x="0" y="0" drill="1.016" shape="square"/>
+<pad name="INT" x="2.54" y="0" drill="1.016"/>
+<pad name="SO" x="2.54" y="-2.54" drill="1.016"/>
+<pad name="WOL" x="0" y="-2.54" drill="1.016"/>
+<pad name="SI" x="0" y="-5.08" drill="1.016"/>
+<pad name="SCK" x="2.54" y="-5.08" drill="1.016"/>
+<pad name="RST" x="2.54" y="-7.62" drill="1.016"/>
+<pad name="CS" x="0" y="-7.62" drill="1.016"/>
+<pad name="VCC" x="0" y="-10.16" drill="1.016"/>
+<pad name="GND" x="2.54" y="-10.16" drill="1.016"/>
 <wire x1="-1.27" y1="1.27" x2="-1.27" y2="-11.43" width="0.127" layer="51"/>
 <wire x1="-1.27" y1="-11.43" x2="3.81" y2="-11.43" width="0.127" layer="51"/>
 <wire x1="3.81" y1="-11.43" x2="3.81" y2="1.27" width="0.127" layer="51"/>
@@ -282,16 +282,16 @@ Includes holes for ICSP header
 <text x="8.89" y="10.16" size="1.27" layer="25">&gt;Name</text>
 </package>
 <package name="DS3231_F">
-<pad name="EMC1" x="22.86" y="5.08" drill="1.016" shape="square"/>
-<pad name="EMC2" x="22.86" y="2.54" drill="1.016"/>
-<pad name="EMC3" x="22.86" y="0" drill="1.016"/>
-<pad name="EMC4" x="22.86" y="-2.54" drill="1.016"/>
-<pad name="EMC5" x="22.86" y="-5.08" drill="1.016"/>
-<pad name="EMC6" x="22.86" y="-7.62" drill="1.016"/>
-<pad name="EMC7" x="-15.24" y="2.54" drill="1.016"/>
-<pad name="EMC8" x="-15.24" y="0" drill="1.016"/>
-<pad name="EMC9" x="-15.24" y="-2.54" drill="1.016"/>
-<pad name="EMC10" x="-15.24" y="-5.08" drill="1"/>
+<pad name="32K" x="22.86" y="5.08" drill="1.016" shape="square"/>
+<pad name="SQW" x="22.86" y="2.54" drill="1.016"/>
+<pad name="SCL" x="22.86" y="0" drill="1.016"/>
+<pad name="SDA" x="22.86" y="-2.54" drill="1.016"/>
+<pad name="VCC" x="22.86" y="-5.08" drill="1.016"/>
+<pad name="GND" x="22.86" y="-7.62" drill="1.016"/>
+<pad name="SCL_E" x="-15.24" y="2.54" drill="1.016"/>
+<pad name="SDA_E" x="-15.24" y="0" drill="1.016"/>
+<pad name="VCC_E" x="-15.24" y="-2.54" drill="1.016"/>
+<pad name="GND_E" x="-15.24" y="-5.08" drill="1"/>
 <wire x1="22.86" y1="10.16" x2="25.4" y2="7.62" width="0.127" layer="51" curve="-90"/>
 <wire x1="25.4" y1="7.62" x2="25.4" y2="-10.16" width="0.127" layer="51"/>
 <wire x1="25.4" y1="-10.16" x2="22.86" y2="-12.7" width="0.127" layer="51" curve="-90"/>
@@ -397,7 +397,7 @@ Includes holes for ICSP header
 <gate name="G$1" symbol="ENC_SHIELD_SYMB" x="-10.16" y="-22.86"/>
 </gates>
 <devices>
-<device name="">
+<device name="" package="EMC_F">
 <technologies>
 <technology name=""/>
 </technologies>
@@ -422,6 +422,28 @@ Includes holes for ICSP header
 </gates>
 <devices>
 <device name="" package="ARDUINO_R3_NO_HOLES">
+<connects>
+<connect gate="G$1" pin="5V" pad="5V"/>
+<connect gate="G$1" pin="5V1" pad="VCC"/>
+<connect gate="G$1" pin="GND" pad="GND@1"/>
+<connect gate="G$1" pin="GND1" pad="GND@2"/>
+<connect gate="G$1" pin="GND2" pad="GND@3"/>
+<connect gate="G$1" pin="GND3" pad="GND@4"/>
+<connect gate="G$1" pin="LCD_BL" pad="D9"/>
+<connect gate="G$1" pin="LCD_CS" pad="D10"/>
+<connect gate="G$1" pin="LCD_DC" pad="D7"/>
+<connect gate="G$1" pin="LCD_RST" pad="D8"/>
+<connect gate="G$1" pin="MISO_G" pad="D12"/>
+<connect gate="G$1" pin="MISO_I" pad="MISO"/>
+<connect gate="G$1" pin="MOSI_G" pad="D11"/>
+<connect gate="G$1" pin="MOSI_I" pad="MOSI"/>
+<connect gate="G$1" pin="SCLK_G" pad="D13"/>
+<connect gate="G$1" pin="SCLK_I" pad="SCK"/>
+<connect gate="G$1" pin="SD_CS" pad="D5"/>
+<connect gate="G$1" pin="TP_BUSY" pad="D6"/>
+<connect gate="G$1" pin="TP_CS" pad="D4"/>
+<connect gate="G$1" pin="TP_IRQ" pad="D3"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>

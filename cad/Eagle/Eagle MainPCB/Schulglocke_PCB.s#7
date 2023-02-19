@@ -15852,6 +15852,9 @@ DIN A4, landscape with extra doc field</description>
 <part name="+3V2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="FRAME1" library="frames" library_urn="urn:adsk.eagle:library:229" deviceset="DINA4_L" device=""/>
+<part name="IC2" library="optocoupler" library_urn="urn:adsk.eagle:library:320" deviceset="SFH6156" device="" package3d_urn="urn:adsk.eagle:package:21969/1"/>
+<part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="M1206" package3d_urn="urn:adsk.eagle:package:23566/2"/>
+<part name="LED2" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -15893,12 +15896,8 @@ Viktor Mandelbauer</text>
 <attribute name="VALUE" x="35.56" y="10.16" size="1.778" layer="96"/>
 </instance>
 <instance part="IC1" gate="CE" x="127" y="152.4" smashed="yes">
-<attribute name="VALUE" x="114.3" y="157.48" size="1.778" layer="96"/>
-<attribute name="NAME" x="114.3" y="160.02" size="1.778" layer="95"/>
-</instance>
-<instance part="IC1" gate="LED" x="88.9" y="27.94" smashed="yes">
-<attribute name="NAME" x="86.36" y="25.4" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="93.98" y="25.4" size="1.778" layer="96" rot="R90"/>
+<attribute name="VALUE" x="116.84" y="157.48" size="1.778" layer="96"/>
+<attribute name="NAME" x="116.84" y="160.02" size="1.778" layer="95"/>
 </instance>
 <instance part="K1" gate="1" x="190.5" y="160.02" smashed="yes">
 <attribute name="VALUE" x="191.77" y="162.941" size="1.778" layer="96"/>
@@ -16004,8 +16003,8 @@ Viktor Mandelbauer</text>
 <attribute name="NAME" x="145.288" y="171.958" size="1.778" layer="95"/>
 <attribute name="VALUE" x="144.526" y="175.133" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="SUPPLY4" gate="GND" x="109.22" y="147.32" smashed="yes">
-<attribute name="VALUE" x="107.315" y="144.145" size="1.778" layer="96"/>
+<instance part="SUPPLY4" gate="GND" x="93.98" y="147.32" smashed="yes">
+<attribute name="VALUE" x="92.075" y="144.145" size="1.778" layer="96"/>
 </instance>
 <instance part="SUPPLY5" gate="GND" x="190.5" y="106.68" smashed="yes">
 <attribute name="VALUE" x="188.595" y="103.505" size="1.778" layer="96"/>
@@ -16060,13 +16059,13 @@ Viktor Mandelbauer</text>
 <attribute name="NAME" x="176.53" y="135.6614" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="176.53" y="140.462" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="R8" gate="G$1" x="162.56" y="127" smashed="yes" rot="R270">
-<attribute name="NAME" x="164.0586" y="130.81" size="1.778" layer="95" rot="R270"/>
-<attribute name="VALUE" x="159.258" y="130.81" size="1.778" layer="96" rot="R270"/>
+<instance part="R8" gate="G$1" x="162.56" y="129.54" smashed="yes" rot="R270">
+<attribute name="NAME" x="164.0586" y="133.35" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="159.258" y="133.35" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="R9" gate="G$1" x="88.9" y="15.24" smashed="yes" rot="R270">
-<attribute name="NAME" x="90.3986" y="19.05" size="1.778" layer="95" rot="R270"/>
-<attribute name="VALUE" x="85.598" y="19.05" size="1.778" layer="96" rot="R270"/>
+<instance part="R9" gate="G$1" x="88.9" y="17.78" smashed="yes" rot="R270">
+<attribute name="NAME" x="90.3986" y="21.59" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="85.598" y="21.59" size="1.778" layer="96" rot="R270"/>
 </instance>
 <instance part="SUPPLY7" gate="GND" x="88.9" y="5.08" smashed="yes">
 <attribute name="VALUE" x="86.995" y="1.905" size="1.778" layer="96"/>
@@ -16094,6 +16093,18 @@ Viktor Mandelbauer</text>
 <attribute name="LAST_DATE_TIME" x="175.26" y="1.27" size="2.54" layer="94"/>
 <attribute name="SHEET" x="248.92" y="1.27" size="2.54" layer="94"/>
 <attribute name="DRAWING_NAME" x="180.34" y="19.05" size="2.54" layer="94"/>
+</instance>
+<instance part="IC2" gate="LED" x="114.3" y="152.4" smashed="yes">
+<attribute name="NAME" x="124.46" y="147.32" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="127" y="144.78" size="1.778" layer="96" rot="R180"/>
+</instance>
+<instance part="R10" gate="G$1" x="101.6" y="152.4" smashed="yes" rot="R90">
+<attribute name="NAME" x="100.1014" y="148.59" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="104.902" y="148.59" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="LED2" gate="G$1" x="88.9" y="30.48" smashed="yes">
+<attribute name="NAME" x="92.456" y="25.908" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="94.615" y="25.908" size="1.778" layer="96" rot="R90"/>
 </instance>
 </instances>
 <busses>
@@ -16215,7 +16226,7 @@ Viktor Mandelbauer</text>
 <wire x1="190.5" y1="111.76" x2="190.5" y2="132.08" width="0.1524" layer="91"/>
 <junction x="190.5" y="111.76"/>
 <pinref part="R8" gate="G$1" pin="2"/>
-<wire x1="162.56" y1="121.92" x2="162.56" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="124.46" x2="162.56" y2="111.76" width="0.1524" layer="91"/>
 <junction x="162.56" y="111.76"/>
 </segment>
 <segment>
@@ -16231,13 +16242,17 @@ Viktor Mandelbauer</text>
 <segment>
 <pinref part="SUPPLY4" gate="GND" pin="GND"/>
 <pinref part="SV1" gate="-3" pin="S"/>
-<wire x1="109.22" y1="149.86" x2="109.22" y2="167.64" width="0.1524" layer="91"/>
-<wire x1="109.22" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="149.86" x2="93.98" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="167.64" x2="101.6" y2="167.64" width="0.1524" layer="91"/>
+<pinref part="R10" gate="G$1" pin="2"/>
+<wire x1="101.6" y1="167.64" x2="139.7" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="157.48" x2="101.6" y2="167.64" width="0.1524" layer="91"/>
+<junction x="101.6" y="167.64"/>
 </segment>
 <segment>
 <pinref part="R9" gate="G$1" pin="2"/>
 <pinref part="SUPPLY7" gate="GND" pin="GND"/>
-<wire x1="88.9" y1="10.16" x2="88.9" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="12.7" x2="88.9" y2="7.62" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U$3" gate="G$1" pin="GND3"/>
@@ -16504,7 +16519,7 @@ Viktor Mandelbauer</text>
 <wire x1="152.4" y1="137.16" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
 <pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="162.56" y1="137.16" x2="167.64" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="162.56" y1="132.08" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="134.62" x2="162.56" y2="137.16" width="0.1524" layer="91"/>
 <junction x="162.56" y="137.16"/>
 <wire x1="152.4" y1="137.16" x2="137.16" y2="137.16" width="0.1524" layer="91"/>
 <junction x="152.4" y="137.16"/>
@@ -16521,16 +16536,16 @@ Viktor Mandelbauer</text>
 <net name="N$12" class="0">
 <segment>
 <pinref part="B1" gate="B1" pin="24"/>
-<pinref part="IC1" gate="LED" pin="A"/>
 <wire x1="63.5" y1="50.8" x2="88.9" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="50.8" x2="88.9" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="A"/>
 </segment>
 </net>
 <net name="N$24" class="0">
 <segment>
-<pinref part="IC1" gate="LED" pin="K"/>
 <pinref part="R9" gate="G$1" pin="1"/>
-<wire x1="88.9" y1="22.86" x2="88.9" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="C"/>
+<wire x1="88.9" y1="22.86" x2="88.9" y2="25.4" width="0.1524" layer="91" style="longdash"/>
 </segment>
 </net>
 <net name="LCD_CS" class="0">
@@ -16638,6 +16653,8 @@ Viktor Mandelbauer</text>
 <segment>
 <wire x1="68.58" y1="124.46" x2="71.12" y2="124.46" width="0.1524" layer="91"/>
 <label x="71.12" y="124.46" size="1.778" layer="95"/>
+<pinref part="B1" gate="B1" pin="SDA"/>
+<wire x1="63.5" y1="124.46" x2="68.58" y2="124.46" width="0.1524" layer="91" style="longdash"/>
 </segment>
 </net>
 <net name="ARD_SCL" class="0">
@@ -16649,6 +16666,8 @@ Viktor Mandelbauer</text>
 <segment>
 <wire x1="68.58" y1="127" x2="71.12" y2="127" width="0.1524" layer="91"/>
 <label x="71.12" y="127" size="1.778" layer="95"/>
+<pinref part="B1" gate="B1" pin="SCL"/>
+<wire x1="68.58" y1="127" x2="63.5" y2="127" width="0.1524" layer="91" style="longdash"/>
 </segment>
 </net>
 <net name="ETH_CS" class="0">
@@ -16658,9 +16677,9 @@ Viktor Mandelbauer</text>
 <label x="129.54" y="55.88" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
-<wire x1="63.5" y1="48.26" x2="71.12" y2="48.26" width="0.1524" layer="91"/>
-<label x="71.12" y="48.26" size="1.778" layer="95"/>
-<pinref part="B1" gate="B1" pin="26"/>
+<wire x1="63.5" y1="45.72" x2="71.12" y2="45.72" width="0.1524" layer="91"/>
+<label x="71.12" y="45.72" size="1.778" layer="95"/>
+<pinref part="B1" gate="B1" pin="28"/>
 </segment>
 </net>
 <net name="N$16" class="0">
@@ -16670,6 +16689,29 @@ Viktor Mandelbauer</text>
 <pinref part="B1" gate="B1" pin="22"/>
 <wire x1="71.12" y1="68.58" x2="71.12" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="53.34" x2="63.5" y2="53.34" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$19" class="0">
+<segment>
+<pinref part="R10" gate="G$1" pin="1"/>
+<wire x1="101.6" y1="147.32" x2="101.6" y2="144.78" width="0.1524" layer="91"/>
+<pinref part="IC2" gate="LED" pin="K"/>
+<wire x1="101.6" y1="144.78" x2="114.3" y2="144.78" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="144.78" x2="114.3" y2="147.32" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="OPT_ISOL" class="0">
+<segment>
+<pinref part="B1" gate="B1" pin="26"/>
+<wire x1="63.5" y1="48.26" x2="71.12" y2="48.26" width="0.1524" layer="91"/>
+<label x="71.12" y="48.26" size="1.778" layer="95"/>
+</segment>
+<segment>
+<label x="106.68" y="162.56" size="1.778" layer="95" rot="R270"/>
+<pinref part="IC2" gate="LED" pin="A"/>
+<wire x1="114.3" y1="157.48" x2="114.3" y2="165.1" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="162.56" x2="106.68" y2="165.1" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="165.1" x2="114.3" y2="165.1" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
