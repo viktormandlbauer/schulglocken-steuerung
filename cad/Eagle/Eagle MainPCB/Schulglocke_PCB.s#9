@@ -15855,6 +15855,7 @@ DIN A4, landscape with extra doc field</description>
 <part name="IC2" library="optocoupler" library_urn="urn:adsk.eagle:library:320" deviceset="SFH6156" device="" package3d_urn="urn:adsk.eagle:package:21969/1"/>
 <part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="M1206" package3d_urn="urn:adsk.eagle:package:23566/2"/>
 <part name="SUPPLY11" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
+<part name="LED2" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -16104,6 +16105,10 @@ Viktor Mandelbauer</text>
 </instance>
 <instance part="SUPPLY11" gate="GND" x="101.6" y="144.78" smashed="yes">
 <attribute name="VALUE" x="99.695" y="141.605" size="1.778" layer="96"/>
+</instance>
+<instance part="LED2" gate="G$1" x="88.9" y="30.48" smashed="yes">
+<attribute name="NAME" x="92.456" y="25.908" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="94.615" y="25.908" size="1.778" layer="96" rot="R90"/>
 </instance>
 </instances>
 <busses>
@@ -16538,12 +16543,15 @@ Viktor Mandelbauer</text>
 <pinref part="B1" gate="B1" pin="24"/>
 <wire x1="63.5" y1="50.8" x2="88.9" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="50.8" x2="88.9" y2="33.02" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="A"/>
 </segment>
 </net>
 <net name="N$24" class="0">
 <segment>
 <pinref part="R9" gate="G$1" pin="1"/>
 <wire x1="88.9" y1="22.86" x2="88.9" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="LED2" gate="G$1" pin="C"/>
+<wire x1="88.9" y1="22.86" x2="88.9" y2="25.4" width="0.1524" layer="91" style="longdash"/>
 </segment>
 </net>
 <net name="LCD_CS" class="0">
