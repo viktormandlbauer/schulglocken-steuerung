@@ -392,7 +392,7 @@ Includes holes for ICSP header
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="EMC28J60SHIELD">
+<deviceset name="EMC28J60SHIELD" prefix="M">
 <gates>
 <gate name="G$1" symbol="ENC_SHIELD_SYMB" x="-10.16" y="-22.86"/>
 </gates>
@@ -440,7 +440,7 @@ Includes holes for ICSP header
 </device>
 </devices>
 </deviceset>
-<deviceset name="WAVESHAREDISPLAY">
+<deviceset name="WAVESHAREDISPLAY" prefix="M">
 <gates>
 <gate name="G$1" symbol="WAVEDISP_SYMB" x="-15.24" y="-7.62"/>
 </gates>

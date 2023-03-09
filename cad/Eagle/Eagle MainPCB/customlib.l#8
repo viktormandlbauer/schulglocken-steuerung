@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -398,6 +398,18 @@ Includes holes for ICSP header
 </gates>
 <devices>
 <device name="" package="EMC_F">
+<connects>
+<connect gate="G$1" pin="CL_O" pad="CLKOUT"/>
+<connect gate="G$1" pin="CS" pad="CS"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="INT" pad="INT"/>
+<connect gate="G$1" pin="RST" pad="RST"/>
+<connect gate="G$1" pin="SCK" pad="SCK"/>
+<connect gate="G$1" pin="SI" pad="SI"/>
+<connect gate="G$1" pin="SO" pad="SO"/>
+<connect gate="G$1" pin="VCC" pad="VCC"/>
+<connect gate="G$1" pin="WOL" pad="WOL"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
@@ -409,7 +421,19 @@ Includes holes for ICSP header
 <gate name="G$1" symbol="DS3231_SHIELD_SYMB" x="2.54" y="-2.54"/>
 </gates>
 <devices>
-<device name="">
+<device name="" package="DS3231_F">
+<connects>
+<connect gate="G$1" pin="32K" pad="32K"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="GND_EE" pad="GND_E"/>
+<connect gate="G$1" pin="SCL" pad="SCL"/>
+<connect gate="G$1" pin="SCL_EE" pad="SCL_E"/>
+<connect gate="G$1" pin="SDA" pad="SDA"/>
+<connect gate="G$1" pin="SDA_EE" pad="SDA_E"/>
+<connect gate="G$1" pin="SQW" pad="SQW"/>
+<connect gate="G$1" pin="VCC" pad="VCC"/>
+<connect gate="G$1" pin="VCC_EE" pad="VCC_E"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
