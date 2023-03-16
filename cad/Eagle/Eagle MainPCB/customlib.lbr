@@ -795,6 +795,9 @@ Includes holes for ICSP header
 <circle x="16.51" y="-19.05" radius="1.524" width="0.127" layer="51"/>
 <circle x="16.51" y="8.89" radius="1.524" width="0.127" layer="51"/>
 </package>
+<package name="MOUNT_POINT_3.3MM">
+<pad name="P$1" x="0" y="0" drill="3.3" diameter="3.7"/>
+</package>
 </packages>
 <symbols>
 <symbol name="ENC_SHIELD_SYMB">
@@ -972,6 +975,11 @@ Includes holes for ICSP header
 <pin name="SDA" x="15.24" y="48.26" length="short" rot="R180"/>
 <pin name="SCL" x="15.24" y="50.8" length="short" rot="R180"/>
 <pin name="IOREF" x="-15.24" y="53.34" length="short"/>
+</symbol>
+<symbol name="MOUNTPOINT_3.3MM">
+<circle x="0" y="0" radius="5.6796125" width="0.1524" layer="94"/>
+<circle x="0" y="0" radius="2.54" width="0.1524" layer="94"/>
+<pin name="P$1" x="-7.62" y="0" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -1254,6 +1262,21 @@ Includes holes for ICSP header
 <connect gate="B1" pin="SCL" pad="SCL"/>
 <connect gate="B1" pin="SDA" pad="SDA"/>
 <connect gate="B1" pin="VIN" pad="VIN"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MOUNTPOINT3.3MM">
+<gates>
+<gate name="G$1" symbol="MOUNTPOINT_3.3MM" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="MOUNT_POINT_3.3MM">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
 </connects>
 <technologies>
 <technology name=""/>

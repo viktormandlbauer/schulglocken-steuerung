@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -795,6 +795,9 @@ Includes holes for ICSP header
 <circle x="16.51" y="-19.05" radius="1.524" width="0.127" layer="51"/>
 <circle x="16.51" y="8.89" radius="1.524" width="0.127" layer="51"/>
 </package>
+<package name="MOUNT_POINT_3.3MM">
+<pad name="P$1" x="0" y="0" drill="3.3" diameter="3.7"/>
+</package>
 </packages>
 <symbols>
 <symbol name="ENC_SHIELD_SYMB">
@@ -973,6 +976,11 @@ Includes holes for ICSP header
 <pin name="SCL" x="15.24" y="50.8" length="short" rot="R180"/>
 <pin name="IOREF" x="-15.24" y="53.34" length="short"/>
 </symbol>
+<symbol name="MOUNTPOINT_3.3MM">
+<circle x="0" y="0" radius="5.6796125" width="0.1524" layer="94"/>
+<circle x="0" y="0" radius="2.54" width="0.1524" layer="94"/>
+<pin name="P$1" x="-7.62" y="0" length="middle"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="EMC28J60SHIELD" prefix="M">
@@ -1058,6 +1066,108 @@ Includes holes for ICSP header
 </devices>
 </deviceset>
 <deviceset name="ARDUINO_MEGA_R3" prefix="B">
+<description>&lt;h3&gt;Arduino Mega R3&lt;/h3&gt;
+&lt;p&gt;ATmega2560 R3 compatible footprint. &lt;/p&gt;
+
+
+&lt;b&gt;&lt;p&gt;SparkFun Products:&lt;/b&gt;
+&lt;ul&gt;&lt;li&gt;&lt;a href=”https://www.sparkfun.com/products/11061”&gt;Arduino Mega 2560 R3&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</description>
+<gates>
+<gate name="B1" symbol="ARDUINO-MEGA" x="0" y="0"/>
+</gates>
+<devices>
+<device name="FULL" package="ARDUINO_MEGA_NO_SILK">
+<connects>
+<connect gate="B1" pin="!RESET" pad="RESET"/>
+<connect gate="B1" pin="0(RX0)" pad="0"/>
+<connect gate="B1" pin="1(TX0)" pad="1"/>
+<connect gate="B1" pin="10" pad="10"/>
+<connect gate="B1" pin="11" pad="11"/>
+<connect gate="B1" pin="12" pad="12"/>
+<connect gate="B1" pin="13" pad="13"/>
+<connect gate="B1" pin="14(TX3)" pad="14"/>
+<connect gate="B1" pin="15(RX3)" pad="15"/>
+<connect gate="B1" pin="16(TX2)" pad="16"/>
+<connect gate="B1" pin="17(RX2)" pad="17"/>
+<connect gate="B1" pin="18(TX1)" pad="18"/>
+<connect gate="B1" pin="19(RX1)" pad="19"/>
+<connect gate="B1" pin="2" pad="2"/>
+<connect gate="B1" pin="20(SDA)" pad="20"/>
+<connect gate="B1" pin="21(SCL)" pad="21"/>
+<connect gate="B1" pin="22" pad="22"/>
+<connect gate="B1" pin="23" pad="23"/>
+<connect gate="B1" pin="24" pad="24"/>
+<connect gate="B1" pin="25" pad="25"/>
+<connect gate="B1" pin="26" pad="26"/>
+<connect gate="B1" pin="27" pad="27"/>
+<connect gate="B1" pin="28" pad="28"/>
+<connect gate="B1" pin="29" pad="29"/>
+<connect gate="B1" pin="3" pad="3"/>
+<connect gate="B1" pin="3.3V" pad="3.3V"/>
+<connect gate="B1" pin="30" pad="30"/>
+<connect gate="B1" pin="31" pad="31"/>
+<connect gate="B1" pin="32" pad="32"/>
+<connect gate="B1" pin="33" pad="33"/>
+<connect gate="B1" pin="34" pad="34"/>
+<connect gate="B1" pin="35" pad="35"/>
+<connect gate="B1" pin="36" pad="36"/>
+<connect gate="B1" pin="37" pad="37"/>
+<connect gate="B1" pin="38" pad="38"/>
+<connect gate="B1" pin="39" pad="39"/>
+<connect gate="B1" pin="4" pad="4"/>
+<connect gate="B1" pin="40" pad="40"/>
+<connect gate="B1" pin="41" pad="41"/>
+<connect gate="B1" pin="42" pad="42"/>
+<connect gate="B1" pin="43" pad="43"/>
+<connect gate="B1" pin="44" pad="44"/>
+<connect gate="B1" pin="45" pad="45"/>
+<connect gate="B1" pin="46" pad="46"/>
+<connect gate="B1" pin="47" pad="47"/>
+<connect gate="B1" pin="48" pad="48"/>
+<connect gate="B1" pin="49" pad="49"/>
+<connect gate="B1" pin="5" pad="5"/>
+<connect gate="B1" pin="50/MISO" pad="50"/>
+<connect gate="B1" pin="51/MOSI" pad="51"/>
+<connect gate="B1" pin="52/SCK" pad="52"/>
+<connect gate="B1" pin="53/!CS" pad="53"/>
+<connect gate="B1" pin="5V" pad="5V 5V@1 5V@2"/>
+<connect gate="B1" pin="6" pad="6"/>
+<connect gate="B1" pin="7" pad="7"/>
+<connect gate="B1" pin="8" pad="8"/>
+<connect gate="B1" pin="9" pad="9"/>
+<connect gate="B1" pin="A0" pad="A0"/>
+<connect gate="B1" pin="A1" pad="A1"/>
+<connect gate="B1" pin="A10" pad="A10"/>
+<connect gate="B1" pin="A11" pad="A11"/>
+<connect gate="B1" pin="A12" pad="A12"/>
+<connect gate="B1" pin="A13" pad="A13"/>
+<connect gate="B1" pin="A14" pad="A14"/>
+<connect gate="B1" pin="A15" pad="A15"/>
+<connect gate="B1" pin="A2" pad="A2"/>
+<connect gate="B1" pin="A3" pad="A3"/>
+<connect gate="B1" pin="A4" pad="A4"/>
+<connect gate="B1" pin="A5" pad="A5"/>
+<connect gate="B1" pin="A6" pad="A6"/>
+<connect gate="B1" pin="A7" pad="A7"/>
+<connect gate="B1" pin="A8" pad="A8"/>
+<connect gate="B1" pin="A9" pad="A9"/>
+<connect gate="B1" pin="AREF" pad="AREF"/>
+<connect gate="B1" pin="GND" pad="GND GND@3 GND@4" route="any"/>
+<connect gate="B1" pin="GND@2" pad="GND@1"/>
+<connect gate="B1" pin="GND@3" pad="GND@2"/>
+<connect gate="B1" pin="IOREF" pad="IOREF"/>
+<connect gate="B1" pin="SCL" pad="SCL"/>
+<connect gate="B1" pin="SDA" pad="SDA"/>
+<connect gate="B1" pin="VIN" pad="VIN"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="ARDUINO_MEGA_R3_CUSTOM_SHIELD" prefix="B">
 <description>&lt;h3&gt;Arduino Mega R3&lt;/h3&gt;
 &lt;p&gt;ATmega2560 R3 compatible footprint. &lt;/p&gt;
 
