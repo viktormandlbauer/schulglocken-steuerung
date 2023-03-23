@@ -21631,7 +21631,6 @@ Viktor Mandelbauer</text>
 <wire x1="152.4" y1="137.16" x2="137.16" y2="137.16" width="0.1524" layer="91"/>
 <junction x="152.4" y="137.16"/>
 <label x="137.16" y="137.16" size="1.778" layer="95" rot="R180"/>
-<label x="73.66" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$22" class="0">
@@ -21828,12 +21827,6 @@ Viktor Mandelbauer</text>
 <net name="N$20" class="0">
 <segment>
 <wire x1="144.78" y1="157.48" x2="144.78" y2="152.4" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$18" class="0">
-<segment>
-<wire x1="73.66" y1="43.18" x2="63.5" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="B2" gate="B1" pin="30"/>
 </segment>
 </net>
 </nets>

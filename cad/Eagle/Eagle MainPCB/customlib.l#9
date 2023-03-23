@@ -440,7 +440,7 @@ Includes holes for ICSP header
 </device>
 </devices>
 </deviceset>
-<deviceset name="WAVESHAREDISPLAY">
+<deviceset name="WAVESHAREDISPLAY" prefix="M">
 <gates>
 <gate name="G$1" symbol="WAVEDISP_SYMB" x="-15.24" y="-7.62"/>
 </gates>

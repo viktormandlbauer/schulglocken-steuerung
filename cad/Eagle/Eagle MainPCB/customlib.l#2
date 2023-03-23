@@ -796,7 +796,7 @@ Includes holes for ICSP header
 <circle x="16.51" y="8.89" radius="1.524" width="0.127" layer="51"/>
 </package>
 <package name="MOUNT_POINT_3.3MM">
-<pad name="P$1" x="0" y="0" drill="3.3"/>
+<pad name="P$1" x="0" y="0" drill="3.3" diameter="3.7"/>
 </package>
 </packages>
 <symbols>

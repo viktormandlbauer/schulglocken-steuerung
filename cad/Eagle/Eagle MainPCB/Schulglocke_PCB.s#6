@@ -21632,6 +21632,11 @@ Viktor Mandelbauer</text>
 <junction x="152.4" y="137.16"/>
 <label x="137.16" y="137.16" size="1.778" layer="95" rot="R180"/>
 </segment>
+<segment>
+<wire x1="71.12" y1="43.18" x2="63.5" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="B2" gate="B1" pin="30"/>
+<label x="71.12" y="43.18" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="N$22" class="0">
 <segment>

@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="100" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -302,20 +302,20 @@ Includes holes for ICSP header
 <pad name="SDA" x="22.86" y="-2.54" drill="1.016"/>
 <pad name="VCC" x="22.86" y="-5.08" drill="1.016"/>
 <pad name="GND" x="22.86" y="-7.62" drill="1.016"/>
-<pad name="SCL_E" x="-15.24" y="2.54" drill="1.016"/>
-<pad name="SDA_E" x="-15.24" y="0" drill="1.016"/>
-<pad name="VCC_E" x="-15.24" y="-2.54" drill="1.016"/>
-<pad name="GND_E" x="-15.24" y="-5.08" drill="1"/>
+<pad name="SCL_E" x="-10.16" y="2.54" drill="1.016"/>
+<pad name="SDA_E" x="-10.16" y="0" drill="1.016"/>
+<pad name="VCC_E" x="-10.16" y="-2.54" drill="1.016"/>
+<pad name="GND_E" x="-10.16" y="-5.08" drill="1"/>
 <wire x1="22.86" y1="10.16" x2="25.4" y2="7.62" width="0.127" layer="51" curve="-90"/>
 <wire x1="25.4" y1="7.62" x2="25.4" y2="-10.16" width="0.127" layer="51"/>
 <wire x1="25.4" y1="-10.16" x2="22.86" y2="-12.7" width="0.127" layer="51" curve="-90"/>
-<wire x1="22.86" y1="-12.7" x2="-15.24" y2="-12.7" width="0.127" layer="51"/>
-<wire x1="-15.24" y1="-12.7" x2="-17.78" y2="-10.16" width="0.127" layer="51" curve="-90"/>
-<wire x1="-17.78" y1="-10.16" x2="-17.78" y2="7.62" width="0.127" layer="51"/>
-<wire x1="-17.78" y1="7.62" x2="-15.24" y2="10.16" width="0.127" layer="51" curve="-90"/>
-<wire x1="-15.24" y1="10.16" x2="22.86" y2="10.16" width="0.127" layer="51"/>
+<wire x1="22.86" y1="-12.7" x2="-10.16" y2="-12.7" width="0.127" layer="51"/>
+<wire x1="-10.16" y1="-12.7" x2="-12.7" y2="-10.16" width="0.127" layer="51" curve="-90"/>
+<wire x1="-12.7" y1="-10.16" x2="-12.7" y2="7.62" width="0.127" layer="51"/>
+<wire x1="-12.7" y1="7.62" x2="-10.16" y2="10.16" width="0.127" layer="51" curve="-90"/>
 <text x="-10.16" y="7.62" size="1.27" layer="25">&gt;Name</text>
 <text x="-10.16" y="5.08" size="1.27" layer="27">&gt;Value</text>
+<wire x1="-10.16" y1="10.16" x2="22.86" y2="10.16" width="0.1524" layer="51"/>
 </package>
 <package name="ARDUINO_MEGA_NO_SILK">
 <description>&lt;h3&gt; Arduino MEGA R3 footprint&lt;/h3&gt;
