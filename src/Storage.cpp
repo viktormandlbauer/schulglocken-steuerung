@@ -24,10 +24,8 @@ using namespace Storage;
 #define ALARMS_ASSIGNMENT_START MAXIMUM_AMOUNT_ALARMS * 2 + 1
 #define ALARM_TYPES_START ALARMS_ASSIGNMENT_START + MAXIMUM_AMOUNT_ALARMS * 1 + 1
 #define NETWORK_CONFIG_START ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
-#define NEXT NETWORK_CONFIG_START + 36 + 1 // 36 Bytes -> 4 x 32bit IP Addressen + 20 chars für NTP Server Name
-
-// #define ALARMS_ASSIGNMENT_START 258
-// #define ALARM_TYPES_START 322
+#define NETWORK_MODE NETWORK_CONFIG_START + 36 + 1 // 36 Bytes -> 4 x 32bit IP Addressen + 20 chars für NTP Server Name
+#define NEXT NETWORK_MODE + 1
 
 void Storage::save_alarm_count(uint8_t alarm_count)
 {
@@ -249,4 +247,26 @@ void Storage::read_network_time_settings(char *myntp_name, uint8_t *myntp_adr)
             myntp_name[i] = read;
         }
     }
+}
+
+void Storage::save_network_dhcp(bool automatic)
+{
+#ifdef DEBUG
+    Serial.print("[Info] (Storage) Saved network node to storage - DHCP: ");
+    Serial.println(automatic, BIN);
+#endif
+
+    EEPROM.put(NETWORK_MODE, automatic);
+}
+bool Storage::read_network_dhcp()
+{
+
+#ifdef DEBUG
+    char automatic = EEPROM.read(NETWORK_MODE);
+    Serial.print("[Info] (Storage) Read network mode from storage - DHCP: ");
+    Serial.println(automatic, BIN);
+    return automatic;
+#endif
+
+    return EEPROM.read(NETWORK_MODE);
 }

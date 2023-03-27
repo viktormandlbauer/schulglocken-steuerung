@@ -40,10 +40,10 @@ void draw_menu()
     // Einstallungs Menü
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
-    button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Zeitplan", 3);
-    button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Uhrzeit", 3);
-    button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "System", 3);
-    button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Netzwerk", 3);
+    button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
+    button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
+    button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"System", 3);
+    button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
 
     button_plan.drawButton(true);
     button_time.drawButton(true);
@@ -67,7 +67,7 @@ void draw_back_button(uint16_t BACKARROW_POS_X, uint16_t BACKARROW_POS_Y, uint8_
 {
 
     button_back.initButton(&tft, BACKARROW_POS_X, BACKARROW_POS_Y, BACKARROW_WIDTH, BACKARROW_HEIGHT,
-                           COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 0);
+                           COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 0);
     button_back.drawButton(true);
 
     tft.fillTriangle(BACKARROW_POS_X - BACKARROW_WIDTH * 0.5 + 5,
@@ -103,9 +103,9 @@ uint8_t alarm_list_position = 0;
 
 void GUI::draw_alarm_list(char alarm_strings[][6])
 {
-    button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
-    button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "", 3);
-    button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "+", 5);
+    button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 3);
+    button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 3);
+    button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"+", 5);
 
     button_down.drawButton(true);
     button_up.drawButton(true);
@@ -192,21 +192,21 @@ Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, 
 
 void draw_numeric_keyboard()
 {
-    buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "0", 4);
-    buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "1", 4);
-    buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "2", 4);
-    buttons_keys[3].initButton(&tft, 168, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "3", 4);
-    buttons_keys[4].initButton(&tft, 216, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "4", 4);
-    buttons_keys[5].initButton(&tft, 24, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "5", 4);
-    buttons_keys[6].initButton(&tft, 72, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "6", 4);
-    buttons_keys[7].initButton(&tft, 120, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "7", 4);
-    buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "8", 4);
-    buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "9", 4);
+    buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"0", 4);
+    buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"1", 4);
+    buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"2", 4);
+    buttons_keys[3].initButton(&tft, 168, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"3", 4);
+    buttons_keys[4].initButton(&tft, 216, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"4", 4);
+    buttons_keys[5].initButton(&tft, 24, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"5", 4);
+    buttons_keys[6].initButton(&tft, 72, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"6", 4);
+    buttons_keys[7].initButton(&tft, 120, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"7", 4);
+    buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"8", 4);
+    buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"9", 4);
 
-    button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "<", 3);
-    button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, ">", 3);
-    button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, "Sichern", 3);
-    button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, "Entfernen", 2);
+    button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"<", 3);
+    button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)">", 3);
+    button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Sichern", 3);
+    button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Entfernen", 2);
 
     buttons_keys[0].drawButton(true);
     buttons_keys[1].drawButton(true);
@@ -601,6 +601,130 @@ void GUI::time(char time_string[9])
     {
         tft.drawChar(0.3 * X_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
     }
+}
+
+Adafruit_GFX_Button button_mode;
+#define BUTTON_DHCP_HEIGHT 80
+#define BUTTON_DHCP_WIDTH 400
+#define BUTTON_DHCP_X 240
+#define BUTTON_DHCP_Y 40
+
+#define IP_ADDRESS_X 20
+#define IP_ADDRESS_Y 80
+
+#define GW_ADDRESS_X 20
+#define GW_ADDRESS_Y 140
+
+#define DNS_ADDRESS_X 20
+#define DNS_ADDRESS_Y 200
+
+void address_to_chararr(uint8_t address[4], char address_string[16])
+{
+    uint8_t mod100, mod10, div100, div10;
+    int pos = 0;
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        div100 = address[i] / 100;
+        mod100 = address[i] % 100;
+        div10 = mod100 / 10;
+        mod10 = mod100 % 10;
+
+        if (div100 > 0)
+        {
+            address_string[pos++] = div100 + '0';
+            address_string[pos++] = div10 + '0';
+            address_string[pos++] = mod10 + '0';
+        }
+        else if (div10 > 0)
+        {
+            address_string[pos++] = div10 + '0';
+            address_string[pos++] = mod10 + '0';
+        }
+        else
+        {
+            address_string[pos++] = mod10 + '0';
+        }
+
+        if (i < 3)
+        {
+            address_string[pos++] = '.';
+        }
+    }
+    address_string[pos] = '\0';
+}
+
+uint8_t GUI::check_network_config(int8_t *network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+{
+    if (check_button_pressed(button_back))
+    {
+        return MENU;
+    }
+    else if (check_button_pressed(button_accept))
+    {
+        return MENU;
+    }
+    else if (check_button_pressed(button_mode))
+    {
+        if (*network_status == DHCP_SETUP_ACTIVE)
+        {
+            button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, YELLOW, COLOR_BLACK, "Manuell", 2);
+            *network_status = STATIC_SETUP_INIT;
+        }
+        else if (*network_status == STATIC_SETUP_ACTIVE)
+        {
+            button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, GREEN, COLOR_BLACK, "Automatisch", 2);
+            *network_status = DHCP_SETUP_INIT;
+        }
+        button_mode.drawButton();
+        return BUTTON_MODIFY;
+    }
+    return NETWORK;
+}
+
+void GUI::network_config(int8_t network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    char address_string[16];
+
+    tft.setCursor(IP_ADDRESS_X, IP_ADDRESS_Y);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setTextSize(4);
+    tft.print("IP:");
+    address_to_chararr(ip, address_string);
+    tft.print(address_string);    
+
+
+    tft.setCursor(GW_ADDRESS_X, GW_ADDRESS_Y);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setTextSize(4);
+    tft.print("GW:");
+    address_to_chararr(gw, address_string);
+    tft.print(address_string);
+
+    tft.setCursor(DNS_ADDRESS_X, DNS_ADDRESS_Y);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setTextSize(4);
+    tft.print("DNS:");
+    address_to_chararr(dns, address_string);
+    tft.print(address_string);
+
+    tft.setFont();
+
+    if (network_status == DHCP_SETUP_ACTIVE)
+    {
+        button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, GREEN, COLOR_BLACK, (char *)"Automatisch", 2);
+        button_mode.drawButton();
+    }
+    else if (network_status == STATIC_SETUP_ACTIVE)
+    {
+        button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, YELLOW, COLOR_BLACK, (char *)"Manuell", 2);
+    }
+
+    button_mode.drawButton();
+    button_accept.initButton(&tft, 400, 290, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, (char *)"Sichern", 3);
+
+    button_mode.drawButton();
+    button_accept.drawButton();
 }
 
 // Sometimes the touch display doesn't work properly and sets the "released" value to true

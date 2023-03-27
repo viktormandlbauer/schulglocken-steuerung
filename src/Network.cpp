@@ -5,12 +5,13 @@
 
 #include <Arduino.h>
 #include <EtherCard.h>
-
 #include "Network.h"
+
 
 byte Ethernet::buffer[700];
 
 using namespace Network;
+int8_t network_status;
 
 bool Network::init_ethernet()
 {
@@ -43,15 +44,26 @@ bool Network::static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t
     netmask[2] = (mask >> 8) & 0xFF;
     netmask[3] = mask & 0xFF;
 
-    ether.staticSetup(ip, gw, dns, netmask);
-
+    if (ether.staticSetup(ip, gw, dns, netmask))
+    {
 #ifdef DEBUG
-    Serial.println(F("[Info] Network Static-IP Setup"));
-    ether.printIp("[Info] IP:   ", ether.myip);
-    ether.printIp("[Info] GW:   ", ether.gwip);
-    ether.printIp("[Info] DNS:  ", ether.dnsip);
-    ether.printIp("[Info] NM:   ", ether.netmask);
+        Serial.println(F("[Info] (Network) Static network successful!"));
+        ether.printIp("[Info] (Network) IP:   ", ether.myip);
+        ether.printIp("[Info] (Network) GW:   ", ether.gwip);
+        ether.printIp("[Info] (Network) DNS:  ", ether.dnsip);
+        ether.printIp("[Info] (Network) NM:   ", ether.netmask);
 #endif
+        network_status = STATIC_SETUP_ACTIVE;
+        return true;
+    }
+    else
+    {
+#ifdef DEBUG
+        Serial.println("[Error] (Network) Static network setup failed!");
+#endif
+        network_status = STATIC_SETUP_FAILED;
+        return false;
+    }
 }
 
 bool Network::dhcp_setup()
@@ -62,19 +74,24 @@ bool Network::dhcp_setup()
 #ifdef DEBUG
         Serial.println("[Error] (Network) DHCP failed.");
 #endif
-
+        network_status = DHCP_SETUP_FAILED;
         return false;
     }
 
 #ifdef DEBUG
-    Serial.println("[Info] (Network) DHCP Setup");
+    Serial.println("[Info] (Network) DHCP setup successful!");
     ether.printIp("[Info] IP:   ", ether.myip);
     ether.printIp("[Info] GW:   ", ether.gwip);
     ether.printIp("[Info] DNS:  ", ether.dnsip);
     ether.printIp("[Info] NM:   ", ether.netmask);
 #endif
-
+    network_status = DHCP_SETUP_ACTIVE;
     return true;
+}
+
+int8_t Network::get_network_status()
+{
+    return network_status;
 }
 
 void Network::sendNTPpacket(const uint8_t *remoteAddress)

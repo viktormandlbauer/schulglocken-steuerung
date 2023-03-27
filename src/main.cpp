@@ -15,6 +15,8 @@ static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
 static Time::Alarm alarm;
 static uint8_t alarm_count = 0;
 
+uint8_t ip[4], gw[4], dns[4], prefix;
+
 void setup()
 {
     Serial.begin(57600);
@@ -33,7 +35,15 @@ void setup()
 #ifdef DEBUG
     Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
 #endif
-
+    if (Storage::read_network_dhcp())
+    {
+        Network::dhcp_setup();
+    }
+    else
+    {
+        Storage::read_network_settings(ip, gw, dns, &prefix);
+        Network::static_setup(ip, gw, dns, prefix);
+    }
     Network::init_ethernet();
 #ifdef DEBUG
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
@@ -135,6 +145,58 @@ void navigation_handler()
         break;
 
     case NETWORK:
+        int8_t network_status = Network::get_network_status();
+        uint8_t ip[4], dns[4], gw[4];
+        uint8_t snm;
+
+        navigation = GUI::check_network_config(&network_status, ip, dns, gw, snm);
+        if (navigation == BUTTON_MODIFY)
+        {
+            if (network_status == DHCP_SETUP_INIT)
+            {
+
+#ifdef DEBUG
+                Serial.println("[Info] (Main) DHCP Mode from GUI ");
+#endif
+
+                if (Network::dhcp_setup())
+                {
+                    uint8_t *snm = Network::get_snm();
+                    uint8_t snm_prefix = 0;
+                    for (uint8_t i = 0; i < 4; i++)
+                    {
+                        for (uint8_t j = 0; j < 8; j++)
+                        {
+                            if (snm[i] && 0b1 << j)
+                            {
+                                snm_prefix += 1;
+                            }
+                        }
+                    }
+#ifdef DEBUG
+                    Serial.print("[Info] (Main) Calculated SNM Prefix: ");
+                    Serial.println(snm_prefix);
+#endif
+                    GUI::network_config(network_status, Network::get_ip(), Network::get_gw(), Network::get_dns(), snm_prefix);
+                }
+            }
+            else if (network_status == STATIC_SETUP_INIT)
+            {
+#ifdef DEBUG
+                Serial.println("[Info] (Main) Static Mode from GUI");
+#endif
+                // Network::static_setup(ip, dns, gw, snm);
+            }
+
+            if (network_status == STATIC_SETUP_FAILED || network_status == DHCP_SETUP_FAILED)
+            {
+            }
+            else if (network_status == STATIC_SETUP_ACTIVE || network_status == DHCP_SETUP_ACTIVE)
+            {
+            }
+
+            navigation = NETWORK;
+        }
         break;
 
     case ALARM_CONFIG:
@@ -279,6 +341,11 @@ void refresh_handler()
     case NEW_ALARM_CONFIG:
         GUI::alarm_config((char *)"??:??", alarm.type);
         break;
+
+    case NETWORK:
+
+        GUI::network_config(Network::get_network_status(), Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_snm());
+        break;
     }
 }
 
@@ -295,6 +362,4 @@ void loop()
     }
 
     Time::check_alarms(alarms, alarm_count);
-
-    // Check Network
 }

@@ -53,6 +53,7 @@
 #define DEBUG_GUI
 #define DEBUG_NETWORK
 
+
 // Definitionen für "return codes"
 #define MENU 0
 #define TIMEPLAN 1
@@ -62,6 +63,8 @@
 #define NETWORK 4
 #define ALARM_CONFIG 5
 #define NEW_ALARM_CONFIG 6
+#define CHANGED_TO_DHCP 245
+#define CHANGED_TO_STATIC 246
 #define NO_CHANGE 247
 #define BUTTON_MODIFY 248
 #define BUTTON_BACK 248
@@ -72,3 +75,11 @@
 #define BUTTON_LEFT 253
 #define BUTTON_DELETE 254
 #define BUTTON_ACCEPT 255
+
+// Network Status Codes
+#define STATIC_SETUP_FAILED -1
+#define STATIC_SETUP_ACTIVE 1
+#define STATIC_SETUP_INIT 3
+#define DHCP_SETUP_FAILED -2
+#define DHCP_SETUP_ACTIVE 2
+#define DHCP_SETUP_INIT 4
