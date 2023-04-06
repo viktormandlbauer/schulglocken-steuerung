@@ -1,5 +1,9 @@
 
-// Einbindung externer Libraries
+#include "DEFINITIONS.h"
+#ifdef DEBUG_TIME
+#define DEBUG
+#endif
+
 #include <RTClib.h>
 #include <Wire.h>
 #include <TimeLib.h>
@@ -10,7 +14,8 @@
 
 namespace Time
 {
-
+    extern RTC_DS3231 rtc;
+    const int utcOffset = 1;
     struct Alarm
     {
         uint16_t minutes;
@@ -43,4 +48,7 @@ namespace Time
     uint32_t get_ring_type(uint8_t index);
 
     void get_alarm_string(uint16_t alarm, char output[6]);
+
+    time_t time_provider();
+    int compare(const void *s1, const void *s2);
 }

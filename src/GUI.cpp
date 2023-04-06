@@ -1,8 +1,3 @@
-#include "DEFINITIONS.h"
-#ifdef DEBUG_GUI
-#define DEBUG
-#endif
-
 #include <GUI.h>
 
 using namespace GUI;

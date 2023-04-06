@@ -1,11 +1,5 @@
 // Einstellung für den DEBUG Mode
-#include "DEFINITIONS.h"
-#ifdef DEBUG_STORAGE
-#define DEBUG
-#endif
 
-#include <Arduino.h>
-#include <EEPROM.h>
 
 // Angabe des Header Files
 #include "Storage.h"

@@ -1,5 +1,10 @@
-// 1024 bytes on the ATmega328P
-// 4 KB (4096 bytes) on the ATmega1280 and ATmega2560
+#include "DEFINITIONS.h"
+#ifdef DEBUG_STORAGE
+#define DEBUG
+#endif
+
+#include <Arduino.h>
+#include <EEPROM.h>
 
 namespace Storage
 {

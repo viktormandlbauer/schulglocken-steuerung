@@ -8,6 +8,7 @@
 #include "GUI.h"
 #include "Network.h"
 #include "Storage.h"
+#include "TimeSync.h"
 
 // Alarme
 static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
@@ -25,11 +26,6 @@ void setup()
     Serial.println("[Info] (Main) Display wurde aktiviert.");
 #endif
 
-    Time::init_rtc_module();
-#ifdef DEBUG
-    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
-#endif
-
     Time::init_alarm_interrupt();
 #ifdef DEBUG
     Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
@@ -44,6 +40,11 @@ void setup()
         Storage::read_network_settings(ip, gw, dns, &prefix);
         Network::static_setup(ip, gw, dns, prefix);
     }
+
+    Time::init_rtc_module();
+#ifdef DEBUG
+    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
+#endif
 
 #ifdef DEBUG
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
@@ -62,12 +63,6 @@ void setup()
 
     // Beeper
     pinMode(OUTPUT_PIN, OUTPUT);
-
-    
-    // Tests
-    Network::set_ntpserver("ntp.bit.nl");
-
-
 }
 
 int navigation;
@@ -376,7 +371,4 @@ void loop()
     }
 
     Time::check_alarms(alarms, alarm_count);
-    
-    
-    ether.packetLoop(ether.packetReceive());
 }

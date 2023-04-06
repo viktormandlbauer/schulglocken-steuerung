@@ -1,21 +1,21 @@
+#include "DEFINITIONS.h"
+#ifdef DEBUG_NETWORK
+#define DEBUG
+#endif
+
 #include <Arduino.h>
 #include <EtherCard.h>
-#define CHIP_SELECT 28 // Mega
-// #define CHIPSE_SELECT 14 // Uno
 
-// Local UDP port to use
+#define CHIP_SELECT 28
 
 namespace Network
 {
+    const char timeServer[] PROGMEM = "pool.ntp.org";
     const byte mac_address[6] = MAC_ADDRESS;
     const unsigned int NTP_LOCALPORT = 8888;
     const unsigned int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
     const unsigned int NTP_REMOTEPORT = 123; // NTP requests are to port 123
 
-    // server 0.at.pool.ntp.org
-    // server 1.at.pool.ntp.org
-    // server 2.at.pool.ntp.org
-    // server 3.at.pool.ntp.org
     // Network Configuration
     bool init_ethernet();
     int8_t get_network_status();
