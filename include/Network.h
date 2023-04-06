@@ -32,7 +32,6 @@ namespace Network
     void udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, const char *packetBuffer, uint16_t len);
     void sendNTPpacket(const uint8_t *remoteAddress);
 
-    bool print_networking_config();
     char *resolve_ip_address();
 
     bool http_response(byte day, byte month, byte year, byte hour, byte minute, byte second);

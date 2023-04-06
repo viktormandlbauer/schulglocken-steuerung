@@ -17,12 +17,6 @@ uint16_t exception_date_begin[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 // Aray mit 16 Bit Werten für Ausnahme End-Tag
 uint16_t exception_date_end[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 
-// Intialisierung der Zeitzonenregeln (DEFINITIONS.h)
-TimeChangeRule myDST = DST;
-TimeChangeRule mySTD = STD;
-Timezone myTZ(myDST, mySTD);
-TimeChangeRule *tcr;
-
 // Funktionen zur Überprüfung des Status eines Alarms
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
 void set_triggered(uint8_t index) { triggered |= 0b1 << index; }
@@ -139,40 +133,28 @@ namespace Time
         }
     }
 
-    time_t time_provider()
-    {
-        time_t utc = rtc.now().unixtime();
-        time_t local = myTZ.toLocal(utc, &tcr);
-        return local;
-    }
-
     bool init_rtc_module()
     {
-        /**
-         * Initiierung des RTC Moduls
-         */
 
+        uint8_t wait_counter = 0;
         while (!rtc.begin())
-            ;
-
-        // Konfiguration der Synchronisation mit dem RTC Modul
-        setSyncProvider(TimeSync::getDstCorrectedTime);
-        setSyncInterval(10);
-
-        if (timeStatus() != timeSet)
         {
+            if (wait_counter > 1000)
+            {
 #ifdef DEBUG
-            Serial.println("[Error] (Time) Time not synced!");
+                Serial.println("[Error] (Time) Fehler bei der Initialisierung der RTC");
 #endif
-            return false;
+                return false;
+            }
+            delay(100);
         }
-        else
-        {
-#ifdef DEBUG
-            Serial.println("[Info] (Time) Time synced!");
-#endif
-            return true;
-        }
+
+        // TODO -> GUI
+        TimeSync::EnableNtpSync = true;
+
+        setSyncProvider(TimeSync::getTime);
+        setSyncInterval(SYNC_INTERVAL_RTC);
+        rtc.adjust(DateTime(TimeSync::getTime()));
     }
 
     bool get_current_timestring(char output[9])

@@ -4,10 +4,8 @@
 
 byte dstOffset(byte d, byte m, unsigned int y, byte h)
 {
-    // Day in March that DST starts on, at 1 am
+    // Berechnung des Datums der Zeitsprünge
     byte dstOn = (31 - (5 * y / 4 + 4) % 7);
-
-    // Day in October that DST ends  on, at 2 am
     byte dstOff = (31 - (5 * y / 4 + 1) % 7);
 
     if ((m > 3 && m < 10) ||
@@ -20,9 +18,12 @@ byte dstOffset(byte d, byte m, unsigned int y, byte h)
 
 namespace TimeSync
 {
+    bool EnableNtpSync;
+    uint32_t LastNtpSync = 0;
+
     time_t getNtpTime()
     {
-        // Send request
+
         Serial.println("[Info] (TimeSync) Transmit NTP Request");
         if (!ether.dnsLookup(Network::timeServer))
         {
@@ -54,8 +55,14 @@ namespace TimeSync
         }
     }
 
+    time_t getRtcTime()
+    {
+        return Time::rtc.now().unixtime();
+    }
+
     time_t getDstCorrectedTime(void)
     {
+
         time_t t = getNtpTime();
 
         if (t > 0)
@@ -68,4 +75,26 @@ namespace TimeSync
         return t;
     }
 
+    time_t getTime()
+    {
+        time_t t = getRtcTime();
+        if (EnableNtpSync && ((SYNC_INTERVAL_NTP + LastNtpSync) < t))
+        {
+            t = getDstCorrectedTime();
+            LastNtpSync = t;
+            Time::rtc.adjust(DateTime(t));
+#ifdef DEBUG
+            Serial.println("[Info] (TimeSync) Synced RTC time with NTP Server");
+#endif
+            return t;
+        }
+        else
+        {
+
+#ifdef DEBUG
+            Serial.println("[Info] (TimeSync) Synced time with RTC");
+#endif
+            return t;
+        }
+    }
 }

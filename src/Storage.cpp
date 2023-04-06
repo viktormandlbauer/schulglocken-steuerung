@@ -1,6 +1,3 @@
-// Einstellung für den DEBUG Mode
-
-
 // Angabe des Header Files
 #include "Storage.h"
 

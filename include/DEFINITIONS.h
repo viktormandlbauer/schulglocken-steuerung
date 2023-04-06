@@ -37,17 +37,11 @@
 #define X_DIM 480
 #define Y_DIM 320
 
-// Zeitzonenregel - Standardzeit
-#define STD {"CET", Last, Sun, Oct, 3, 60};
+// Synchronisierungsintervall Systemzeit mit RTC
+#define SYNC_INTERVAL_RTC 10
 
-// Zeitzonenregel - Sommerzeit
-#define DST {"CEST", Last, Sun, Mar, 2, 120};
-
-// Synchronisierungsintervall der Systemzeit mit dem RTC Modul (Sekunden)
-#define SYNC_INTERVAL_RTC 60
-
-// Synchronisierungsintervall des RTC Moduls mit einem NTP Server
-#define SYNC_INTERVAL_NTP 6000
+// Synchronisierungsintervall RTC mit NTP
+#define SYNC_INTERVAL_NTP 15
 
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
