@@ -4,20 +4,15 @@
 #define DEBUG
 #endif
 
-// Einbindung externer Libraries
-#include "RTClib.h"
-#include <Wire.h>
-#include <TimeLib.h>
-#include <SPI.h>
 
 // Angabe des Header Files
 #include "Time.h"
 
-// Verwendung des Namespaces
-using namespace Time;
-
 // RTC Objekt aus der RTClib
 RTC_DS3231 rtc;
+
+// Verwendung des Namespaces
+using namespace Time;
 
 // Array mit Alarmtypen
 uint32_t alarm_types[MAXIMUM_AMOUNT_ALARM_TYPES];
@@ -34,11 +29,17 @@ uint16_t exception_date_begin[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 // Aray mit 16 Bit Werten für Ausnahme End-Tag
 uint16_t exception_date_end[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
 
+// Intialisierung der Zeitzonenregeln (DEFINITIONS.h)
+TimeChangeRule myDST = DST;
+TimeChangeRule mySTD = STD;
+Timezone myTZ(myDST, mySTD);
+TimeChangeRule *tcr;
+
 time_t time_provider()
 {
-    // Rückgabe der aktuellen Unix Zeit
-    // Vergangene Sekunden nach dem 1.Januar 1970, 00:00 Uhr UTC
-    return rtc.now().unixtime();
+    time_t utc = rtc.now().unixtime();
+    time_t local = myTZ.toLocal(utc, &tcr);
+    return local;
 }
 
 bool Time::init_rtc_module()
@@ -46,28 +47,9 @@ bool Time::init_rtc_module()
     /**
      * Initiierung des RTC Moduls
      */
-    Wire.begin();
+
     while (!rtc.begin())
         ;
-
-    // Konfiguration der Synchronisation mit dem RTC Modul
-    setSyncProvider(time_provider);
-    setSyncInterval(60);
-
-    if (timeStatus() != timeSet)
-    {
-#ifdef DEBUG
-        Serial.println("[Error] (Time) Time not synced!");
-#endif
-        return false;
-    }
-    else
-    {
-#ifdef DEBUG
-        Serial.println("[Info] (Time) Time synced!");
-#endif
-        return true;
-    }
 }
 
 void get_timestring(int hour, int minute, int second, char *buf)
@@ -174,7 +156,6 @@ bool Time::get_current_timestring(char output[9])
 void Time::set_datetime(uint16_t new_year, uint8_t new_month, uint8_t new_day, uint8_t new_hour, uint8_t new_minute, uint8_t new_second)
 {
     // rtc.adjust(DateTime(new_year, new_month, new_day, new_hour, new_minute, new_second));
-    
     rtc.adjust(DateTime(new_year, new_month, new_day, new_hour, new_minute, new_second));
     setTime(new_hour, new_minute, new_second, new_day, new_month, new_year);
     now();

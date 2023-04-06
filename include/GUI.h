@@ -24,6 +24,10 @@ namespace GUI
     void time_setting(char time_string[9]);
     uint8_t check_time_setting(char *time_string);
 
+    void network_menu();
+    uint8_t check_network_menu();
+    void network_ntp();
+    uint8_t check_network_ntp();
     void network_config(int8_t network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
     uint8_t check_network_config(int8_t *network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
     void network_config_update(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);

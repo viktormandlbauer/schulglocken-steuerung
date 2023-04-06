@@ -37,6 +37,18 @@
 #define X_DIM 480
 #define Y_DIM 320
 
+// Zeitzonenregel - Standardzeit
+#define STD {"CET", Last, Sun, Oct, 3, 60};
+
+// Zeitzonenregel - Sommerzeit
+#define DST {"CEST", Last, Sun, Mar, 2, 120};
+
+// Synchronisierungsintervall der Systemzeit mit dem RTC Modul (Sekunden)
+#define SYNC_INTERVAL_RTC 60
+
+// Synchronisierungsintervall des RTC Moduls mit einem NTP Server
+#define SYNC_INTERVAL_NTP 6000
+
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
  * Durch das Aktivieren werden über serial.print Statusinformation ausgegeben.
@@ -53,16 +65,19 @@
 #define DEBUG_GUI
 #define DEBUG_NETWORK
 
-
 // Definitionen für "return codes"
 #define MENU 0
 #define TIMEPLAN 1
 #define TIME 2
-#define TIME_SETTING 7
 #define SYSTEM 3
-#define NETWORK 4
+#define NETWORK_CONFIG 4
 #define ALARM_CONFIG 5
 #define NEW_ALARM_CONFIG 6
+#define TIME_SETTING 7
+#define NETWORK_MENU 8
+#define NETWORK_NTP 9
+#define NETWORK_SHOW 10
+#define NETWORK_MODE 11
 #define CHANGED_TO_DHCP 245
 #define CHANGED_TO_STATIC 246
 #define NO_CHANGE 247

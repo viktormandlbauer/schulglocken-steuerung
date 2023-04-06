@@ -37,7 +37,6 @@ Adafruit_GFX_Button button_menu, button_pause;
 void draw_menu()
 {
 
-    // Einstallungs Menü
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
     button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
@@ -477,7 +476,7 @@ uint8_t GUI::check_menu()
 #endif
         button_network.drawButton(false);
         menu_drawn = false;
-        return NETWORK;
+        return NETWORK_MENU;
     }
 
     return MENU;
@@ -603,7 +602,7 @@ void GUI::time(char time_string[9])
     }
 }
 
-Adafruit_GFX_Button button_mode;
+Adafruit_GFX_Button button_sync, button_config, button_mode, button_show;
 #define BUTTON_DHCP_HEIGHT 80
 #define BUTTON_DHCP_WIDTH 400
 #define BUTTON_DHCP_X 240
@@ -653,6 +652,54 @@ void address_to_chararr(uint8_t address[4], char address_string[16])
     address_string[pos] = '\0';
 }
 
+void GUI::network_menu()
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+
+    button_sync.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
+    button_config.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Konfiguration", 3);
+    button_mode.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Modus", 3);
+    button_show.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
+
+    button_sync.drawButton(true);
+    button_config.drawButton(true);
+    button_mode.drawButton(true);
+    button_show.drawButton(true);
+}
+
+uint8_t GUI::check_network_menu()
+{
+    if (check_button_pressed(button_sync))
+    {
+        return NETWORK_NTP;
+    }
+    else if (check_button_pressed(button_config))
+    {
+        return NETWORK_CONFIG;
+    }
+    else if (check_button_pressed(button_show))
+    {
+        return NETWORK_SHOW;
+    }
+    else if (check_button_pressed(button_mode))
+    {
+        return NETWORK_MODE;
+    }
+
+    return NETWORK_MENU;
+}
+
+void GUI::network_ntp()
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+}
+
+uint8_t GUI::check_network_ntp()
+{
+
+    return NETWORK_NTP;
+}
+
 uint8_t GUI::check_network_config(int8_t *network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
 {
     if (check_button_pressed(button_back))
@@ -678,7 +725,7 @@ uint8_t GUI::check_network_config(int8_t *network_status, uint8_t ip[4], uint8_t
         button_mode.drawButton();
         return BUTTON_MODIFY;
     }
-    return NETWORK;
+    return NETWORK_CONFIG;
 }
 
 void GUI::network_config(int8_t network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
@@ -691,8 +738,7 @@ void GUI::network_config(int8_t network_status, uint8_t ip[4], uint8_t gw[4], ui
     tft.setTextSize(4);
     tft.print("IP:");
     address_to_chararr(ip, address_string);
-    tft.print(address_string);    
-
+    tft.print(address_string);
 
     tft.setCursor(GW_ADDRESS_X, GW_ADDRESS_Y);
     tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);

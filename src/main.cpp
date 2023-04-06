@@ -1,4 +1,3 @@
-// Einstellung für den DEBUG Mode
 #include "DEFINITIONS.h"
 #ifdef DEBUG_MAIN
 #define DEBUG
@@ -35,7 +34,8 @@ void setup()
 #ifdef DEBUG
     Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
 #endif
-    if (Storage::read_network_dhcp())
+    Network::init_ethernet();
+    if (!Storage::read_network_dhcp())
     {
         Network::dhcp_setup();
     }
@@ -44,7 +44,7 @@ void setup()
         Storage::read_network_settings(ip, gw, dns, &prefix);
         Network::static_setup(ip, gw, dns, prefix);
     }
-    Network::init_ethernet();
+
 #ifdef DEBUG
     Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
 #endif
@@ -62,6 +62,12 @@ void setup()
 
     // Beeper
     pinMode(OUTPUT_PIN, OUTPUT);
+
+    
+    // Tests
+    Network::set_ntpserver("ntp.bit.nl");
+
+
 }
 
 int navigation;
@@ -144,7 +150,11 @@ void navigation_handler()
     case SYSTEM:
         break;
 
-    case NETWORK:
+    case NETWORK_MENU:
+        navigation = GUI::check_network_menu();
+        break;
+
+    case NETWORK_CONFIG:
         int8_t network_status = Network::get_network_status();
         uint8_t ip[4], dns[4], gw[4];
         uint8_t snm;
@@ -195,7 +205,7 @@ void navigation_handler()
             {
             }
 
-            navigation = NETWORK;
+            navigation = NETWORK_CONFIG;
         }
         break;
 
@@ -286,7 +296,7 @@ void navigation_handler()
     }
 
     // Eine Aktualisierung des Bildschirm ist nur notwendig,
-    // wenn sich die Navigation geändert hat oder die Komponente Updates benötigt.
+    // wenn sich die Navigation geändert hat oder die GUI Komponenten Updates benötigen.
     if (navigation != last_navigation)
     {
 #ifdef DEBUG
@@ -342,7 +352,11 @@ void refresh_handler()
         GUI::alarm_config((char *)"??:??", alarm.type);
         break;
 
-    case NETWORK:
+    case NETWORK_MENU:
+        GUI::network_menu();
+        break;
+
+    case NETWORK_CONFIG:
 
         GUI::network_config(Network::get_network_status(), Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_snm());
         break;
@@ -362,4 +376,7 @@ void loop()
     }
 
     Time::check_alarms(alarms, alarm_count);
+    
+    
+    ether.packetLoop(ether.packetReceive());
 }

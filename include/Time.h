@@ -1,18 +1,16 @@
-// Dokumentation der Zeit
-/**
- * Alerts auf Tagesbasis
- * Ausnahmen auf Wochentagbasis (Mo - So)
- * Ausnahmen Datumsbasiert (einmalig)
- */
 
-// Format der Zeit
-/**
- * Zwei statische arrays[100] :
- *   * uint16_t Minute
- *   * bool beginn
- */
+// Einbindung externer Libraries
+#include <RTClib.h>
+#include <Wire.h>
+#include <TimeLib.h>
+#include <Timezone.h>
+#include <SPI.h>
+
+// RTC Objekt aus der RTClib
+
 namespace Time
 {
+
     struct Alarm
     {
         uint16_t minutes;

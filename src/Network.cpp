@@ -7,9 +7,7 @@
 #include <EtherCard.h>
 #include "Network.h"
 
-
 byte Ethernet::buffer[700];
-
 using namespace Network;
 int8_t network_status;
 
@@ -144,33 +142,14 @@ void Network::udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], ui
     Serial.println(epoch);
 }
 
-unsigned long get_ntp_time()
+bool Network::set_ntpserver(char *ntp_server)
 {
-    ether.dnsLookup(NTP_REMOTEPORT);
 
-    uint8_t ntpIp[IP_LEN];
-    ether.copyIp(ntpIp, ether.hisip);
-    ether.printIp("NTP: ", ntpIp);
+    Serial.println(ntp_server);
 
-    // TODO:
-    // Verbindungsaufbau mit NTP Server
-    return true;
-}
+    if (!ether.dnsLookup(ntp_server, true))
+        Serial.println("DNS failed");
 
-char *Network::resolve_ip_address()
-{
-    uint8_t ntpIp[IP_LEN];
-    ether.copyIp(ntpIp, ether.hisip);
-    ether.printIp("NTP: ", ntpIp);
-}
-
-bool Network::set_ntpserver(String ntp_server)
-{
-    int str_length = ntp_server.length() + 1;
-    char char_array[str_length + 1];
-    ntp_server.toCharArray(char_array, str_length);
-
-    ether.dnsLookup(char_array);
     uint8_t ntpIp[IP_LEN];
     ether.copyIp(ntpIp, ether.hisip);
 

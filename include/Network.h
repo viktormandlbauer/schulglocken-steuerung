@@ -28,7 +28,7 @@ namespace Network
     uint8_t *get_snm();
 
     // NTP
-    bool set_ntpserver(String ntp_server);
+    bool set_ntpserver(char *ntp_server);
     void udpReceiveNtpPacket(uint16_t dest_port, uint8_t src_ip[IP_LEN], uint16_t src_port, const char *packetBuffer, uint16_t len);
     void sendNTPpacket(const uint8_t *remoteAddress);
 
