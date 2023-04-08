@@ -684,14 +684,55 @@ uint8_t GUI::check_network_menu()
     return NETWORK_MENU;
 }
 
-void GUI::network_ntp()
+void GUI::network_ntp(char *lastNtpSync, bool isEnabled)
 {
     Waveshield.fillScreen(COLOR_BACKGROUND);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+    tft.setTextSize(4);
+    tft.print("NTP Einstellungen");
+
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setCursor(X_DIM * 0.1, Y_DIM * 0.2);
+    tft.setTextSize(3);
+    tft.print("NTP ist ");
+
+    if (isEnabled)
+    {
+        tft.print("aktiviert");
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.4);
+        tft.print("Letzte Synchronisierung: ");
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.5);
+        tft.print(lastNtpSync);
+        button_mode.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"OFF", 2);
+        button_mode.drawButton(true);
+        button_sync.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Test", 2);
+        button_sync.drawButton(true);
+    }
+    else
+    {
+        tft.print("deaktiviert");
+        button_mode.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"ON", 2);
+        button_mode.drawButton(true);
+    }
+
+    draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
 }
 
-uint8_t GUI::check_network_ntp()
+uint8_t GUI::check_network_ntp(bool isEnabled)
 {
-
+    if (check_button_pressed(button_mode))
+    {
+        return NETWORK_NTP_SWITCH;
+    }
+    else if (check_button_pressed(button_sync) && isEnabled)
+    {
+        return NETWORK_NTP_TEST;
+    }
+    else if (check_button_pressed(button_back))
+    {
+        return BUTTON_BACK;
+    }
     return NETWORK_NTP;
 }
 

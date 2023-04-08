@@ -38,10 +38,10 @@
 #define Y_DIM 320
 
 // Synchronisierungsintervall Systemzeit mit RTC
-#define SYNC_INTERVAL_RTC 10
+#define SYNC_INTERVAL_RTC 60
 
 // Synchronisierungsintervall RTC mit NTP
-#define SYNC_INTERVAL_NTP 15
+#define SYNC_INTERVAL_NTP 600
 
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
@@ -64,14 +64,16 @@
 #define TIMEPLAN 1
 #define TIME 2
 #define SYSTEM 3
-#define NETWORK_CONFIG 4
+#define NETWORK_MENU 4
 #define ALARM_CONFIG 5
 #define NEW_ALARM_CONFIG 6
 #define TIME_SETTING 7
-#define NETWORK_MENU 8
+#define NETWORK_CONFIG 8
 #define NETWORK_NTP 9
 #define NETWORK_SHOW 10
 #define NETWORK_MODE 11
+#define NETWORK_NTP_SWITCH 245
+#define NETWORK_NTP_TEST 246
 #define CHANGED_TO_DHCP 245
 #define CHANGED_TO_STATIC 246
 #define NO_CHANGE 247

@@ -26,51 +26,6 @@ uint32_t position;
 bool finished = true;
 char time_internal_timestring[9];
 
-void get_timestring(int hour, int minute, int second, char *buf)
-{
-    /**
-     * Formatierung "HH:MM:SS" Format
-     */
-
-    // Konviertung der Stunde
-    if (hour < 10)
-    {
-        buf[0] = '0';
-        buf[1] = hour + '0';
-    }
-    else
-    {
-        buf[0] = (char)hour / 10 + '0';
-        buf[1] = hour % 10 + '0';
-    }
-
-    // Konvertierung der Minute
-    buf[2] = ':';
-    if (minute < 10)
-    {
-        buf[3] = '0';
-        buf[4] = minute + '0';
-    }
-    else
-    {
-        buf[3] = (char)minute / 10 + '0';
-        buf[4] = minute % 10 + '0';
-    }
-
-    // Konvertierung der Sekunden
-    buf[5] = ':';
-    if (second < 10)
-    {
-        buf[6] = '0';
-        buf[7] = second + '0';
-    }
-    else
-    {
-        buf[6] = (char)second / 10 + '0';
-        buf[7] = second % 10 + '0';
-    }
-    buf[8] = '\0';
-}
 void get_timestring(int hour, int minute, char *buf)
 {
     /**
@@ -103,9 +58,9 @@ void get_timestring(int hour, int minute, char *buf)
     buf[5] = '\0';
 }
 
+// Interne Funtkion für die Konvertierung von Stunden und Minuten in vergehende Minuten von 00:00:00 weg
 uint16_t convert_time_to_alarm(uint8_t hour, uint8_t minute)
 {
-    // Interne Funtkion für die Konvertierung von Stunden und Minuten in vergehende Minuten von 00:00:00 weg
     return hour * 60ul + minute;
 }
 
@@ -113,6 +68,12 @@ namespace Time
 {
 
     RTC_DS3231 rtc;
+
+    // Funktion zur Formatierung eines Unix-Zeitstempels als Zeichenkette im Format DD.MM.YYYY HH:MM:SS
+    void get_formatted_time(time_t unix_time, char *buffer)
+    {
+        sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d", day(unix_time), month(unix_time), year(unix_time), hour(unix_time), minute(unix_time), second(unix_time));
+    }
 
     int compare(const void *s1, const void *s2)
     {
@@ -148,19 +109,43 @@ namespace Time
             }
             delay(100);
         }
+    }
 
-        // TODO -> GUI
-        TimeSync::EnableNtpSync = true;
+    byte dstOffset(byte d, byte m, unsigned int y, byte h)
+    {
+        // Berechnung des Datums, an dem die Sommerzeit beginnt und endet
+        byte dstOn = (31 - (5 * y / 4 + 4) % 7);
+        byte dstOff = (31 - (5 * y / 4 + 1) % 7);
 
-        setSyncProvider(TimeSync::getTime);
-        setSyncInterval(SYNC_INTERVAL_RTC);
-        rtc.adjust(DateTime(TimeSync::getTime()));
+        // Überprüfung, ob das aktuelle Datum innerhalb des Sommerzeitzeitraums liegt
+        if ((m > 3 && m < 10) ||
+            (m == 3 && (d > dstOn || (d == dstOn && h >= 1))) ||
+            (m == 10 && (d < dstOff || (d == dstOff && h <= 1))))
+            return 1;
+        else
+            return 0;
+    }
+
+    time_t get_corrected_utctime(time_t t)
+    {
+        // Überprüfen, ob die Eingabezeit gültig ist
+        if (t > 0)
+        {
+            // Eingabezeit in eine "TimeElements"-Struktur umwandeln
+            TimeElements tm;
+            breakTime(t, tm);
+            // Die UTC- und DST-Offsetwerte zur Eingabezeit addieren
+            t += (utcOffset + dstOffset(tm.Day, tm.Month, tm.Year + 1970, tm.Hour)) * SECS_PER_HOUR;
+        }
+
+        // Die korrigierte Zeit zurückgeben
+        return t;
     }
 
     bool get_current_timestring(char output[9])
     {
         // Schreibt die in "HH:MM:SS" formatierte Zeit in ein character array der länge 9
-        get_timestring(hour(), minute(), second(), output);
+        sprintf(output, "%02d:%02d:%02d", hour(), minute(), second());
 
         if (strcmp(output, time_internal_timestring) != 0)
         {
@@ -199,6 +184,7 @@ namespace Time
     void get_alarm_string(uint16_t alarm, char output[6])
     {
         get_timestring(alarm / 60, alarm % 60, output);
+
     }
 
     void sort_alarms(Alarm alarms[], uint8_t alarm_count)
@@ -209,10 +195,8 @@ namespace Time
 
     bool alarm_exists(Alarm alarms[], uint16_t minutes, uint8_t alarm_count)
     {
-        Serial.println(minutes);
         for (uint8_t i = 0; i < alarm_count; i++)
         {
-            Serial.println(alarms[i].minutes);
             if (alarms[i].minutes == minutes)
             {
                 return true;

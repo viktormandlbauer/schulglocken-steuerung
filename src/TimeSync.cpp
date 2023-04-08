@@ -2,20 +2,6 @@
 #include "Time.h"
 #include "Network.h"
 
-byte dstOffset(byte d, byte m, unsigned int y, byte h)
-{
-    // Berechnung des Datums der Zeitsprünge
-    byte dstOn = (31 - (5 * y / 4 + 4) % 7);
-    byte dstOff = (31 - (5 * y / 4 + 1) % 7);
-
-    if ((m > 3 && m < 10) ||
-        (m == 3 && (d > dstOn || (d == dstOn && h >= 1))) ||
-        (m == 10 && (d < dstOff || (d == dstOff && h <= 1))))
-        return 1;
-    else
-        return 0;
-}
-
 namespace TimeSync
 {
     bool EnableNtpSync;
@@ -42,7 +28,7 @@ namespace TimeSync
                 word len = ether.packetReceive();
                 ether.packetLoop(len);
 
-                unsigned long secsSince1900 = 0L;
+                uint32_t secsSince1900 = 0L;
                 if (len > 0 && ether.ntpProcessAnswer(&secsSince1900, Network::NTP_REMOTEPORT))
                 {
                     Serial.println("[Info] (TimeSync) Receive NTP Response");
@@ -60,27 +46,28 @@ namespace TimeSync
         return Time::rtc.now().unixtime();
     }
 
-    time_t getDstCorrectedTime(void)
+    time_t getTime(void)
     {
+#ifdef DEBUG
 
-        time_t t = getNtpTime();
-
-        if (t > 0)
+        if (EnableNtpSync)
         {
-            TimeElements tm;
-            breakTime(t, tm);
-            t += (Time::utcOffset + dstOffset(tm.Day, tm.Month, tm.Year + 1970, tm.Hour)) * SECS_PER_HOUR;
+            char buffer[20];
+            Serial.println("[Info] (TimeSync) NTP sync is enabled");
+            Serial.print("[Info] (TimeSync) Last sync: ");
+            Time::get_formatted_time(LastNtpSync, buffer);
+            Serial.println(buffer);
         }
-
-        return t;
-    }
-
-    time_t getTime()
-    {
+        else
+        {
+            Serial.println("[Info] (TimeSync) NTP sync is disabled");
+        }
+#endif
         time_t t = getRtcTime();
         if (EnableNtpSync && ((SYNC_INTERVAL_NTP + LastNtpSync) < t))
         {
-            t = getDstCorrectedTime();
+            time_t t = getNtpTime();
+            t = Time::get_corrected_utctime(t);
             LastNtpSync = t;
             Time::rtc.adjust(DateTime(t));
 #ifdef DEBUG
@@ -96,5 +83,17 @@ namespace TimeSync
 #endif
             return t;
         }
+    }
+
+    time_t getLastNtpSync()
+    {
+        return LastNtpSync;
+    }
+
+    void init_timesync(bool isNtpEnabled)
+    {
+        EnableNtpSync = isNtpEnabled;
+        setSyncProvider(TimeSync::getTime);
+        setSyncInterval(SYNC_INTERVAL_RTC);
     }
 }

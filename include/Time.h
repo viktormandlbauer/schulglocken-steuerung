@@ -23,6 +23,9 @@ namespace Time
 
     bool init_rtc_module();
 
+    byte dstOffset(byte d, byte m, unsigned int y, byte h);
+    time_t get_corrected_utctime(time_t t);
+    void get_formatted_time(time_t unix_time, char *buffer);
     bool get_current_timestring(char time_string[9]);
 
     void set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);

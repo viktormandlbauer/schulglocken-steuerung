@@ -25,4 +25,7 @@ namespace Storage
 
     void save_network_dhcp(bool automatic);
     bool read_network_dhcp();
+
+    void save_network_ntp(bool isEnabled);
+    bool read_network_ntp();
 }

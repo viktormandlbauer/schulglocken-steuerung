@@ -13,6 +13,7 @@ namespace TimeSync
 {
     extern bool EnableNtpSync;
     time_t getNtpTime();
-    time_t getDstCorrectedTime(void);
     time_t getTime();
+    time_t getLastNtpSync();
+    void init_timesync(bool isNtpEnabled);
 }
