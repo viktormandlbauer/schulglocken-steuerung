@@ -17,42 +17,56 @@ static uint8_t alarm_count = 0;
 
 uint8_t ip[4], gw[4], dns[4], prefix;
 
+void network_manager()
+{
+    uint8_t NetworkSetup = Network::NetworkStatus;
+    if (Network::init_ethernet())
+    {
+#ifdef DEBUG
+        Serial.println("[Info] (Main) Ethernet Modul wurde aktiviert.");
+#endif
+        if (Network::is_cable_connected())
+        {
+#ifdef DEBUG
+            Serial.println("[Info] (Main) Netzwerkanschluss ist aktiv.");
+#endif
+
+            if (NetworkSetup == ETHERNET_DHCP_INIT)
+            {
+                Network::dhcp_setup();
+                if (Network::NetworkStatus == ETHERNET_DHCP_SUCCESS)
+                {
+                    Storage::save_network_settings(Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+                    Storage::save_network_dhcp(true);
+                }
+            }
+            else if (NetworkSetup == ETHERNET_STATIC_INIT)
+            {
+                Storage::read_network_settings(ip, gw, dns, &prefix);
+                Network::static_setup(ip, gw, dns, prefix);
+                Storage::save_network_dhcp(false);
+            }
+        }
+    }
+}
+
 void setup()
 {
-    Serial.begin(57600);
+    Serial.begin(9600);
 
     GUI::init_display();
 #ifdef DEBUG
     Serial.println("[Info] (Main) Display wurde aktiviert.");
 #endif
-
-    Time::init_alarm_interrupt();
-#ifdef DEBUG
-    Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
-#endif
-    Network::init_ethernet();
-    if (!Storage::read_network_dhcp())
+    if (Storage::read_network_dhcp())
     {
-        Network::dhcp_setup();
+        Network::NetworkStatus = ETHERNET_DHCP_INIT;
     }
     else
     {
-        Storage::read_network_settings(ip, gw, dns, &prefix);
-        Network::static_setup(ip, gw, dns, prefix);
+        Network::NetworkStatus = ETHERNET_STATIC_INIT;
     }
-#ifdef DEBUG
-    Serial.println("[Info] (Main) Ethernet wurde aktiviert.");
-#endif
-
-    Time::init_rtc_module();
-#ifdef DEBUG
-    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
-#endif
-
-    TimeSync::init_timesync(Storage::read_network_ntp());
-#ifdef DEBUG
-    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
-#endif
+    network_manager();
 
     alarm_count = Storage::read_alarm_count();
     for (uint8_t i = 0; i < alarm_count; i++)
@@ -60,10 +74,16 @@ void setup()
         Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
     }
 
-    // Alarmtypes
-    Time::set_alarm_types(0, 0xAAAAAAAA);
-    Time::set_alarm_types(1, 0xF0F0F0F0);
-    Time::set_alarm_types(2, 0xAF00FF0A);
+// Breaks DHCP setup ... 
+//     TimeSync::init_timesync(Storage::read_network_ntp());
+// #ifdef DEBUG
+//     Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
+// #endif
+
+    Time::init_alarm_interrupt();
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
+#endif
 
     // Beeper
     pinMode(OUTPUT_PIN, OUTPUT);
@@ -160,64 +180,31 @@ void navigation_handler()
     }
     case NETWORK_MENU:
     {
-
         navigation = GUI::check_network_menu();
         break;
     }
-    case NETWORK_CONFIG:
+    case NETWORK_DHCP:
     {
+        selection = GUI::check_network_dhcp();
 
-        int8_t network_status = Network::get_network_status();
-        uint8_t ip[4], dns[4], gw[4];
-        uint8_t snm;
-
-        navigation = GUI::check_network_config(&network_status, ip, dns, gw, snm);
-        if (navigation == BUTTON_MODIFY)
+        if (selection == NETWORK_DHCP_SWITCH)
         {
-            if (network_status == DHCP_SETUP_INIT)
+            if ((Network::NetworkStatus == ETHERNET_DHCP_SUCCESS) || (Network::NetworkStatus == ETHERNET_DHCP_FAILED))
             {
-
-#ifdef DEBUG
-                Serial.println("[Info] (Main) DHCP Mode from GUI ");
-#endif
-
-                if (Network::dhcp_setup())
-                {
-                    uint8_t *snm = Network::get_snm();
-                    uint8_t snm_prefix = 0;
-                    for (uint8_t i = 0; i < 4; i++)
-                    {
-                        for (uint8_t j = 0; j < 8; j++)
-                        {
-                            if (snm[i] && 0b1 << j)
-                            {
-                                snm_prefix += 1;
-                            }
-                        }
-                    }
-#ifdef DEBUG
-                    Serial.print("[Info] (Main) Calculated SNM Prefix: ");
-                    Serial.println(snm_prefix);
-#endif
-                    GUI::network_config(network_status, Network::get_ip(), Network::get_gw(), Network::get_dns(), snm_prefix);
-                }
+                Network::NetworkStatus = ETHERNET_STATIC_INIT;
             }
-            else if (network_status == STATIC_SETUP_INIT)
+            else if ((Network::NetworkStatus == ETHERNET_STATIC_SUCCESS) || (Network::NetworkStatus == ETHERNET_STATIC_FAILED))
             {
-#ifdef DEBUG
-                Serial.println("[Info] (Main) Static Mode from GUI");
-#endif
-                // Network::static_setup(ip, dns, gw, snm);
+                Network::NetworkStatus = ETHERNET_DHCP_INIT;
             }
 
-            if (network_status == STATIC_SETUP_FAILED || network_status == DHCP_SETUP_FAILED)
-            {
-            }
-            else if (network_status == STATIC_SETUP_ACTIVE || network_status == DHCP_SETUP_ACTIVE)
-            {
-            }
-
-            navigation = NETWORK_CONFIG;
+            GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+            network_manager();
+            GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+        }
+        else if (selection == NETWORK_MENU)
+        {
+            navigation = NETWORK_MENU;
         }
         break;
     }
@@ -395,9 +382,9 @@ void refresh_handler()
         GUI::network_menu();
         break;
     }
-    case NETWORK_CONFIG:
+    case NETWORK_DHCP:
     {
-        GUI::network_config(Network::get_network_status(), Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_snm());
+        GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
         break;
     }
     case NETWORK_NTP:

@@ -4,10 +4,10 @@
 #define ALARMS_START 0
 #define ALARMS_ASSIGNMENT_START MAXIMUM_AMOUNT_ALARMS * 2 + 1
 #define ALARM_TYPES_START ALARMS_ASSIGNMENT_START + MAXIMUM_AMOUNT_ALARMS * 1 + 1
-#define NETWORK_CONFIG_START ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
-#define NETWORK_MODE NETWORK_CONFIG_START + 36 + 1 // 36 Bytes -> 4 x 32bit IP Addressen + 20 chars für NTP Server Name
-#define NETWORK_NTP_ENABlED NETWORK_MODE + 1
-#define NEXT NETWORK_NTP_ENABlED + 1
+#define STORAGE_NETWORK_CONFIG_START ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
+#define STORAGE_NETWORK_DHCP_ENABLED STORAGE_NETWORK_CONFIG_START + 36 + 1 // 36 Bytes -> 4 x 32bit IP Addressen + 20 chars für NTP Server Name
+#define STORAGE_NETWORK_NTP_ENABlED STORAGE_NETWORK_DHCP_ENABLED + 1
+#define NEXT STORAGE_NETWORK_NTP_ENABlED + 1
 
 namespace Storage
 {
@@ -100,25 +100,25 @@ namespace Storage
     void save_network_settings(uint8_t *ip, uint8_t *gw, uint8_t *dns, uint8_t prefix)
     {
         // 32 bit IP Address
-        EEPROM.put(NETWORK_CONFIG_START, ip[0]);
-        EEPROM.put(NETWORK_CONFIG_START + 1, ip[1]);
-        EEPROM.put(NETWORK_CONFIG_START + 2, ip[2]);
-        EEPROM.put(NETWORK_CONFIG_START + 3, ip[3]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START, ip[0]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 1, ip[1]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 2, ip[2]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 3, ip[3]);
 
         // 32 bit Gateway Address
-        EEPROM.put(NETWORK_CONFIG_START + 4, gw[0]);
-        EEPROM.put(NETWORK_CONFIG_START + 5, gw[1]);
-        EEPROM.put(NETWORK_CONFIG_START + 6, gw[2]);
-        EEPROM.put(NETWORK_CONFIG_START + 7, gw[3]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 4, gw[0]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 5, gw[1]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 6, gw[2]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 7, gw[3]);
 
         // 32 bit DNS Server Address
-        EEPROM.put(NETWORK_CONFIG_START + 8, dns[0]);
-        EEPROM.put(NETWORK_CONFIG_START + 9, dns[1]);
-        EEPROM.put(NETWORK_CONFIG_START + 10, dns[2]);
-        EEPROM.put(NETWORK_CONFIG_START + 11, dns[3]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 8, dns[0]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 9, dns[1]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 10, dns[2]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 11, dns[3]);
 
         // 0 - 32 Subnetmask Suffix
-        EEPROM.put(NETWORK_CONFIG_START + 12, prefix);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 12, prefix);
 
 #ifdef DEBUG
 
@@ -143,25 +143,25 @@ namespace Storage
     void read_network_settings(uint8_t *ip, uint8_t *gw, uint8_t *dns, uint8_t *prefix)
     {
         // 32 bit IP Address
-        ip[0] = EEPROM.read(NETWORK_CONFIG_START);
-        ip[1] = EEPROM.read(NETWORK_CONFIG_START + 1);
-        ip[2] = EEPROM.read(NETWORK_CONFIG_START + 2);
-        ip[3] = EEPROM.read(NETWORK_CONFIG_START + 3);
+        ip[0] = EEPROM.read(STORAGE_NETWORK_CONFIG_START);
+        ip[1] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 1);
+        ip[2] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 2);
+        ip[3] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 3);
 
         // 32 bit Gateway Address
-        gw[0] = EEPROM.read(NETWORK_CONFIG_START + 4);
-        gw[1] = EEPROM.read(NETWORK_CONFIG_START + 5);
-        gw[2] = EEPROM.read(NETWORK_CONFIG_START + 6);
-        gw[3] = EEPROM.read(NETWORK_CONFIG_START + 7);
+        gw[0] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 4);
+        gw[1] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 5);
+        gw[2] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 6);
+        gw[3] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 7);
 
         // 32 bit DNS Server Address
-        dns[0] = EEPROM.read(NETWORK_CONFIG_START + 8);
-        dns[1] = EEPROM.read(NETWORK_CONFIG_START + 9);
-        dns[2] = EEPROM.read(NETWORK_CONFIG_START + 10);
-        dns[3] = EEPROM.read(NETWORK_CONFIG_START + 11);
+        dns[0] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 8);
+        dns[1] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 9);
+        dns[2] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 10);
+        dns[3] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 11);
 
         // Read 1 byte SNM Suffix
-        *prefix = EEPROM.read(NETWORK_CONFIG_START + 12);
+        *prefix = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 12);
 
 #ifdef DEBUG
 
@@ -188,10 +188,10 @@ namespace Storage
     {
 
         // 32 bit NTP Server IP Address
-        EEPROM.put(NETWORK_CONFIG_START + 13, myntp_adr[0]);
-        EEPROM.put(NETWORK_CONFIG_START + 14, myntp_adr[1]);
-        EEPROM.put(NETWORK_CONFIG_START + 15, myntp_adr[2]);
-        EEPROM.put(NETWORK_CONFIG_START + 16, myntp_adr[3]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 13, myntp_adr[0]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 14, myntp_adr[1]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 15, myntp_adr[2]);
+        EEPROM.put(STORAGE_NETWORK_CONFIG_START + 16, myntp_adr[3]);
 
         // Maximale Länge für den NTP Server Namen sind 20 Stellen
         for (int i = 0; i < 20; i++)
@@ -199,12 +199,12 @@ namespace Storage
             if (myntp_name[i] == 0)
             {
                 // Letzte Stelle wird NULL gesetzt
-                EEPROM.put(NETWORK_CONFIG_START + 17 + i * sizeof(char), 0);
+                EEPROM.put(STORAGE_NETWORK_CONFIG_START + 17 + i * sizeof(char), 0);
                 break;
             }
             else
             {
-                EEPROM.put(NETWORK_CONFIG_START + 17 + i * sizeof(char), myntp_adr[i]);
+                EEPROM.put(STORAGE_NETWORK_CONFIG_START + 17 + i * sizeof(char), myntp_adr[i]);
             }
         }
     }
@@ -212,15 +212,15 @@ namespace Storage
     void read_network_time_settings(char *myntp_name, uint8_t *myntp_adr)
     {
         // 32 bit Gateway Address
-        myntp_adr[0] = EEPROM.read(NETWORK_CONFIG_START + 13);
-        myntp_adr[1] = EEPROM.read(NETWORK_CONFIG_START + 14);
-        myntp_adr[2] = EEPROM.read(NETWORK_CONFIG_START + 15);
-        myntp_adr[3] = EEPROM.read(NETWORK_CONFIG_START + 16);
+        myntp_adr[0] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 13);
+        myntp_adr[1] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 14);
+        myntp_adr[2] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 15);
+        myntp_adr[3] = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 16);
 
         // Maximale Länge für den NTP Server Namen sind 20 Stellen
         for (int i = 0; i < 20; i++)
         {
-            char read = EEPROM.read(NETWORK_CONFIG_START + 17 + i * sizeof(char));
+            char read = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 17 + i * sizeof(char));
             if (read == '\0')
             {
                 // Letzte Stelle wird NULL gesetzt
@@ -241,18 +241,18 @@ namespace Storage
         Serial.println(automatic, BIN);
 #endif
 
-        EEPROM.put(NETWORK_MODE, automatic);
+        EEPROM.put(STORAGE_NETWORK_DHCP_ENABLED, automatic);
     }
     
     bool read_network_dhcp()
     {
 #ifdef DEBUG
-        char automatic = EEPROM.read(NETWORK_MODE);
+        bool automatic = EEPROM.read(NETWORK_DHCP);
         Serial.print("[Info] (Storage) Read DHCP enabled: ");
         Serial.println(automatic, BIN);
         return automatic;
 #endif
-        return EEPROM.read(NETWORK_MODE);
+        return EEPROM.read(STORAGE_NETWORK_DHCP_ENABLED);
     }
 
     void save_network_ntp(bool isEnabled)
@@ -261,17 +261,17 @@ namespace Storage
         Serial.print("[Info] (Storage) Save NTP enabled: ");
         Serial.println(isEnabled, BIN);
 #endif
-        EEPROM.put(NETWORK_NTP_ENABlED, isEnabled);
+        EEPROM.put(STORAGE_NETWORK_NTP_ENABlED, isEnabled);
     }
 
     bool read_network_ntp()
     {
 #ifdef DEBUG
-        char isEnabled = EEPROM.read(NETWORK_MODE);
+        bool isEnabled = EEPROM.read(NETWORK_DHCP);
         Serial.print("[Info] (Storage) Read NTP enabled: ");
         Serial.println(isEnabled, BIN);
         return isEnabled;
 #endif
-        return EEPROM.read(NETWORK_NTP_ENABlED);
+        return EEPROM.read(STORAGE_NETWORK_NTP_ENABlED);
     }
 }

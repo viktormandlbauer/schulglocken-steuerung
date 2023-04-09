@@ -597,20 +597,7 @@ void GUI::time(char time_string[9])
     }
 }
 
-Adafruit_GFX_Button button_sync, button_config, button_mode, button_show;
-#define BUTTON_DHCP_HEIGHT 80
-#define BUTTON_DHCP_WIDTH 400
-#define BUTTON_DHCP_X 240
-#define BUTTON_DHCP_Y 40
-
-#define IP_ADDRESS_X 20
-#define IP_ADDRESS_Y 80
-
-#define GW_ADDRESS_X 20
-#define GW_ADDRESS_Y 140
-
-#define DNS_ADDRESS_X 20
-#define DNS_ADDRESS_Y 200
+Adafruit_GFX_Button button_ntp, button_dhcp, button_http, button_networkstatus;
 
 void address_to_chararr(uint8_t address[4], char address_string[16])
 {
@@ -651,34 +638,34 @@ void GUI::network_menu()
 {
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
-    button_sync.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
-    button_config.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Konfiguration", 3);
-    button_mode.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Modus", 3);
-    button_show.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
+    button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
+    button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"DHCP", 3);
+    button_http.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"HTTP", 3);
+    button_networkstatus.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Status", 3);
 
-    button_sync.drawButton(true);
-    button_config.drawButton(true);
-    button_mode.drawButton(true);
-    button_show.drawButton(true);
+    button_ntp.drawButton(true);
+    button_dhcp.drawButton(true);
+    button_http.drawButton(true);
+    button_networkstatus.drawButton(true);
 }
 
 uint8_t GUI::check_network_menu()
 {
-    if (check_button_pressed(button_sync))
+    if (check_button_pressed(button_ntp))
     {
         return NETWORK_NTP;
     }
-    else if (check_button_pressed(button_config))
+    else if (check_button_pressed(button_dhcp))
     {
-        return NETWORK_CONFIG;
+        return NETWORK_DHCP;
     }
-    else if (check_button_pressed(button_show))
+    else if (check_button_pressed(button_http))
     {
-        return NETWORK_SHOW;
+        return NETWORK_HTTP;
     }
-    else if (check_button_pressed(button_mode))
+    else if (check_button_pressed(button_networkstatus))
     {
-        return NETWORK_MODE;
+        return NETWORK_STATUS;
     }
 
     return NETWORK_MENU;
@@ -704,16 +691,16 @@ void GUI::network_ntp(char *lastNtpSync, bool isEnabled)
         tft.print("Letzte Synchronisierung: ");
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.5);
         tft.print(lastNtpSync);
-        button_mode.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"OFF", 2);
-        button_mode.drawButton(true);
-        button_sync.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Test", 2);
-        button_sync.drawButton(true);
+        button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"OFF", 2);
+        button_ntp.drawButton(true);
+        button_networkstatus.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Test", 2);
+        button_networkstatus.drawButton(true);
     }
     else
     {
         tft.print("deaktiviert");
-        button_mode.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"ON", 2);
-        button_mode.drawButton(true);
+        button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"ON", 2);
+        button_ntp.drawButton(true);
     }
 
     draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
@@ -721,11 +708,11 @@ void GUI::network_ntp(char *lastNtpSync, bool isEnabled)
 
 uint8_t GUI::check_network_ntp(bool isEnabled)
 {
-    if (check_button_pressed(button_mode))
+    if (check_button_pressed(button_ntp))
     {
         return NETWORK_NTP_SWITCH;
     }
-    else if (check_button_pressed(button_sync) && isEnabled)
+    else if (check_button_pressed(button_networkstatus) && isEnabled)
     {
         return NETWORK_NTP_TEST;
     }
@@ -736,81 +723,153 @@ uint8_t GUI::check_network_ntp(bool isEnabled)
     return NETWORK_NTP;
 }
 
-uint8_t GUI::check_network_config(int8_t *network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
+    tft.setTextSize(4);
+    tft.print("DHCP Einstellungen");
+
+    char address_string[16];
+
+    if (NetworkStatus == ETHERNET_DHCP_SUCCESS)
+    {
+        char output[3];
+        if (prefix > 9)
+        {
+            output[0] = (uint8_t)(prefix / 10) + '0';
+            output[1] = (uint8_t)(prefix % 10) + '0';
+            output[2] = '\0';
+        }
+        else
+        {
+            output[0] = prefix + '0';
+            output[1] = '\0';
+        }
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("IP:");
+        address_to_chararr(ip, address_string);
+        tft.print(address_string);
+        tft.print("/");
+        tft.print(output);
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("GW:");
+        address_to_chararr(gw, address_string);
+        tft.print(address_string);
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("DNS:");
+        address_to_chararr(dns, address_string);
+        tft.print(address_string);
+        tft.setFont();
+
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+        button_dhcp.drawButton(true);
+    }
+    else if (NetworkStatus == ETHERNET_STATIC_SUCCESS)
+    {
+        char output[3];
+        if (prefix > 9)
+        {
+            output[0] = (uint8_t)(prefix / 10) + '0';
+            output[1] = (uint8_t)(prefix % 10) + '0';
+            output[2] = '\0';
+        }
+        else
+        {
+            output[0] = prefix + '0';
+            output[1] = '\0';
+        }
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("IP:");
+        address_to_chararr(ip, address_string);
+        tft.print(address_string);
+        tft.print("/");
+        tft.print(output);
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("GW:");
+        address_to_chararr(gw, address_string);
+        tft.print(address_string);
+
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("DNS:");
+        address_to_chararr(dns, address_string);
+        tft.print(address_string);
+        tft.setFont();
+
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+        button_dhcp.drawButton(true);
+    }
+    else if (NetworkStatus == ETHERNET_DHCP_INIT)
+    {
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("DHCP Einstellungen werden geladen...");
+    }
+    else if (NetworkStatus == ETHERNET_STATIC_INIT)
+    {
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("Statische IP Einstellungen werden geladen...");
+    }
+    else if (NetworkStatus == ETHERNET_DHCP_FAILED)
+    {
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("Statische IP Konfiguration ist fehlgeschlagen.");
+        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
+        button_network.drawButton(true);
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+        button_dhcp.drawButton(true);
+    }
+    else if (NetworkStatus == ETHERNET_STATIC_FAILED)
+    {
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print("DHCP ist fehlgeschlagen");
+        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
+        button_network.drawButton(true);
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+        button_dhcp.drawButton(true);
+    }
+
+    draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 100, 60);
+}
+
+uint8_t GUI::check_network_dhcp()
 {
     if (check_button_pressed(button_back))
     {
-        return MENU;
+        return NETWORK_MENU;
     }
-    else if (check_button_pressed(button_accept))
+    else if (check_button_pressed(button_dhcp))
     {
-        return MENU;
+        return NETWORK_DHCP_SWITCH;
     }
-    else if (check_button_pressed(button_mode))
-    {
-        if (*network_status == DHCP_SETUP_ACTIVE)
-        {
-            button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, YELLOW, COLOR_BLACK, "Manuell", 2);
-            *network_status = STATIC_SETUP_INIT;
-        }
-        else if (*network_status == STATIC_SETUP_ACTIVE)
-        {
-            button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, GREEN, COLOR_BLACK, "Automatisch", 2);
-            *network_status = DHCP_SETUP_INIT;
-        }
-        button_mode.drawButton();
-        return BUTTON_MODIFY;
-    }
-    return NETWORK_CONFIG;
+    return NETWORK_DHCP;
 }
 
-void GUI::network_config(int8_t network_status, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
-{
-    Waveshield.fillScreen(COLOR_BACKGROUND);
-    char address_string[16];
-
-    tft.setCursor(IP_ADDRESS_X, IP_ADDRESS_Y);
-    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    tft.setTextSize(4);
-    tft.print("IP:");
-    address_to_chararr(ip, address_string);
-    tft.print(address_string);
-
-    tft.setCursor(GW_ADDRESS_X, GW_ADDRESS_Y);
-    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    tft.setTextSize(4);
-    tft.print("GW:");
-    address_to_chararr(gw, address_string);
-    tft.print(address_string);
-
-    tft.setCursor(DNS_ADDRESS_X, DNS_ADDRESS_Y);
-    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-    tft.setTextSize(4);
-    tft.print("DNS:");
-    address_to_chararr(dns, address_string);
-    tft.print(address_string);
-
-    tft.setFont();
-
-    if (network_status == DHCP_SETUP_ACTIVE)
-    {
-        button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, GREEN, COLOR_BLACK, (char *)"Automatisch", 2);
-        button_mode.drawButton();
-    }
-    else if (network_status == STATIC_SETUP_ACTIVE)
-    {
-        button_mode.initButton(&tft, BUTTON_DHCP_X, BUTTON_DHCP_Y, BUTTON_DHCP_WIDTH, BUTTON_DHCP_HEIGHT, COLOR_SECONDARY, YELLOW, COLOR_BLACK, (char *)"Manuell", 2);
-    }
-
-    button_mode.drawButton();
-    button_accept.initButton(&tft, 400, 290, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, (char *)"Sichern", 3);
-
-    button_mode.drawButton();
-    button_accept.drawButton();
-}
-
-// Sometimes the touch display doesn't work properly and sets the "released" value to true
-// Therefore it has to recognize it multiple times as "released"
 int released;
 #define THRESHOLD_RELEASED 100
 

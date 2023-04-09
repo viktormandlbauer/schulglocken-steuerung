@@ -96,19 +96,21 @@ namespace Time
 
     bool init_rtc_module()
     {
-
-        uint8_t wait_counter = 0;
         while (!rtc.begin())
         {
-            if (wait_counter > 1000)
+            position = +1;
+            if (position < 600)
             {
-#ifdef DEBUG
-                Serial.println("[Error] (Time) Fehler bei der Initialisierung der RTC");
-#endif
+                delay(100);
+            }
+            else
+            {
+                position = 0;
                 return false;
             }
-            delay(100);
         }
+        position = 0;
+        return true;
     }
 
     byte dstOffset(byte d, byte m, unsigned int y, byte h)
@@ -184,7 +186,6 @@ namespace Time
     void get_alarm_string(uint16_t alarm, char output[6])
     {
         get_timestring(alarm / 60, alarm % 60, output);
-
     }
 
     void sort_alarms(Alarm alarms[], uint8_t alarm_count)

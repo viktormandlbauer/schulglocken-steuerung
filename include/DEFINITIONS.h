@@ -15,6 +15,7 @@
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
 #define OUTPUT_PIN 24
+#define CHIP_SELECT 28
 
 // Farbeschema grafischen Benutzeroberfläche
 #define COLOR_BLACK 0x0000
@@ -36,6 +37,9 @@
 // Displaydimension
 #define X_DIM 480
 #define Y_DIM 320
+
+// Hostname
+#define HOSTNAME "sgs2023"
 
 // Synchronisierungsintervall Systemzeit mit RTC
 #define SYNC_INTERVAL_RTC 60
@@ -70,12 +74,12 @@
 #define TIME_SETTING 7
 #define NETWORK_CONFIG 8
 #define NETWORK_NTP 9
-#define NETWORK_SHOW 10
-#define NETWORK_MODE 11
+#define NETWORK_STATUS 10
+#define NETWORK_DHCP 11
+#define NETWORK_HTTP 12
 #define NETWORK_NTP_SWITCH 245
 #define NETWORK_NTP_TEST 246
-#define CHANGED_TO_DHCP 245
-#define CHANGED_TO_STATIC 246
+#define NETWORK_DHCP_SWITCH 245
 #define NO_CHANGE 247
 #define BUTTON_MODIFY 248
 #define BUTTON_BACK 248
@@ -87,10 +91,14 @@
 #define BUTTON_DELETE 254
 #define BUTTON_ACCEPT 255
 
-// Network Status Codes
-#define STATIC_SETUP_FAILED -1
-#define STATIC_SETUP_ACTIVE 1
-#define STATIC_SETUP_INIT 3
-#define DHCP_SETUP_FAILED -2
-#define DHCP_SETUP_ACTIVE 2
-#define DHCP_SETUP_INIT 4
+// Network Status Code
+#define ETHERNET_INITIALIZED_FAILED 255
+#define ETHERNET_LINKDOWN 254
+#define ETHERNET_DHCP_FAILED 253
+#define ETHERNET_STATIC_FAILED 252
+#define ETHERNET_INITIALIZED 0
+#define ETHERNET_LINKUP 1
+#define ETHERNET_DHCP_INIT 2
+#define ETHERNET_DHCP_SUCCESS 3
+#define ETHERNET_STATIC_INIT 4
+#define ETHERNET_STATIC_SUCCESS 5
