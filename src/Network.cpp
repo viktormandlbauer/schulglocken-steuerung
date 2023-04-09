@@ -9,18 +9,18 @@ namespace Network
     bool init_ethernet()
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Network) Activate ethernet ...");
+        Serial.println(F("[Info] (Network) Activate ethernet ..."));
 #endif
         if (ether.begin(sizeof Ethernet::buffer, mac_address, CHIP_SELECT) == 0)
         {
 #ifdef DEBUG
-            Serial.println("[Error] (Network) Failed to active ethernet.");
+            Serial.println(F("[Error] (Network) Failed to active ethernet."));
 #endif
             NetworkStatus = ETHERNET_INITIALIZED_FAILED;
             return false;
         }
 #ifdef DEBUG
-        Serial.println("[Info] (Network) Ethernet activated.");
+        Serial.println(F("[Info] (Network) Ethernet activated."));
 #endif
         NetworkStatus = ETHERNET_INITIALIZED;
         return true;
@@ -46,16 +46,16 @@ namespace Network
     bool dhcp_setup()
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Network) Starting DHCP setup.");
+        Serial.println(F("[Info] (Network) Starting DHCP setup."));
 #endif
         if (ether.dhcpSetup(hostname))
         {
 #ifdef DEBUG
-            Serial.println("[Info] (Network) DHCP setup successful!");
-            ether.printIp("[Info] IP:   ", ether.myip);
-            ether.printIp("[Info] GW:   ", ether.gwip);
-            ether.printIp("[Info] DNS:  ", ether.dnsip);
-            ether.printIp("[Info] NM:   ", ether.netmask);
+            Serial.println(F("[Info] (Network) DHCP setup successful!"));
+            ether.printIp(F("[Info] IP:   "), ether.myip);
+            ether.printIp(F("[Info] GW:   "), ether.gwip);
+            ether.printIp(F("[Info] DNS:  "), ether.dnsip);
+            ether.printIp(F("[Info] NM:   "), ether.netmask);
 #endif
             NetworkStatus = ETHERNET_DHCP_SUCCESS;
             return true;
@@ -63,7 +63,7 @@ namespace Network
         else
         {
 #ifdef DEBUG
-            Serial.println("[Error] (Network) DHCP failed.");
+            Serial.println(F("[Error] (Network) DHCP failed."));
 #endif
             NetworkStatus = ETHERNET_DHCP_FAILED;
             return false;
@@ -85,10 +85,10 @@ namespace Network
         {
 #ifdef DEBUG
             Serial.println(F("[Info] (Network) Static network successful!"));
-            ether.printIp("[Info] (Network) IP:   ", ether.myip);
-            ether.printIp("[Info] (Network) GW:   ", ether.gwip);
-            ether.printIp("[Info] (Network) DNS:  ", ether.dnsip);
-            ether.printIp("[Info] (Network) NM:   ", ether.netmask);
+            ether.printIp(F("[Info] (Network) IP:   "), ether.myip);
+            ether.printIp(F("[Info] (Network) GW:   "), ether.gwip);
+            ether.printIp(F("[Info] (Network) DNS:  "), ether.dnsip);
+            ether.printIp(F("[Info] (Network) NM:   "), ether.netmask);
 #endif
             NetworkStatus = ETHERNET_STATIC_SUCCESS;
             return true;
@@ -96,7 +96,7 @@ namespace Network
         else
         {
 #ifdef DEBUG
-            Serial.println("[Error] (Network) Static network setup failed!");
+            Serial.println(F("[Error] (Network) Static network setup failed!"));
 #endif
             NetworkStatus = ETHERNET_STATIC_FAILED;
             return false;

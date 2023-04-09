@@ -23,12 +23,12 @@ void network_manager()
     if (Network::init_ethernet())
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Main) Ethernet Modul wurde aktiviert.");
+        Serial.println(F("[Info] (Main) Ethernet Modul wurde aktiviert."));
 #endif
         if (Network::is_cable_connected())
         {
 #ifdef DEBUG
-            Serial.println("[Info] (Main) Netzwerkanschluss ist aktiv.");
+            Serial.println(F("[Info] (Main) Netzwerkanschluss ist aktiv."));
 #endif
 
             if (NetworkSetup == ETHERNET_DHCP_INIT)
@@ -56,8 +56,14 @@ void setup()
 
     GUI::init_display();
 #ifdef DEBUG
-    Serial.println("[Info] (Main) Display wurde aktiviert.");
+    Serial.println(F("[Info] (Main) Display wurde aktiviert."));
 #endif
+
+    Time::init_rtc_module();
+#ifdef DEBUG
+    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
+#endif
+
     if (Storage::read_network_dhcp())
     {
         Network::NetworkStatus = ETHERNET_DHCP_INIT;
@@ -74,15 +80,14 @@ void setup()
         Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
     }
 
-// Breaks DHCP setup ... 
-//     TimeSync::init_timesync(Storage::read_network_ntp());
-// #ifdef DEBUG
-//     Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
-// #endif
+    TimeSync::init_timesync(Storage::read_network_ntp());
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
+#endif
 
     Time::init_alarm_interrupt();
 #ifdef DEBUG
-    Serial.println("[Info] (Main) Timerinterrupt wurde konfiguriert.");
+    Serial.println(F("[Info] (Main) Timerinterrupt wurde konfiguriert."));
 #endif
 
     // Beeper
@@ -107,7 +112,7 @@ void navigation_handler()
     {
 
 #ifdef DEBUG
-        Serial.println("[Info] (Main) Menu");
+        Serial.println(F("[Info] (Main) Menu"));
 #endif
         navigation = GUI::check_menu();
 
@@ -120,7 +125,7 @@ void navigation_handler()
     case TIMEPLAN:
     {
 #ifdef DEBUG
-        Serial.println("[Info] (Main) Timeplan");
+        Serial.println(F("[Info] (Main) Timeplan"));
 #endif
         selection = GUI::check_timeplan(alarm_count);
 
@@ -279,14 +284,14 @@ void navigation_handler()
                 }
                 Storage::save_alarm_count(alarm_count);
 #ifdef DEBUG
-                Serial.println("[Info] (Main) Successfully added new alarm!");
+                Serial.println(F("[Info] (Main) Successfully added new alarm!"));
 #endif
                 navigation = TIMEPLAN;
             }
             else
             {
 #ifdef DEBUG
-                Serial.println("[Error] (Main) Failed adding new alarm, because timeframe alarm already exists!");
+                Serial.println(F("[Error] (Main) Failed adding new alarm, because timeframe alarm already exists!"));
 #endif
                 navigation = NEW_ALARM_CONFIG;
             }
@@ -317,9 +322,9 @@ void navigation_handler()
     if (navigation != last_navigation)
     {
 #ifdef DEBUG
-        Serial.print("[Info] (Main) Action Handler - Last Navigation ID: ");
+        Serial.print(F("[Info] (Main) Action Handler - Last Navigation ID: "));
         Serial.println(last_navigation);
-        Serial.print("[Info] (Main) Action Handler - New Navigation ID: ");
+        Serial.print(F("[Info] (Main) Action Handler - New Navigation ID: "));
         Serial.println(navigation);
 #endif
         last_navigation = navigation;
@@ -331,7 +336,7 @@ void refresh_handler()
 {
     refresh = false;
 #ifdef DEBUG
-    Serial.println("[Info] (Main) Refresh Handler");
+    Serial.println(F("[Info] (Main) Refresh Handler"));
 #endif
 
     switch (navigation)
@@ -389,7 +394,7 @@ void refresh_handler()
     }
     case NETWORK_NTP:
     {
-        Time::get_formatted_time(TimeSync::getLastNtpSync(), buffer);
+        Time::get_formatted_time(TimeSync::LastNtpSync, buffer);
         GUI::network_ntp(buffer, TimeSync::EnableNtpSync);
         break;
     }

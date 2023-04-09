@@ -4,10 +4,7 @@
 #endif
 
 #include <RTClib.h>
-#include <Wire.h>
 #include <TimeLib.h>
-#include <Timezone.h>
-#include <SPI.h>
 
 // RTC Objekt aus der RTClib
 
@@ -21,7 +18,7 @@ namespace Time
         uint8_t type;
     };
 
-    bool init_rtc_module();
+    bool init_rtc_module(void);
 
     byte dstOffset(byte d, byte m, unsigned int y, byte h);
     time_t get_corrected_utctime(time_t t);

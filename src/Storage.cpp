@@ -1,11 +1,11 @@
 // Angabe des Header Files
 #include "Storage.h"
 
-#define ALARMS_START 0
-#define ALARMS_ASSIGNMENT_START MAXIMUM_AMOUNT_ALARMS * 2 + 1
-#define ALARM_TYPES_START ALARMS_ASSIGNMENT_START + MAXIMUM_AMOUNT_ALARMS * 1 + 1
-#define STORAGE_NETWORK_CONFIG_START ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
-#define STORAGE_NETWORK_DHCP_ENABLED STORAGE_NETWORK_CONFIG_START + 36 + 1 // 36 Bytes -> 4 x 32bit IP Addressen + 20 chars für NTP Server Name
+#define STORAGE_ALARMS_START 0
+#define STORAGE_ALARMS_ASSIGNMENT_START MAXIMUM_AMOUNT_ALARMS * 2 + 1
+#define STORAGE_ALARM_TYPES_START STORAGE_ALARMS_ASSIGNMENT_START + MAXIMUM_AMOUNT_ALARMS * 1 + 1
+#define STORAGE_NETWORK_CONFIG_START STORAGE_ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
+#define STORAGE_NETWORK_DHCP_ENABLED STORAGE_NETWORK_CONFIG_START + 36 + 1  + 300
 #define STORAGE_NETWORK_NTP_ENABlED STORAGE_NETWORK_DHCP_ENABLED + 1
 #define NEXT STORAGE_NETWORK_NTP_ENABlED + 1
 
@@ -14,22 +14,22 @@ namespace Storage
 
     void save_alarm_count(uint8_t alarm_count)
     {
-        EEPROM.put(ALARMS_START, alarm_count);
+        EEPROM.put(STORAGE_ALARMS_START, alarm_count);
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Saved alarm count: ");
+        Serial.print(F("[Info] (Storage) Saved alarm count: "));
         Serial.println(alarm_count);
 #endif
     }
 
     void save_alarm(uint16_t alarm, uint8_t alarms_type_assignment, uint8_t index)
     {
-        EEPROM.put(1 + ALARMS_START + sizeof(uint16_t) * index, alarm);
-        EEPROM.put(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, alarms_type_assignment);
+        EEPROM.put(1 + STORAGE_ALARMS_START + sizeof(uint16_t) * index, alarm);
+        EEPROM.put(STORAGE_ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, alarms_type_assignment);
 
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Saved alarm: ");
+        Serial.print(F("[Info] (Storage) Saved alarm: "));
         Serial.println(alarm);
-        Serial.print("[Info] (Storage) Saved alarm type assignment: ");
+        Serial.print(F("[Info] (Storage) Saved alarm type assignment: "));
         Serial.println(alarms_type_assignment);
 #endif
     }
@@ -37,24 +37,24 @@ namespace Storage
     uint8_t read_alarm_count()
     {
 #ifdef DEBUG
-        uint8_t alarm_count = EEPROM.read(ALARMS_START);
-        Serial.print("[Info] (Storage) Read alarm count : ");
+        uint8_t alarm_count = EEPROM.read(STORAGE_ALARMS_START);
+        Serial.print(F("[Info] (Storage) Read alarm count : "));
         Serial.println(alarm_count);
         return alarm_count;
 #endif
-        return EEPROM.read(ALARMS_START);
+        return EEPROM.read(STORAGE_ALARMS_START);
     }
 
     void read_alarm(uint16_t *alarm, uint8_t *alarms_type_assignment, uint8_t index)
     {
-        EEPROM.get(1 + ALARMS_START + sizeof(uint16_t) * index, *alarm);
-        EEPROM.get(ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, *alarms_type_assignment);
+        EEPROM.get(1 + STORAGE_ALARMS_START + sizeof(uint16_t) * index, *alarm);
+        EEPROM.get(STORAGE_ALARMS_ASSIGNMENT_START + sizeof(uint8_t) * index, *alarms_type_assignment);
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Read alarm: ");
+        Serial.print(F("[Info] (Storage) Read alarm: "));
         Serial.print(*alarm);
-        Serial.print(" with type: ");
+        Serial.print(F(" with type: "));
         Serial.print(*alarms_type_assignment);
-        Serial.print(" at index: ");
+        Serial.print(F(" at index: "));
         Serial.println(index);
 #endif
     }
@@ -66,14 +66,14 @@ namespace Storage
          */
 
         // Anzahl wird an erster Stelle des Addressbereichs gespeichert.
-        EEPROM.put(ALARM_TYPES_START, count);
+        EEPROM.put(STORAGE_ALARM_TYPES_START, count);
 
         for (int i = 0; i < count; i++)
         {
-            EEPROM.put(1 + ALARM_TYPES_START + sizeof(uint64_t) * i, alarm_types[i]);
+            EEPROM.put(1 + STORAGE_ALARM_TYPES_START + sizeof(uint64_t) * i, alarm_types[i]);
 
 #ifdef DEBUG
-            Serial.print("[Info] (Storage) Alarmtyp wurde gespeichert.");
+            Serial.print(F("[Info] (Storage) Alarmtyp wurde gespeichert."));
 #endif
         }
     }
@@ -84,13 +84,13 @@ namespace Storage
          * Auslesen von Alarmtypen
          */
 
-        uint8_t count = EEPROM.read(ALARM_TYPES_START);
+        uint8_t count = EEPROM.read(STORAGE_ALARM_TYPES_START);
 
         for (int i = 0; i < count; i++)
         {
-            EEPROM.get(1 + ALARM_TYPES_START + sizeof(uint64_t), alarm_types[i]);
+            EEPROM.get(1 + STORAGE_ALARM_TYPES_START + sizeof(uint64_t), alarm_types[i]);
 #ifdef DEBUG
-            Serial.print("[Info] (Storage) Alarmtyp wurde ausgelesen.");
+            Serial.print(F("[Info] (Storage) Alarmtyp wurde ausgelesen."));
 #endif
         }
 
@@ -124,18 +124,18 @@ namespace Storage
 
         char buffer[16];
         sprintf(buffer, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-        Serial.print("[Info] (Storage) Saved IP: ");
+        Serial.print(F("[Info] (Storage) Saved IP: "));
         Serial.println(buffer);
 
         sprintf(buffer, "%d.%d.%d.%d", gw[0], gw[1], gw[2], gw[3]);
-        Serial.print("[Info] (Storage) Saved Gateway: ");
+        Serial.print(F("[Info] (Storage) Saved Gateway: "));
         Serial.println(buffer);
 
         sprintf(buffer, "%d.%d.%d.%d", dns[0], dns[1], dns[2], dns[3]);
-        Serial.print("[Info] (Storage) Saved DNS: ");
+        Serial.print(F("[Info] (Storage) Saved DNS: "));
         Serial.println(buffer);
 
-        Serial.print("[Info] (Storage) Saved Prefix: ");
+        Serial.print(F("[Info] (Storage) Saved Prefix: "));
         Serial.println(prefix);
 
 #endif
@@ -164,23 +164,21 @@ namespace Storage
         *prefix = EEPROM.read(STORAGE_NETWORK_CONFIG_START + 12);
 
 #ifdef DEBUG
-
         char buffer[16];
         sprintf(buffer, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-        Serial.print("[Info] (Storage) Read IP: ");
+        Serial.print(F("[Info] (Storage) Read IP: "));
         Serial.println(buffer);
 
         sprintf(buffer, "%d.%d.%d.%d", gw[0], gw[1], gw[2], gw[3]);
-        Serial.print("[Info] (Storage) Read Gateway: ");
+        Serial.print(F("[Info] (Storage) Read Gateway: "));
         Serial.println(buffer);
 
         sprintf(buffer, "%d.%d.%d.%d", dns[0], dns[1], dns[2], dns[3]);
-        Serial.print("[Info] (Storage) Read DNS: ");
+        Serial.print(F("[Info] (Storage) Read DNS: "));
         Serial.println(buffer);
 
-        Serial.print("[Info] (Storage) Read Prefix: ");
+        Serial.print(F("[Info] (Storage) Read Prefix: "));
         Serial.println(*prefix);
-
 #endif
     }
 
@@ -237,18 +235,18 @@ namespace Storage
     void save_network_dhcp(bool automatic)
     {
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Save DHCP enabled: ");
+        Serial.print(F("[Info] (Storage) Save DHCP enabled: "));
         Serial.println(automatic, BIN);
 #endif
 
         EEPROM.put(STORAGE_NETWORK_DHCP_ENABLED, automatic);
     }
-    
+
     bool read_network_dhcp()
     {
 #ifdef DEBUG
-        bool automatic = EEPROM.read(NETWORK_DHCP);
-        Serial.print("[Info] (Storage) Read DHCP enabled: ");
+        bool automatic = EEPROM.read(STORAGE_NETWORK_DHCP_ENABLED);
+        Serial.print(F("[Info] (Storage) Read DHCP enabled: "));
         Serial.println(automatic, BIN);
         return automatic;
 #endif
@@ -258,7 +256,7 @@ namespace Storage
     void save_network_ntp(bool isEnabled)
     {
 #ifdef DEBUG
-        Serial.print("[Info] (Storage) Save NTP enabled: ");
+        Serial.print(F("[Info] (Storage) Save NTP enabled: "));
         Serial.println(isEnabled, BIN);
 #endif
         EEPROM.put(STORAGE_NETWORK_NTP_ENABlED, isEnabled);
@@ -267,11 +265,11 @@ namespace Storage
     bool read_network_ntp()
     {
 #ifdef DEBUG
-        bool isEnabled = EEPROM.read(NETWORK_DHCP);
-        Serial.print("[Info] (Storage) Read NTP enabled: ");
+        bool isEnabled = EEPROM.read(STORAGE_NETWORK_NTP_ENABlED);
+        Serial.print(F("[Info] (Storage) Read NTP enabled: "));
         Serial.println(isEnabled, BIN);
         return isEnabled;
 #endif
-        return EEPROM.read(STORAGE_NETWORK_NTP_ENABlED);
+        return (bool)EEPROM.read(STORAGE_NETWORK_NTP_ENABlED);
     }
 }

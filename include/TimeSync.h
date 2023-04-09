@@ -7,13 +7,12 @@
 #include <EtherCard.h>
 #include <RTClib.h>
 #include <TimeLib.h>
-#include "DEFINITIONS.h"
 
 namespace TimeSync
 {
     extern bool EnableNtpSync;
-    time_t getNtpTime();
-    time_t getTime();
-    time_t getLastNtpSync();
+    extern uint32_t LastNtpSync;
+    time_t getNtpTime(void);
+    time_t getTime(void);
     void init_timesync(bool isNtpEnabled);
 }

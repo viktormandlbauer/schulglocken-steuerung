@@ -41,11 +41,11 @@
 // Hostname
 #define HOSTNAME "sgs2023"
 
-// Synchronisierungsintervall Systemzeit mit RTC
-#define SYNC_INTERVAL_RTC 60
+// Synchronisierungsintervall Systemzeit mit RTC in Sekunden
+#define SYNC_INTERVAL_RTC 600
 
-// Synchronisierungsintervall RTC mit NTP
-#define SYNC_INTERVAL_NTP 600
+// NTP Synchronisation nach x RTC Synchronisation
+#define SYNC_WITH_NTP 60
 
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.

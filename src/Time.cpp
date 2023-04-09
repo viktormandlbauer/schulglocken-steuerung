@@ -94,7 +94,7 @@ namespace Time
         }
     }
 
-    bool init_rtc_module()
+    bool init_rtc_module(void)
     {
         while (!rtc.begin())
         {
@@ -152,7 +152,7 @@ namespace Time
         if (strcmp(output, time_internal_timestring) != 0)
         {
 #ifdef DEBUG
-            Serial.println("[Info] (Time) HH:MM:SS changed");
+            Serial.println(F("[Info] (Time) HH:MM:SS changed"));
 #endif
             memcpy(time_internal_timestring, output, 9 * sizeof(*output));
             return true;
@@ -167,11 +167,11 @@ namespace Time
         setTime(new_hour, new_minute, new_second, new_day, new_month, new_year);
         now();
 #ifdef DEBUG
-        Serial.print("[Info] (Time) Time set: ");
+        Serial.print(F("[Info] (Time) Time set: "));
         Serial.print(new_hour);
-        Serial.print(":");
+        Serial.print(F(":"));
         Serial.print(new_minute);
-        Serial.print(":");
+        Serial.print(F(":"));
         Serial.println(new_second);
 #endif
     }
@@ -214,18 +214,18 @@ namespace Time
             alarms[*alarm_count].type = alarm_type;
             *alarm_count += 1;
 #ifdef DEBUG
-            Serial.print("[Info] (Time) Added new alarm ");
+            Serial.print(F("[Info] (Time) Added new alarm "));
             Serial.print(minutes);
-            Serial.print(" with type: ");
+            Serial.print(F(" with type: "));
             Serial.println(alarm_type);
-            Serial.print("[Info] (Time) Alarm count: ");
+            Serial.print(F("[Info] (Time) Alarm count: "));
             Serial.println(*alarm_count);
 #endif
         }
         else
         {
 #ifdef DEBUG
-            Serial.println("[Error] (Time) Alarm already exists");
+            Serial.println(F("[Error] (Time) Alarm already exists"));
 #endif
             return false;
         }
@@ -240,9 +240,9 @@ namespace Time
             alarms[i] = alarms[i + 1];
         }
 #ifdef DEBUG
-        Serial.print("[Info] (GUI) Removed alarm at index: ");
+        Serial.print(F("[Info] (GUI) Removed alarm at index: "));
         Serial.println(index);
-        Serial.print("[Info] (GUI) New alarm count: ");
+        Serial.print(F("[Info] (GUI) New alarm count: "));
         Serial.println(alarm_count - 1);
 #endif
 
@@ -276,7 +276,7 @@ namespace Time
         if (!finished)
         {
 #ifdef DEBUG
-            Serial.println("[Info] Alarm is active!");
+            Serial.println(F("[Info] Alarm is active!"));
 #endif
             return true;
         }
@@ -297,7 +297,7 @@ namespace Time
                         current_alarm_type = alarms[i].type;
                         finished = false;
 #ifdef DEBUG
-                        Serial.print("[Info] Alarm triggered: ");
+                        Serial.print(F("[Info] Alarm triggered: "));
                         Serial.println(alarms[i].minutes);
 #endif
                         return true;
