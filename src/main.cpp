@@ -184,6 +184,7 @@ void navigation_handler()
     }
     case SYSTEM:
     {
+        navigation = GUI::check_exception_menu();
         break;
     }
     case NETWORK_MENU:
@@ -365,9 +366,13 @@ void refresh_handler()
         refresh = true;
         break;
     }
+    case SYSTEM:
+    {
+        GUI::exception_menu();
+        break;
+    }
     case TIME_SETTING:
     {
-
         GUI::time_setting(time_string);
         break;
     }
