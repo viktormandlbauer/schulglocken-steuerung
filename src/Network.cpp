@@ -11,7 +11,7 @@ namespace Network
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Activate ethernet ..."));
 #endif
-        if (ether.begin(sizeof Ethernet::buffer, mac_address, CHIP_SELECT) == 0)
+        if (ether.begin(sizeof Ethernet::buffer, mac_address, CS_ETHERNET) == 0)
         {
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) Failed to active ethernet."));

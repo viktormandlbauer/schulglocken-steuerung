@@ -2,6 +2,12 @@
  * Programmdefinitionen
  */
 
+// Pin Definitionen
+#define RELAIS 30
+#define LED_SIGNAL 24
+#define AUDIO_SIGNAL 22 
+#define CS_ETHERNET 28
+
 // Maximal möglich einstellbare Alarme
 #define MAXIMUM_AMOUNT_ALARMS 64
 
@@ -13,9 +19,6 @@
 
 // MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
-
-#define OUTPUT_PIN 24
-#define CHIP_SELECT 28
 
 // Farbeschema grafischen Benutzeroberfläche
 #define COLOR_BLACK 0x0000

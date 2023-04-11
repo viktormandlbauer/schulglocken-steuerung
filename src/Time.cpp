@@ -316,10 +316,6 @@ namespace Time
     void set_alarm_types(uint8_t index, uint32_t ring_type)
     {
         alarm_types[index] = ring_type;
-
-        // ring_types[0] = 0xAAAAAAAA;
-        // ring_types[1] = 0xF0F0F0F0;
-        // ring_types[2] = 0xAA0F0AAA;
     }
 
     void init_alarm_interrupt()
@@ -350,18 +346,19 @@ namespace Time
 
 ISR(TIMER1_COMPA_vect)
 {
+
     // Wird abgefragt um ungewolltes Läuten zu vermeiden
     if (!finished)
     {
         if (alarm_types[current_alarm_type] & (1ul << position))
         {
             // HIGH wenn bit von ring_types an position 1 ist.
-            digitalWrite(OUTPUT_PIN, HIGH);
+            digitalWrite(RELAIS, HIGH);
         }
         else
         {
             // LOW wenn bit von ring_types an position 0 ist.
-            digitalWrite(OUTPUT_PIN, LOW);
+            digitalWrite(RELAIS, LOW);
         }
         if (position >= 32)
         {
