@@ -638,8 +638,8 @@ void GUI::network_menu()
 {
     Waveshield.fillScreen(COLOR_BACKGROUND);
 
-    button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
-    button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"DHCP", 3);
+    button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"IP", 3);
+    button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
     button_http.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"HTTP", 3);
     button_networkstatus.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Status", 3);
 
@@ -729,7 +729,7 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
     tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
     tft.setTextSize(4);
-    tft.print(F("DHCP Einstellungen"));
+    tft.print(F("IP Einstellungen"));
 
     char address_string[16];
 
@@ -772,7 +772,7 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
         tft.print(address_string);
         tft.setFont();
 
-        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Static", 2);
         button_dhcp.drawButton(true);
     }
     else if (NetworkStatus == ETHERNET_STATIC_SUCCESS)
@@ -814,7 +814,7 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
         tft.print(address_string);
         tft.setFont();
 
-        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"DHCP", 2);
         button_dhcp.drawButton(true);
     }
     else if (NetworkStatus == ETHERNET_DHCP_INIT)
@@ -848,6 +848,17 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         tft.setTextSize(3);
         tft.print(F("DHCP ist fehlgeschlagen"));
+        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
+        button_network.drawButton(true);
+        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+        button_dhcp.drawButton(true);
+    }
+    else if (NetworkStatus == ETHERNET_LINKDOWN)
+    {
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextSize(3);
+        tft.print(F(""));
         button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
         button_network.drawButton(true);
         button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
