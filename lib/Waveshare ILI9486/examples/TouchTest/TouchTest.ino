@@ -26,11 +26,10 @@ void setup()
 {
     SPI.begin();
     Waveshield.begin();
-
     Waveshield.setRotation(1);
     Waveshield.setTextSize(2);
     Waveshield.print("Run stylus off each edge to calibrate!");
-
+    
     Waveshield.setRotation(0);
 }
 

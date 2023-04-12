@@ -54,6 +54,12 @@ void setup()
 {
     Serial.begin(9600);
 
+    pinMode(LED_SIGNAL, OUTPUT);
+    pinMode(RELAIS, OUTPUT);
+    pinMode(AUDIO_SIGNAL, OUTPUT);
+
+    digitalWrite(LED_SIGNAL, HIGH);
+
     GUI::init_display();
 #ifdef DEBUG
     Serial.println(F("[Info] (Main) Display wurde aktiviert."));
@@ -89,9 +95,6 @@ void setup()
 #ifdef DEBUG
     Serial.println(F("[Info] (Main) Timerinterrupt wurde konfiguriert."));
 #endif
-
-    // Beeper
-    pinMode(OUTPUT_PIN, OUTPUT);
 }
 
 int navigation;
@@ -181,6 +184,7 @@ void navigation_handler()
     }
     case SYSTEM:
     {
+        navigation = GUI::check_exception_menu();
         break;
     }
     case NETWORK_MENU:
@@ -362,9 +366,13 @@ void refresh_handler()
         refresh = true;
         break;
     }
+    case SYSTEM:
+    {
+        GUI::exception_menu();
+        break;
+    }
     case TIME_SETTING:
     {
-
         GUI::time_setting(time_string);
         break;
     }

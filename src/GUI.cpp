@@ -881,6 +881,16 @@ uint8_t GUI::check_network_dhcp()
     return NETWORK_DHCP;
 }
 
+void GUI::exception_menu()
+{
+    Waveshield.fillScreen(COLOR_BACKGROUND);
+    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+    tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+    tft.setTextSize(4);
+    tft.print("Ausnahmen");
+}
+uint8_t GUI::check_exception_menu();
+
 int released;
 #define THRESHOLD_RELEASED 100
 
