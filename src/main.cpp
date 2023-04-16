@@ -20,6 +20,7 @@ uint8_t ip[4], gw[4], dns[4], prefix;
 void network_manager()
 {
     uint8_t NetworkSetup = Network::NetworkStatus;
+
     if (Network::init_ethernet())
     {
 #ifdef DEBUG
@@ -30,7 +31,6 @@ void network_manager()
 #ifdef DEBUG
             Serial.println(F("[Info] (Main) Netzwerkanschluss ist aktiv."));
 #endif
-
             if (NetworkSetup == ETHERNET_DHCP_INIT)
             {
                 Network::dhcp_setup();
@@ -44,7 +44,11 @@ void network_manager()
             {
                 Storage::read_network_settings(ip, gw, dns, &prefix);
                 Network::static_setup(ip, gw, dns, prefix);
-                Storage::save_network_dhcp(false);
+
+                if (Network::NetworkStatus == ETHERNET_STATIC_SUCCESS)
+                {
+                    Storage::save_network_dhcp(false);
+                }
             }
         }
     }
@@ -157,7 +161,6 @@ void navigation_handler()
     }
     case TIME:
     {
-
         navigation = GUI::check_time();
         if (navigation != TIME)
         {
@@ -195,7 +198,7 @@ void navigation_handler()
     }
     case NETWORK_DHCP:
     {
-        selection = GUI::check_network_dhcp();
+        selection = GUI::check_network_ip();
 
         if (selection == NETWORK_DHCP_SWITCH)
         {
@@ -208,9 +211,22 @@ void navigation_handler()
                 Network::NetworkStatus = ETHERNET_DHCP_INIT;
             }
 
-            GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+            GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
             network_manager();
-            GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+            GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+        }
+        else if (selection == NETWORK_RETRY)
+        {
+            if (Network::NetworkStatus == ETHERNET_DHCP_FAILED)
+            {
+                Network::NetworkStatus = ETHERNET_DHCP_INIT;
+                network_manager();
+            }
+            else if (Network::NetworkStatus == ETHERNET_STATIC_FAILED)
+            {
+                Network::NetworkStatus = ETHERNET_DHCP_FAILED;
+                network_manager();
+            }
         }
         else if (selection == NETWORK_MENU)
         {
@@ -398,7 +414,7 @@ void refresh_handler()
     }
     case NETWORK_DHCP:
     {
-        GUI::network_dhcp(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+        GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
         break;
     }
     case NETWORK_NTP:

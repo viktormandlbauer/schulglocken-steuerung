@@ -40,8 +40,8 @@ namespace GUI
     void network_ntp(char *lastNtpSync, bool isEnabled);
     uint8_t check_network_ntp(bool isEnabled);
 
-    void network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
-    uint8_t check_network_dhcp();
+    void network_ip(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
+    uint8_t check_network_ip();
     void network_config_update(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
 
     void exception_menu();

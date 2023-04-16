@@ -728,7 +728,7 @@ uint8_t GUI::check_network_ntp(bool isEnabled)
     return NETWORK_NTP;
 }
 
-void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+void GUI::network_ip(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
 {
     Waveshield.fillScreen(COLOR_BACKGROUND);
     tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
@@ -842,9 +842,9 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         tft.setTextSize(3);
         tft.print(F("Statische IP Konfiguration ist fehlgeschlagen."));
-        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
+        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
         button_network.drawButton(true);
-        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+        button_dhcp.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
         button_dhcp.drawButton(true);
     }
     else if (NetworkStatus == ETHERNET_STATIC_FAILED)
@@ -853,27 +853,23 @@ void GUI::network_dhcp(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         tft.setTextSize(3);
         tft.print(F("DHCP ist fehlgeschlagen"));
-        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
+        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
         button_network.drawButton(true);
-        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+        button_dhcp.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
         button_dhcp.drawButton(true);
     }
     else if (NetworkStatus == ETHERNET_LINKDOWN)
     {
         tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setTextSize(3);
-        tft.print(F(""));
-        button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
-        button_network.drawButton(true);
-        button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
-        button_dhcp.drawButton(true);
+        tft.setTextSize(2);
+        tft.print(F("Kein Netzwerkanschluss vorhanden"));
     }
 
     draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 100, 60);
 }
 
-uint8_t GUI::check_network_dhcp()
+uint8_t GUI::check_network_ip()
 {
     if (check_button_pressed(button_back))
     {
@@ -882,6 +878,10 @@ uint8_t GUI::check_network_dhcp()
     else if (check_button_pressed(button_dhcp))
     {
         return NETWORK_DHCP_SWITCH;
+    }
+    else if (check_button_pressed(button_network))
+    {
+        return NETWORK_RETRY;
     }
     return NETWORK_DHCP;
 }

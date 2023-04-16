@@ -5,7 +5,7 @@
 // Pin Definitionen
 #define RELAIS 30
 #define LED_SIGNAL 24
-#define AUDIO_SIGNAL 22 
+#define AUDIO_SIGNAL 22
 #define CS_ETHERNET 28
 
 // Maximal möglich einstellbare Alarme
@@ -79,7 +79,8 @@
 #define NETWORK_NTP 9
 #define NETWORK_STATUS 10
 #define NETWORK_DHCP 11
-#define NETWORK_HTTP 12
+#define NETWORK_RETRY 12
+#define NETWORK_HTTP 13
 #define NETWORK_NTP_SWITCH 245
 #define NETWORK_NTP_TEST 246
 #define NETWORK_DHCP_SWITCH 245
