@@ -6,6 +6,11 @@
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Waveshare_ILI9486.h>
+#include <XPT2046_Touchscreen.h>
+
+#define CS_PIN 4
+#define TIRQ_PIN 3
+
 
 namespace GUI
 {

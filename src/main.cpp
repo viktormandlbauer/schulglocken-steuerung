@@ -95,6 +95,7 @@ void setup()
 #ifdef DEBUG
     Serial.println(F("[Info] (Main) Timerinterrupt wurde konfiguriert."));
 #endif
+    digitalWrite(LED_SIGNAL, LOW);
 }
 
 int navigation;

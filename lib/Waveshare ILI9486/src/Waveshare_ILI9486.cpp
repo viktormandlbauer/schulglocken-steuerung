@@ -26,12 +26,11 @@
 
 #include "Waveshare_ILI9486.h"
 
-
 namespace
 {
 #ifdef ARDUINO_ESP8266_WEMOS_D1R1
-	//GPIO config
-	//LCD
+	// GPIO config
+	// LCD
 
 	//  D1 R1 pins are not 'general purpose". D5, D6 and D7 are actually *duplicates* of
 	//  D11, D12 and D13, so you can't use them at all.  D9 is hard to use, it's part of
@@ -39,9 +38,9 @@ namespace
 	//  So, you can't plug the shield into a D1 R1, you need to map the pins.
 	//
 	constexpr unsigned int LCD_CS = D10; //  LCD Chip Select
-	constexpr unsigned int LCD_BL = D8;  //  LCD Backlight
-	constexpr unsigned int LCD_RST = D4;  //  LCD Reset
-	constexpr unsigned int LCD_DC = D3;  //  LCD Data/Control
+	constexpr unsigned int LCD_BL = D8;	 //  LCD Backlight
+	constexpr unsigned int LCD_RST = D4; //  LCD Reset
+	constexpr unsigned int LCD_DC = D3;	 //  LCD Data/Control
 
 	constexpr unsigned int TP_CS = D0;
 
@@ -58,25 +57,25 @@ namespace
 		digitalWrite(pin, val ? HIGH : LOW);
 	}
 
-	constexpr unsigned int LCD_CS = 5;  // 10; //  LCD Chip Select
-	constexpr unsigned int LCD_BL = 13; // 9;  //  LCD Backlight
+	constexpr unsigned int LCD_CS = 5;	 // 10; //  LCD Chip Select
+	constexpr unsigned int LCD_BL = 13;	 // 9;  //  LCD Backlight
 	constexpr unsigned int LCD_RST = 12; // 8;  //  LCD Reset
-	constexpr unsigned int LCD_DC = 14; // 7;  //  LCD Data/Control
+	constexpr unsigned int LCD_DC = 14;	 // 7;  //  LCD Data/Control
 
-	constexpr unsigned int TP_CS = 17;   // 4;
-	constexpr unsigned int TP_IRQ = 25;  // 3
+	constexpr unsigned int TP_CS = 17;	 // 4;
+	constexpr unsigned int TP_IRQ = 25;	 // 3
 	constexpr unsigned int TP_BUSY = 27; // 6
 
-	constexpr unsigned int SD_CS = 16;   // 5;
+	constexpr unsigned int SD_CS = 16; // 5;
 
 #else
 
-	//GPIO config
-	//LCD
+	// GPIO config
+	// LCD
 	constexpr unsigned int LCD_CS = 10; //  LCD Chip Select
-	constexpr unsigned int LCD_BL = 9;  //  LCD Backlight
-	constexpr unsigned int LCD_RST = 8;  //  LCD Reset
-	constexpr unsigned int LCD_DC = 7;  //  LCD Data/Control
+	constexpr unsigned int LCD_BL = 9;	//  LCD Backlight
+	constexpr unsigned int LCD_RST = 8; //  LCD Reset
+	constexpr unsigned int LCD_DC = 7;	//  LCD Data/Control
 
 	constexpr unsigned int TP_CS = 4;
 	constexpr unsigned int TP_IRQ = 3;
@@ -90,17 +89,16 @@ namespace
 	constexpr int16_t LCD_HEIGHT = 480;
 
 	//  Data sheets says min clock width is 66ns, for a max clock of 15 MHz.  Except, this
-//  thing isn't *actually* SPI!  It's a 16 bit shift register connected to the parallel
-//  interface, and that can run at 20 Mhz
+	//  thing isn't *actually* SPI!  It's a 16 bit shift register connected to the parallel
+	//  interface, and that can run at 20 Mhz
 	SPISettings _tftSpiSettingsWrite(20000000, MSBFIRST, SPI_MODE0);
 
 	//  TFT reads are slower, 150 ns period.
 	//  Nevermind, Waveshare shield doesn't support reads at all!
-	//SPISettings _tftSpiSettingsRead(6500000, MSBFIRST, SPI_MODE0);
+	// SPISettings _tftSpiSettingsRead(6500000, MSBFIRST, SPI_MODE0);
 
 	//  Touch screen wants 400 ns period.
 	SPISettings tsSpiSettings(2500000, MSBFIRST, SPI_MODE0);
-
 
 	inline void lcdWriteReg(uint8_t reg)
 	{
@@ -124,7 +122,6 @@ namespace
 		SPI.transfer(data);
 	}
 
-
 	inline void lcdWriteData16(uint16_t data)
 	{
 		lcdWriteData(uint8_t(data >> 8));
@@ -139,10 +136,10 @@ namespace
 
 #ifdef ARDUINO_ARCH_AVR
 	//  Version of SPI.transfer(...) that *doesn't* read data back into the buffer.
-	//  
+	//
 
 	//  Wrote this, then went with a bulk repeat implementation instead.
-	//inline static void transferOut(void *buf, size_t count)
+	// inline static void transferOut(void *buf, size_t count)
 	//{
 	//	if (count == 0) return;
 	//	uint8_t *p = (uint8_t *)buf;
@@ -155,7 +152,6 @@ namespace
 	//	}
 	//	while (!(SPSR & _BV(SPIF)));
 	//}
-
 
 	inline static void transfer16Repeat(uint16_t data, unsigned long count)
 	{
@@ -170,7 +166,8 @@ namespace
 			uint16_t val;
 			struct
 			{
-				uint8_t lsb; uint8_t msb;
+				uint8_t lsb;
+				uint8_t msb;
 			};
 		} in;
 		in.val = data;
@@ -183,7 +180,8 @@ namespace
 		//  Loop phase shifting AND Duff's device?  Inconceivable!
 		SPDR = msb;
 		count--;
-		while (!(SPSR & _BV(SPIF)));
+		while (!(SPSR & _BV(SPIF)))
+			;
 		SPDR = lsb;
 		switch (count & 0x01)
 		{
@@ -191,25 +189,29 @@ namespace
 			while (count)
 			{
 				count--;
-				while (!(SPSR & _BV(SPIF)));
+				while (!(SPSR & _BV(SPIF)))
+					;
 				SPDR = msb;
 				asm volatile("nop");
-				while (!(SPSR & _BV(SPIF)));
+				while (!(SPSR & _BV(SPIF)))
+					;
 				SPDR = lsb;
-		case 1:
-			count--;
-			while (!(SPSR & _BV(SPIF)));
-			SPDR = msb;
-			asm volatile("nop");
-			while (!(SPSR & _BV(SPIF)));
-			SPDR = lsb;
+			case 1:
+				count--;
+				while (!(SPSR & _BV(SPIF)))
+					;
+				SPDR = msb;
+				asm volatile("nop");
+				while (!(SPSR & _BV(SPIF)))
+					;
+				SPDR = lsb;
 			}
 		}
 		// MUST wait for final shift out to complete!  Otherwise subsequent commands
 		// happen quickly enough to stomp on it.
 		asm volatile("nop");
-		while (!(SPSR & _BV(SPIF)));
-
+		while (!(SPSR & _BV(SPIF)))
+			;
 	}
 #endif
 
@@ -220,7 +222,7 @@ namespace
 
 #ifdef ARDUINO_ARCH_ESP32
 		//
-		//  ESP8266 seems to have better bulk transfer APIs for SPI.  
+		//  ESP8266 seems to have better bulk transfer APIs for SPI.
 		uint8_t pattern[2];
 		pattern[0] = data >> 8;
 		pattern[1] = data & 0xff;
@@ -287,7 +289,6 @@ namespace
 	}
 }
 
-
 namespace Waveshare_ILI9486_Impl
 {
 	void initializePins()
@@ -335,20 +336,20 @@ namespace Waveshare_ILI9486_Impl
 			//  Power control settings
 			lcdWriteCommand(0xC0, 0x19, 0x1a);
 			lcdWriteCommand(0xC1, 0x45, 0x00);
-			lcdWriteCommand(0xC2, 0x33);        //  Power/Reset on default
+			lcdWriteCommand(0xC2, 0x33); //  Power/Reset on default
 
-			lcdWriteCommand(0xC5, 0x00, 0x28);  //  VCOM control
+			lcdWriteCommand(0xC5, 0x00, 0x28); //  VCOM control
 
-			lcdWriteCommand(0xB1, 0xA0, 0x11);  //  Frame rate control
+			lcdWriteCommand(0xB1, 0xA0, 0x11); //  Frame rate control
 
-			lcdWriteCommand(0xB4, 0x02);        //  Display Z Inversion
+			lcdWriteCommand(0xB4, 0x02); //  Display Z Inversion
 
-			lcdWriteReg(0xB6);                  //  Display Control Function      
+			lcdWriteReg(0xB6); //  Display Control Function
 			lcdWriteData(0x00);
 			lcdWriteDataContinue(0x42);
 			lcdWriteDataContinue(0x3B);
 
-			lcdWriteReg(0xE0);                  //  Positive Gamma control
+			lcdWriteReg(0xE0); //  Positive Gamma control
 			lcdWriteData(0x1F);
 			lcdWriteDataContinue(0x25);
 			lcdWriteDataContinue(0x22);
@@ -365,7 +366,7 @@ namespace Waveshare_ILI9486_Impl
 			lcdWriteDataContinue(0x00);
 			lcdWriteDataContinue(0x00);
 
-			lcdWriteReg(0XE1);                  //  Negative Gamma control
+			lcdWriteReg(0XE1); //  Negative Gamma control
 			lcdWriteData(0x1F);
 			lcdWriteDataContinue(0x3F);
 			lcdWriteDataContinue(0x3F);
@@ -429,7 +430,7 @@ namespace Waveshare_ILI9486_Impl
 			//  Fill screen to black
 			writeFillRect2(0, 0, LCD_WIDTH, LCD_HEIGHT, 0x0000);
 
-			lcdWriteReg(0x29);  // Turn on display
+			lcdWriteReg(0x29); // Turn on display
 		}
 		endWrite();
 	}
@@ -440,7 +441,6 @@ namespace Waveshare_ILI9486_Impl
 		lcdWriteActiveRect(x, y, w, h);
 		lcdWriteDataRepeat(color, (int32_t)w * (int32_t)h);
 	}
-
 
 	void writeColors(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pColors)
 	{
@@ -524,7 +524,6 @@ namespace Waveshare_ILI9486_Impl
 
 #define NUMSAMPLES 2
 
-
 //  TSPoint code taken from Adafruit 'Touchscreen' library, MIT licence.
 TSPoint::TSPoint(void)
 {
@@ -540,12 +539,12 @@ TSPoint::TSPoint(int16_t x0, int16_t y0, int16_t z0)
 
 bool TSPoint::operator==(TSPoint p1)
 {
-	return  ((p1.x == x) && (p1.y == y) && (p1.z == z));
+	return ((p1.x == x) && (p1.y == y) && (p1.z == z));
 }
 
 bool TSPoint::operator!=(TSPoint p1)
 {
-	return  ((p1.x != x) || (p1.y != y) || (p1.z != z));
+	return ((p1.x != x) || (p1.y != y) || (p1.z != z));
 }
 
 #if (NUMSAMPLES > 2)
@@ -564,10 +563,9 @@ static void insert_sort(int array[], uint8_t size)
 }
 #endif
 
-
 //  Not implemented in Adafruit libraries?
-//bool
-//Waveshare_ILI9486::isTouching()
+// bool
+// Waveshare_ILI9486::isTouching()
 //{
 //	return false;
 //}
@@ -610,14 +608,13 @@ WaveshareTouchScreen::pressure()
 	float rtouch;
 	rtouch = z2;
 	rtouch /= z1;
-	//rtouch -= 1;
+	// rtouch -= 1;
 	rtouch *= ((uint16_t)(readTouchX()));
 	rtouch *= _rxplate;
 	rtouch /= 1024;
 
 	return (rtouch);
 }
-
 
 int16_t
 WaveshareTouchScreen::readTouchY()
@@ -669,8 +666,8 @@ WaveshareTouchScreen::getPoint()
 
 	// Match 10 bit resolution of Adafruit touchplates
 	x = (1023 - (samples[NUMSAMPLES / 2] >> 2));
-	if (x == 1023) x = 0;
-
+	if (x == 1023)
+		x = 0;
 
 	for (i = 0; i < NUMSAMPLES; i++)
 	{
@@ -711,7 +708,6 @@ WaveshareTouchScreen::getPoint()
 	return TSPoint(x, y, z);
 }
 
-
 namespace
 {
 	//  Some starting values that seem be just inside the actual limits.
@@ -724,18 +720,15 @@ WaveshareTouchScreen::getTsConfigData()
 	return tscd;
 }
 
-void
-WaveshareTouchScreen::setTsConfigData(const TSConfigData &newData)
+void WaveshareTouchScreen::setTsConfigData(const TSConfigData &newData)
 {
 	tscd = newData;
 }
 
-void
-WaveshareTouchScreen::resetTsConfigData()
+void WaveshareTouchScreen::resetTsConfigData()
 {
 	tscd = {100, 900, 75, 900};
 }
-
 
 namespace
 {
@@ -749,8 +742,7 @@ namespace
 //  Normalize the touchscreen readings to the dimensions of the screen.  Automatically
 //  adjusts the limits over time.  To calibrate, just run the stylus off each of the four
 //  edges of the screen.
-bool
-WaveshareTouchScreen::normalizeTsPoint(
+bool WaveshareTouchScreen::normalizeTsPoint(
 	TSPoint &p,
 	uint8_t rotation)
 {
@@ -786,7 +778,8 @@ WaveshareTouchScreen::normalizeTsPoint(
 
 	//  Touchscreen area extends past bottom of screen.
 	p.y = map(p.y, tscd.yMin, tscd.yMax, 0, LCD_HEIGHT + 10);
-	if (p.y >= LCD_HEIGHT) p.y = LCD_HEIGHT - 1;
+	if (p.y >= LCD_HEIGHT)
+		p.y = LCD_HEIGHT - 1;
 
 	switch (rotation)
 	{
@@ -807,9 +800,7 @@ WaveshareTouchScreen::normalizeTsPoint(
 		swap(p.x, p.y);
 		p.x = LCD_HEIGHT - 1 - p.x;
 		break;
-
 	}
 
 	return fReturn;
 }
-

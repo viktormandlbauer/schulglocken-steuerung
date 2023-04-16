@@ -6,6 +6,8 @@ Waveshare_ILI9486 Waveshield;
 Adafruit_GFX &tft = Waveshield;
 TSPoint p;
 
+XPT2046_Touchscreen ts(CS_PIN, TIRQ_PIN);
+
 void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
 {
     tft.setFont();
@@ -51,6 +53,9 @@ void GUI::init_display()
     SPI.begin();
     Waveshield.begin();
     Waveshield.setRotation(1);
+
+    ts.begin();
+    ts.setRotation(1);
 
     draw_menu();
     menu_drawn = true;
@@ -889,37 +894,32 @@ void GUI::exception_menu()
     tft.setTextSize(4);
     tft.print("Ausnahmen");
 }
-uint8_t GUI::check_exception_menu();
+uint8_t GUI::check_exception_menu()
+{
+}
 
-int released;
-#define THRESHOLD_RELEASED 100
-
+bool released = true;
 bool GUI::display_action()
 {
-    // Check ob Display bedient wird
-    p = Waveshield.getPoint();
-    Waveshield.normalizeTsPoint(p);
-
-    if (p.z > 10)
+    if (ts.tirqTouched())
     {
-        if (THRESHOLD_RELEASED == released)
+        if (ts.touched())
         {
+            if (released)
+            {
 #ifdef DEBUG
-            Serial.println(F("[Info] (GUI) Display Action"));
+                Serial.println(F("[Info] (GUI) Display Action"));
 #endif
-            released = 0;
-            return true;
+                p = Waveshield.getPoint();
+                Waveshield.normalizeTsPoint(p);
+                released = false;
+                return true;
+            }
         }
-#ifdef DEBUG
-        else
-        {
-            Serial.println(F("[Info] (GUI) Display Action - not released"));
-        }
-#endif
     }
-    else if (released < THRESHOLD_RELEASED)
+    else
     {
-        released += 1;
+        released = true;
     }
     return false;
 }
