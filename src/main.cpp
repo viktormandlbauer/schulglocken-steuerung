@@ -23,9 +23,13 @@ int last_navigation = !navigation;
 int selection;
 bool refresh;
 
+char date_string[11];
 char time_string[9];
+char day_string[4];
+
 char buffer[20];
 char compare_time_string[9];
+
 void network_manager()
 {
     uint8_t NetworkSetup = Network::NetworkStatus;
@@ -319,9 +323,13 @@ void refresh_handler()
 
     case DEFAULT:
 
-        // TODO
+        Time::get_current_timestring(time_string);
+        Time::get_current_date(date_string);
+        Time::get_current_weekday(day_string);
         Time::get_upcoming_alarm_strings(alarms, alarm_count, alarm_string, 3);
-        GUI::default_menu("01.01.2001", 1, "23:59", alarm_string, "01.01", "02.02", 0b11111111);
+        // TODO Upcomfing Exceptions
+        
+        GUI::default_menu(date_string, time_string, day_string, alarm_string, "01.01", "02.02", 0b11111111);
         break;
     case MENU:
     {
@@ -340,8 +348,8 @@ void refresh_handler()
         if (Time::get_current_timestring(time_string))
         {
             GUI::time(time_string);
+            refresh = true;
         }
-        refresh = true;
         break;
     }
     case SYSTEM:

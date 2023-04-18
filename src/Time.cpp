@@ -42,10 +42,28 @@ namespace Time
 
     RTC_DS3231 rtc;
 
+    // Aktuelle Zeit als Zeichenkette im Format DD.MM.YYYY HH:MM:SS
+    void get_current_datetime(char *buffer)
+    {
+        sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
+    }
+
+    void get_current_date(char *buffer)
+    {
+        sprintf(buffer, "%02d.%02d.%04d", day(), month(), year());
+    }
+
     // Funktion zur Formatierung eines Unix-Zeitstempels als Zeichenkette im Format DD.MM.YYYY HH:MM:SS
     void get_formatted_time(time_t unix_time, char *buffer)
     {
         sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d", day(unix_time), month(unix_time), year(unix_time), hour(unix_time), minute(unix_time), second(unix_time));
+    }
+
+    void get_current_weekday(char *buffer)
+    {
+        uint8_t number_weekday = weekday();
+        char weekdays[7][4] = {"Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa.", "So."};
+        strcpy(buffer, weekdays[number_weekday]);
     }
 
     int compare(const void *s1, const void *s2)
@@ -244,7 +262,7 @@ namespace Time
 
     void get_upcoming_exceptions(char exception_start[6], char exception_end[6])
     {
-        //TODO
+        // TODO
     }
 
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting)

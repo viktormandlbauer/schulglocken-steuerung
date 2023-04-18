@@ -964,58 +964,24 @@ namespace GUI
         tft.println(alarm_strings[2]);
     }
 
-    void draw_datetime(uint8_t weekday, char date[11], char time[6])
+    void draw_datetime(char *date, char *time, char *day)
     {
-        char *day = "Err";
-        switch (weekday)
-        {
-        case 1:
-            day = "Mo.";
-            break;
-        case 2:
-            day = "Di.";
-            break;
-        case 3:
-            day = "Mi.";
-            break;
-
-        case 4:
-            day = "Do.";
-            break;
-
-        case 5:
-            day = "Fr.";
-            break;
-
-        case 6:
-            day = "Sa.";
-            break;
-
-        case 7:
-            day = "So.";
-            break;
-
-        default:
-            day = "Err";
-            break;
-        }
 
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
         tft.setTextSize(4);
 
         tft.print(day);
-        tft.print(" ");
         tft.println(date);
         tft.println(time);
     }
 
-    void default_menu(char date[11], uint8_t weekday, char time[6], char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status)
+    void default_menu(char *date, char *time, char *day, char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
 
-        draw_datetime(weekday, date, time);
+        draw_datetime(date, time, day);
 
         draw_upcoming_alarms(alarms);
         draw_upcoming_exception(exception_start, exception_end);
