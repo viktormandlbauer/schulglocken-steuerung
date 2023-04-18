@@ -38,6 +38,9 @@ namespace Time
 
     uint8_t remove_alarm_at_index(Alarm alarms[], uint8_t alarm_count, uint8_t index);
 
+    void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting);
+    
+    void get_upcoming_exceptions(char exception_start[6], char exception_end[6]);
     void get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6]);
 
     void init_alarm_interrupt();

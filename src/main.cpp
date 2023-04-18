@@ -17,6 +17,15 @@ static uint8_t alarm_count = 0;
 
 uint8_t ip[4], gw[4], dns[4], prefix;
 
+char alarm_string[64][6];
+int navigation = GUI_INIT;
+int last_navigation = !navigation;
+int selection;
+bool refresh;
+
+char time_string[9];
+char buffer[20];
+char compare_time_string[9];
 void network_manager()
 {
     uint8_t NetworkSetup = Network::NetworkStatus;
@@ -54,68 +63,13 @@ void network_manager()
     }
 }
 
-void setup()
-{
-    Serial.begin(9600);
-
-    pinMode(LED_SIGNAL, OUTPUT);
-    pinMode(RELAIS, OUTPUT);
-    pinMode(AUDIO_SIGNAL, OUTPUT);
-
-    digitalWrite(LED_SIGNAL, HIGH);
-
-    GUI::init_display();
-#ifdef DEBUG
-    Serial.println(F("[Info] (Main) Display wurde aktiviert."));
-#endif
-
-    Time::init_rtc_module();
-#ifdef DEBUG
-    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
-#endif
-
-    if (Storage::read_network_dhcp())
-    {
-        Network::NetworkStatus = ETHERNET_DHCP_INIT;
-    }
-    else
-    {
-        Network::NetworkStatus = ETHERNET_STATIC_INIT;
-    }
-    network_manager();
-
-    alarm_count = Storage::read_alarm_count();
-    for (uint8_t i = 0; i < alarm_count; i++)
-    {
-        Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
-    }
-
-    TimeSync::init_timesync(Storage::read_network_ntp());
-#ifdef DEBUG
-    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
-#endif
-
-    Time::init_alarm_interrupt();
-#ifdef DEBUG
-    Serial.println(F("[Info] (Main) Timerinterrupt wurde konfiguriert."));
-#endif
-    digitalWrite(LED_SIGNAL, LOW);
-}
-
-int navigation;
-int last_navigation;
-int selection;
-bool refresh;
-
-char time_string[9];
-char buffer[20];
-char compare_time_string[9];
-char alarm_string[64][6];
-
 void navigation_handler()
 {
     switch (navigation)
     {
+    case DEFAULT:
+        selection = GUI::check_default_menu();
+        break;
     case MENU:
     {
 
@@ -362,6 +316,13 @@ void refresh_handler()
 
     switch (navigation)
     {
+
+    case DEFAULT:
+
+        // TODO
+        Time::get_upcoming_alarm_strings(alarms, alarm_count, alarm_string, 3);
+        GUI::default_menu("01.01.2001", 1, "23:59", alarm_string, "01.01", "02.02", 0b11111111);
+        break;
     case MENU:
     {
         GUI::menu();
@@ -439,4 +400,54 @@ void loop()
     }
 
     Time::check_alarms(alarms, alarm_count);
+}
+
+void setup()
+{
+    Serial.begin(9600);
+
+    pinMode(LED_SIGNAL, OUTPUT);
+    pinMode(RELAIS, OUTPUT);
+    pinMode(AUDIO_SIGNAL, OUTPUT);
+
+    digitalWrite(LED_SIGNAL, HIGH);
+
+    GUI::init_display();
+#ifdef DEBUG
+    Serial.println(F("[Info] (Main) Display wurde aktiviert."));
+#endif
+
+    Time::init_rtc_module();
+#ifdef DEBUG
+    Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
+#endif
+
+    if (Storage::read_network_dhcp())
+    {
+        Network::NetworkStatus = ETHERNET_DHCP_INIT;
+    }
+    else
+    {
+        Network::NetworkStatus = ETHERNET_STATIC_INIT;
+    }
+    network_manager();
+
+    alarm_count = Storage::read_alarm_count();
+    for (uint8_t i = 0; i < alarm_count; i++)
+    {
+        Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
+    }
+
+    TimeSync::init_timesync(Storage::read_network_ntp());
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
+#endif
+
+    Time::init_alarm_interrupt();
+#ifdef DEBUG
+    Serial.println(F("[Info] (Main) Timerinterrupt wurde konfiguriert."));
+#endif
+    digitalWrite(LED_SIGNAL, LOW);
+
+    navigation_handler();
 }

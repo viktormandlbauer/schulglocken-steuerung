@@ -26,36 +26,9 @@ uint32_t position;
 bool finished = true;
 char time_internal_timestring[9];
 
-void get_timestring(int hour, int minute, char *buf)
+void get_alarmstring(int hour, int minute, char buf[6])
 {
-    /**
-     * Formatierung "HH:MM" Format
-     */
-
-    if (hour < 10)
-    {
-        buf[0] = '0';
-        buf[1] = hour + '0';
-    }
-    else
-    {
-        buf[0] = (char)hour / 10 + '0';
-        buf[1] = hour % 10 + '0';
-    }
-
-    // Konvertierung der Minute
-    buf[2] = ':';
-    if (minute < 10)
-    {
-        buf[3] = '0';
-        buf[4] = minute + '0';
-    }
-    else
-    {
-        buf[3] = (char)minute / 10 + '0';
-        buf[4] = minute % 10 + '0';
-    }
-    buf[5] = '\0';
+    sprintf(buf, "%02d:%02d", hour, minute);
 }
 
 // Interne Funtkion für die Konvertierung von Stunden und Minuten in vergehende Minuten von 00:00:00 weg
@@ -185,7 +158,7 @@ namespace Time
 
     void get_alarm_string(uint16_t alarm, char output[6])
     {
-        get_timestring(alarm / 60, alarm % 60, output);
+        get_alarmstring(alarm / 60, alarm % 60, output);
     }
 
     void sort_alarms(Alarm alarms[], uint8_t alarm_count)
@@ -255,7 +228,7 @@ namespace Time
         // Füllt ein zweidimensionales character array mit den formatierten Alarmzeiten und gibt die Anzahl der Alarme zurück.
         for (int i = 0; i < alarm_count; i++)
         {
-            get_timestring(alarms[i].minutes / 60, alarms[i].minutes % 60, output[i]);
+            get_alarmstring(alarms[i].minutes / 60, alarms[i].minutes % 60, output[i]);
         }
     }
 
@@ -267,6 +240,25 @@ namespace Time
     {
         // Gibt die Minuten nach 00:00 als Ganzzahl zurück
         return convert_time_to_alarm(hour(), minute());
+    }
+
+    void get_upcoming_exceptions(char exception_start[6], char exception_end[6])
+    {
+        //TODO
+    }
+
+    void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting)
+    {
+        uint16_t minutes_passed = get_minutes_passed();
+        uint8_t found = 0;
+        for (uint8_t i = 0; (i < alarm_count) && (found < wanting); i++)
+        {
+            if (minutes_passed < alarms[i].minutes)
+            {
+                get_alarmstring(alarms[i].minutes / 60, alarms[i].minutes % 60, output[found]);
+                found += 1;
+            }
+        }
     }
 
     // Allgemeine Überprüfung eines Alarms

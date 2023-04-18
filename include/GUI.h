@@ -11,7 +11,6 @@
 #define CS_PIN 4
 #define TIRQ_PIN 3
 
-
 namespace GUI
 {
     void init_display();
@@ -46,4 +45,7 @@ namespace GUI
 
     void exception_menu();
     uint8_t check_exception_menu();
+
+    void default_menu(char date[11], uint8_t weekday, char time[6], char alarms[3][6], char exception_start[7], char exception_end[7], uint8_t status);
+    uint8_t check_default_menu();
 }
