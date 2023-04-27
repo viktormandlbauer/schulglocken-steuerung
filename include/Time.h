@@ -18,14 +18,17 @@ namespace Time
         uint8_t type;
     };
 
+    struct AlarmException
+    {
+        uint8_t BeginDay, BeginMonth, EndDay, EndMonth;
+        bool reoccurring;
+    };
+
     bool init_rtc_module(void);
 
     byte dstOffset(byte d, byte m, unsigned int y, byte h);
     time_t get_corrected_utctime(time_t t);
 
-
-    
-    
     void get_formatted_time(time_t unix_time, char *buffer);
     void get_formatted_datetime(char *buffer);
 
@@ -33,7 +36,7 @@ namespace Time
     bool get_current_timestring(char time_string[9]);
     void get_current_datetime(char buffer[20]);
     void get_current_weekday(char buffer[4]);
-    
+
     void set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
     void timestring_to_timearray(char *time, uint8_t datetime_array[3]);
 
@@ -48,7 +51,7 @@ namespace Time
     uint8_t remove_alarm_at_index(Alarm alarms[], uint8_t alarm_count, uint8_t index);
 
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting);
-    
+
     void get_upcoming_exceptions(char exception_start[6], char exception_end[6]);
     void get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6]);
 

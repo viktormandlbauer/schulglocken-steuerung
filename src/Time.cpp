@@ -262,7 +262,7 @@ namespace Time
 
     void get_upcoming_exceptions(char exception_start[6], char exception_end[6])
     {
-        // TODO
+        // TODO: Upcoming exceptios auslesen
     }
 
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting)

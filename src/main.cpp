@@ -19,7 +19,7 @@ uint8_t ip[4], gw[4], dns[4], prefix;
 
 char alarm_string[64][6];
 int navigation = GUI_INIT;
-int last_navigation = !navigation;
+int last_navigation = GUI_INIT;
 int selection;
 bool refresh;
 
@@ -71,8 +71,8 @@ void navigation_handler()
 {
     switch (navigation)
     {
-    case DEFAULT:
-        selection = GUI::check_default_menu();
+    case STANDARD:
+        navigation = GUI::check_default_menu();
         break;
     case MENU:
     {
@@ -132,7 +132,6 @@ void navigation_handler()
     }
     case TIME_SETTING:
     {
-
         navigation = GUI::check_time_setting(time_string);
 
         if (navigation == BUTTON_ACCEPT)
@@ -147,6 +146,37 @@ void navigation_handler()
     case SYSTEM:
     {
         navigation = GUI::check_exception_menu();
+        if (navigation == BUTTON_BACK)
+        {
+            navigation = MENU;
+        }
+        break;
+    }
+    case SHOW_EXCEPTIONS:
+    {
+        navigation = GUI::check_show_exception();
+        if (navigation == BUTTON_BACK)
+        {
+            navigation = SYSTEM;
+        }
+        break;
+    }
+    case ADD_EXCEPTION:
+    {
+        navigation = GUI::check_add_exception();
+        if (navigation == BUTTON_BACK)
+        {
+            navigation = SYSTEM;
+        }
+        break;
+    }
+    case REMOVE_EXCEPTION:
+    {
+        navigation = GUI::check_remove_exception();
+        if (navigation == BUTTON_BACK)
+        {
+            navigation = SYSTEM;
+        }
         break;
     }
     case NETWORK_MENU:
@@ -315,20 +345,18 @@ void refresh_handler()
 {
     refresh = false;
 #ifdef DEBUG
-    Serial.println(F("[Info] (Main) Refresh Handler"));
+    Serial.print(F("[Info] (Main) Refresh Handler for navigation: "));
+    Serial.println(navigation);
 #endif
-
     switch (navigation)
     {
-
-    case DEFAULT:
-
+    case STANDARD:
         Time::get_current_timestring(time_string);
         Time::get_current_date(date_string);
         Time::get_current_weekday(day_string);
         Time::get_upcoming_alarm_strings(alarms, alarm_count, alarm_string, 3);
         // TODO Upcomfing Exceptions
-        
+
         GUI::default_menu(date_string, time_string, day_string, alarm_string, "01.01", "02.02", 0b11111111);
         break;
     case MENU:
@@ -348,13 +376,28 @@ void refresh_handler()
         if (Time::get_current_timestring(time_string))
         {
             GUI::time(time_string);
-            refresh = true;
         }
+        refresh = true;
         break;
     }
     case SYSTEM:
     {
         GUI::exception_menu();
+        break;
+    }
+    case SHOW_EXCEPTIONS:
+    {
+        GUI::show_exception();
+        break;
+    }
+    case ADD_EXCEPTION:
+    {
+        GUI::add_exception();
+        break;
+    }
+    case REMOVE_EXCEPTION:
+    {
+        GUI::remove_exception();
         break;
     }
     case TIME_SETTING:
@@ -457,5 +500,6 @@ void setup()
 #endif
     digitalWrite(LED_SIGNAL, LOW);
 
-    navigation_handler();
+    // Zeichnen von initialen Menü
+    refresh_handler();
 }

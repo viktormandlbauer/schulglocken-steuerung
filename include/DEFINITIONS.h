@@ -47,7 +47,7 @@
 // Synchronisierungsintervall Systemzeit mit RTC in Sekunden
 #define SYNC_INTERVAL_RTC 600
 
-// NTP Synchronisation nach x RTC Synchronisation
+// NTP Synchronisation nach x RTC-Synchronisationen
 #define SYNC_WITH_NTP 60
 
 /**
@@ -81,7 +81,10 @@
 #define NETWORK_DHCP 11
 #define NETWORK_RETRY 12
 #define NETWORK_HTTP 13
-#define DEFAULT 100
+#define SHOW_EXCEPTIONS 14
+#define ADD_EXCEPTION 15
+#define REMOVE_EXCEPTION 16
+#define STANDARD 100
 #define NETWORK_NTP_SWITCH 245
 #define NETWORK_NTP_TEST 246
 #define NETWORK_DHCP_SWITCH 245
@@ -95,7 +98,7 @@
 #define BUTTON_LEFT 253
 #define BUTTON_DELETE 254
 #define BUTTON_ACCEPT 255
-#define GUI_INIT DEFAULT
+#define GUI_INIT STANDARD
 
 // Network Status Code
 #define ETHERNET_INITIALIZED_FAILED 255

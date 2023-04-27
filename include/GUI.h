@@ -46,6 +46,16 @@ namespace GUI
     void exception_menu();
     uint8_t check_exception_menu();
 
+    void show_exception();
+    uint8_t check_show_exception();
+
+    void add_exception();
+    uint8_t check_add_exception();
+
+    void remove_exception();
+    uint8_t check_remove_exception();
+
+
     void default_menu(char date[11], char time[9], char day[4], char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status);
     uint8_t check_default_menu();
 }

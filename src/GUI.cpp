@@ -48,7 +48,6 @@ namespace GUI
         button_network.drawButton(true);
     }
 
-    bool menu_drawn = false;
     void init_display()
     {
         SPI.begin();
@@ -57,6 +56,19 @@ namespace GUI
 
         ts.begin();
         ts.setRotation(1);
+    }
+
+    Adafruit_GFX_Button button_main;
+#define PADDING_X 10
+#define PADDING_Y 10
+    void draw_menu_button(uint16_t pos_x, uint16_t pos_y, uint8_t width, uint8_t height)
+    {
+        button_main.initButton(&tft, pos_x, pos_y, width, height,
+                               COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 0);
+        button_main.drawButton(true);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.5, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.25, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
     }
 
     Adafruit_GFX_Button button_back;
@@ -426,11 +438,17 @@ namespace GUI
 
     void menu()
     {
-        if (!menu_drawn)
-        {
-            draw_menu();
-            menu_drawn = true;
-        }
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+
+        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
+        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
+        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"System", 3);
+        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
+
+        button_plan.drawButton(true);
+        button_time.drawButton(true);
+        button_sys.drawButton(true);
+        button_network.drawButton(true);
     }
 
     uint8_t check_menu()
@@ -446,7 +464,6 @@ namespace GUI
             Serial.println("[Info] (GUI) Timeplan pressed");
 #endif
             button_plan.drawButton(false);
-            menu_drawn = false;
             return TIMEPLAN;
         }
         else if (check_button_pressed(button_time))
@@ -455,7 +472,6 @@ namespace GUI
             Serial.println("[Info] (GUI) Time pressed");
 #endif
             button_time.drawButton(false);
-            menu_drawn = false;
             return TIME;
         }
         else if (check_button_pressed(button_sys))
@@ -464,7 +480,6 @@ namespace GUI
             Serial.println("[Info] (GUI) Sytem pressed");
 #endif
             button_sys.drawButton(false);
-            menu_drawn = false;
             return SYSTEM;
         }
         else if (check_button_pressed(button_network))
@@ -473,7 +488,6 @@ namespace GUI
             Serial.println("[Info] (GUI) Network pressed");
 #endif
             button_network.drawButton(false);
-            menu_drawn = false;
             return NETWORK_MENU;
         }
 
@@ -869,6 +883,7 @@ namespace GUI
 
     uint8_t check_network_ip()
     {
+        // TODO Einstellungen einer statischen IP per GUI
         if (check_button_pressed(button_back))
         {
             return NETWORK_MENU;
@@ -884,46 +899,112 @@ namespace GUI
         return NETWORK_DHCP;
     }
 
+    void show_exception()
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+        tft.setTextSize(4);
+        tft.print("Ausnahmen anzeigen");
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+
+        // TODO Anzeigen der Ausnahmen
+    }
+
+    uint8_t check_show_exception()
+    {
+        if (check_button_pressed(button_back))
+        {
+            return BUTTON_BACK;
+        }
+        return SHOW_EXCEPTIONS;
+    }
+
+    void add_exception()
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+        tft.setTextSize(4);
+        tft.print("Ausnahme erstellen");
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.3);
+        tft.print("Start Datum: ");
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.5);
+        tft.print("End Datum: ");
+
+        draw_numeric_keyboard();
+    }
+
+    uint8_t check_add_exception()
+    {
+        // TODO Hinzufügen von Ausnahmen
+        return ADD_EXCEPTION;
+    }
+
+    void remove_exception()
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+        tft.setTextSize(4);
+        tft.print("Ausnahme entfernen");
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+    }
+
+    uint8_t check_remove_exception()
+    {
+
+        // TODO Löschen von Ausnahmen aus der Liste
+        return REMOVE_EXCEPTION;
+    }
+
+    Adafruit_GFX_Button button_show_exceptions, button_add_exception, button_remove_exception;
     void exception_menu()
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
         tft.setTextSize(4);
-        tft.print("Ausnahmen");
-    }
-    uint8_t check_exception_menu()
-    {
+        tft.print("Datumsausnahme");
+
+        button_show_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 3, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
+        button_add_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 5, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Erstellen", 3);
+        button_remove_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Entfernen", 3);
+
+        button_show_exceptions.drawButton();
+        button_add_exception.drawButton();
+        button_remove_exception.drawButton();
+
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
     }
 
-    bool released = true;
-    bool display_action()
+    uint8_t check_exception_menu()
     {
-        if (ts.tirqTouched())
+        if (check_button_pressed(button_show_exceptions))
         {
-            if (ts.touched())
-            {
-                if (released)
-                {
-#ifdef DEBUG
-                    Serial.println(F("[Info] (GUI) Display Action"));
-#endif
-                    p = Waveshield.getPoint();
-                    Waveshield.normalizeTsPoint(p);
-                    released = false;
-                    return true;
-                }
-            }
+            return SHOW_EXCEPTIONS;
         }
-        else
+        else if (check_button_pressed(button_remove_exception))
         {
-            released = true;
+            return REMOVE_EXCEPTION;
         }
-        return false;
+        else if (check_button_pressed(button_add_exception))
+        {
+            return ADD_EXCEPTION;
+        }
+        else if (check_button_pressed(button_back))
+        {
+            return BUTTON_BACK;
+        }
+        return SYSTEM;
     }
 
     void draw_status(uint8_t status)
     {
+        // TODO Auswertung der Zustände am Default Screen
+
         // Tagesausnahme aktiv
         if (status & (0b1 << 0))
         {
@@ -979,7 +1060,7 @@ namespace GUI
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        draw_menu_button(X_DIM * 0.9, Y_DIM * 0.9, 100, 80);
 
         draw_datetime(date, time, day);
 
@@ -990,5 +1071,38 @@ namespace GUI
 
     uint8_t check_default_menu()
     {
+        if (check_button_pressed(button_main))
+        {
+            return MENU;
+        }
+
+        return STANDARD;
     }
+
+    bool released = true;
+    bool display_action()
+    {
+        if (ts.tirqTouched())
+        {
+            if (ts.touched())
+            {
+                if (released)
+                {
+#ifdef DEBUG
+                    Serial.println(F("[Info] (GUI) Display Action"));
+#endif
+                    p = Waveshield.getPoint();
+                    Waveshield.normalizeTsPoint(p);
+                    released = false;
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            released = true;
+        }
+        return false;
+    }
+
 }
