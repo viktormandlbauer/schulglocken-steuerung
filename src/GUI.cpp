@@ -199,7 +199,7 @@ namespace GUI
 
     Adafruit_GFX_Button buttons_keys[12], button_left, button_right, button_accept, button_delete;
 
-    void draw_numeric_keyboard()
+    void draw_numeric_keyboard(bool enable_delete_button)
     {
         buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"0", 4);
         buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"1", 4);
@@ -215,7 +215,6 @@ namespace GUI
         button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"<", 3);
         button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)">", 3);
         button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Sichern", 3);
-        button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Entfernen", 2);
 
         buttons_keys[0].drawButton(true);
         buttons_keys[1].drawButton(true);
@@ -231,7 +230,12 @@ namespace GUI
         button_right.drawButton(true);
         button_left.drawButton(true);
         button_accept.drawButton(true);
-        button_delete.drawButton(true);
+
+        if (enable_delete_button)
+        {
+            button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Entfernen", 2);
+            button_delete.drawButton(true);
+        }
     }
 
     uint8_t check_numeric_keyboard()
@@ -349,7 +353,7 @@ namespace GUI
 
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
         draw_time(alarm_setting, 5);
-        draw_numeric_keyboard();
+        draw_numeric_keyboard(true);
     }
 
     uint16_t text_to_time(char *alarm_string)
@@ -580,7 +584,7 @@ namespace GUI
     void time_setting(char *time_string)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        draw_numeric_keyboard();
+        draw_numeric_keyboard(true);
         draw_time(time_string, 8);
     }
 
@@ -920,6 +924,34 @@ namespace GUI
         return SHOW_EXCEPTIONS;
     }
 
+    void draw_add_exception(char exception_start[6], char exception_end[6])
+    {
+        for (uint8_t i = 0; i < 5; i++)
+        {
+            if (i == string_position)
+            {
+                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], COLOR_BLACK, COLOR_WHITE, 5);
+            }
+            else
+            {
+                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            }
+
+            if (i + 5 == string_position)
+            {
+                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], COLOR_BLACK, COLOR_WHITE, 5);
+            }
+            else
+            {
+                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            }
+        }
+        tft.drawChar(0.2 * X_DIM + 30 * 5, Y_DIM * 0.4, '-', COLOR_BLACK, COLOR_BACKGROUND, 5);
+    }
+
+    char exception_start_string[6];
+    char exception_end_string[6];
+
     void add_exception()
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
@@ -927,20 +959,148 @@ namespace GUI
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
         tft.setTextSize(4);
         tft.print("Ausnahme erstellen");
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.1, 80, 60);
+        draw_numeric_keyboard(false);
 
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.3);
-        tft.print("Start Datum: ");
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.5);
-        tft.print("End Datum: ");
+        strncpy(exception_start_string, "01.01", 6);
+        strncpy(exception_end_string, "02.01", 6);
 
-        draw_numeric_keyboard();
+        draw_add_exception(exception_start_string, exception_end_string);
+    }
+
+    bool is_valid_date(char *date_str)
+    {
+        int day, month;
+
+        // Convert the day and month strings to integers
+        day = atoi(date_str);
+        month = atoi(date_str + 3);
+
+        // Check that the day is between 1 and 31
+        if (day < 1 || day > 31)
+        {
+            return false;
+        }
+
+        // Check that the month is between 1 and 12
+        if (month < 1 || month > 12)
+        {
+            return false;
+        }
+
+        // Check that the day is valid for the given month
+        switch (month)
+        {
+        case 2:
+            if (day > 29)
+            {
+                return false;
+            }
+            break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (day > 30)
+            {
+                return false;
+            }
+            break;
+        default:
+            break;
+        }
+
+        // If all checks pass, the date is valid
+        return true;
     }
 
     uint8_t check_add_exception()
     {
-        // TODO Hinzufügen von Ausnahmen
-        return ADD_EXCEPTION;
+        uint8_t input = check_numeric_keyboard();
+        if (input < 10)
+        {
+
+            char buffer1[6];
+            char buffer2[6];
+
+            strncpy(buffer1, exception_start_string, 6);
+            strncpy(buffer2, exception_end_string, 6);
+
+            if (string_position < 5)
+            {
+                exception_start_string[string_position] = input + '0';
+            }
+            else
+            {
+                exception_end_string[string_position - 5] = input + '0';
+            }
+
+            if (is_valid_date(exception_start_string) && is_valid_date(exception_end_string))
+            {
+                draw_add_exception(exception_start_string, exception_end_string);
+                return ADD_EXCEPTION;
+            }
+            else
+            {
+                strncpy(exception_start_string, buffer1, 6);
+                strncpy(exception_end_string, buffer2, 6);
+#ifdef DEBUG
+                Serial.println("[Error] (GUI) Invalid input");
+#endif
+                return ADD_EXCEPTION;
+            }
+        }
+
+        switch (input)
+        {
+        case BUTTON_RIGH:
+            Serial.println(string_position);
+            if (string_position == 1)
+            {
+                string_position += 2;
+            }
+            else if (string_position == 6)
+            {
+                string_position += 2;
+            }
+            else if (string_position == 9)
+            {
+                return ADD_EXCEPTION;
+            }
+            else
+            {
+                string_position += 1;
+            }
+            draw_add_exception(exception_start_string, exception_end_string);
+            return ADD_EXCEPTION;
+            break;
+
+        case BUTTON_LEFT:
+            if (string_position == 3)
+            {
+                string_position -= 2;
+            }
+            else if (string_position == 8)
+            {
+                string_position -= 2;
+            }
+            else if (string_position == 0)
+            {
+                return ADD_EXCEPTION;
+            }
+            else
+            {
+                string_position -= 1;
+            }
+            draw_add_exception(exception_start_string, exception_end_string);
+            return ADD_EXCEPTION;
+            break;
+        case BUTTON_ACCEPT:
+            return BUTTON_ACCEPT;
+        default:
+            return ADD_EXCEPTION;
+            break;
+        }
     }
 
     void remove_exception()
@@ -1104,5 +1264,4 @@ namespace GUI
         }
         return false;
     }
-
 }

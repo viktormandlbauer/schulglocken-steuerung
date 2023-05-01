@@ -472,7 +472,7 @@ void setup()
 #ifdef DEBUG
     Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
 #endif
-
+    // TODO
     if (Storage::read_network_dhcp())
     {
         Network::NetworkStatus = ETHERNET_DHCP_INIT;
