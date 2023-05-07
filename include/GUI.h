@@ -46,11 +46,11 @@ namespace GUI
     void exception_menu();
     uint8_t check_exception_menu();
 
-    void show_exception();
+    void show_exception(char alarm_exceptions[][13], uint8_t alarm_exception_count);
     uint8_t check_show_exception();
 
-    void add_exception();
-    uint8_t check_add_exception();
+    void add_exception(char exception_start_string[6], char exception_end_string[6]);
+    uint8_t check_add_exception(char exception_start_string[6], char exception_end_string[6], bool *reoccurring);
 
     void remove_exception();
     uint8_t check_remove_exception();

@@ -903,16 +903,21 @@ namespace GUI
         return NETWORK_DHCP;
     }
 
-    void show_exception()
+    void show_exception(char alarm_exceptions[][13], uint8_t alarm_exception_count)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
         tft.setTextSize(4);
-        tft.print("Ausnahmen anzeigen");
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        tft.println("Ausnahmen anzeigen");
 
-        // TODO Anzeigen der Ausnahmen
+        Serial.println(alarm_exception_count);
+        for (uint8_t i = 0; i < alarm_exception_count; i++)
+        {
+            tft.println(alarm_exceptions[i]);
+        }
+
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
     }
 
     uint8_t check_show_exception()
@@ -949,16 +954,15 @@ namespace GUI
         tft.drawChar(0.2 * X_DIM + 30 * 5, Y_DIM * 0.4, '-', COLOR_BLACK, COLOR_BACKGROUND, 5);
     }
 
-    char exception_start_string[6];
-    char exception_end_string[6];
+    Adafruit_GFX_Button button_exception_mode;
+#define REOCCURING_BUTTON_POS_X X_DIM * 0.7
+#define REOCCURING_BUTTON_POS_Y Y_DIM * 0.1
+#define REOCCURING_BUTTON_WIDTH_Y 250
+#define REOCCURING_BUTTON_HEIGHT_Y Y_DIM / 6
 
-    void add_exception()
+    void add_exception(char exception_start_string[6], char exception_end_string[6])
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
-        tft.setTextSize(4);
-        tft.print("Ausnahme erstellen");
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.1, 80, 60);
         draw_numeric_keyboard(false);
 
@@ -966,6 +970,9 @@ namespace GUI
         strncpy(exception_end_string, "02.01", 6);
 
         draw_add_exception(exception_start_string, exception_end_string);
+
+        button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, RED, (char *)"Wdh.", 2);
+        button_exception_mode.drawButton(true);
     }
 
     bool is_valid_date(char *date_str)
@@ -1014,7 +1021,7 @@ namespace GUI
         return true;
     }
 
-    uint8_t check_add_exception()
+    uint8_t check_add_exception(char exception_start_string[6], char exception_end_string[6], bool *reoccurring)
     {
         uint8_t input = check_numeric_keyboard();
         if (input < 10)
@@ -1050,7 +1057,23 @@ namespace GUI
                 return ADD_EXCEPTION;
             }
         }
-
+        else
+        {
+            if (check_button_pressed(button_exception_mode))
+            {
+                if (*reoccurring)
+                {
+                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, RED, (char *)"Wdh.", 2);
+                    button_exception_mode.drawButton(true);
+                }
+                else
+                {
+                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, GREEN, (char *)"Wdh.", 2);
+                    button_exception_mode.drawButton(true);
+                }
+                *reoccurring = !*reoccurring;
+            }
+        }
         switch (input)
         {
         case BUTTON_RIGH:

@@ -15,7 +15,7 @@
 #define MAXIMUM_AMOUNT_ALARM_TYPES 3
 
 // Maximale Anzahl an Ausnahmen
-#define MAXIMUM_AMOUNT_DAY_EXCEPTIONS 20
+#define MAXIMUM_AMOUNT_EXCEPTIONS 20
 
 // MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};

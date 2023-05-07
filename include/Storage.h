@@ -28,4 +28,9 @@ namespace Storage
 
     void save_network_ntp(bool isEnabled);
     bool read_network_ntp();
+
+    uint8_t read_exception_count();
+    void save_exception_count(uint8_t exception_count);
+    void save_exception(uint8_t BeginDay, uint8_t BeginMonth, uint8_t EndDay, uint8_t EndMonth, bool reoccurring, uint8_t index);
+    void read_exception(uint8_t *BeginDay, uint8_t *BeginMonth, uint8_t *EndDay, uint8_t *EndMonth, bool *reoccurring, uint8_t index);
 }

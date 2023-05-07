@@ -11,12 +11,6 @@ static uint64_t triggered;
 // Anzahl der Ausnahmen
 uint8_t exception_count;
 
-// Array mit 16 Bit Werten für Ausnahme Beginn-Tag
-uint16_t exception_date_begin[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
-
-// Aray mit 16 Bit Werten für Ausnahme End-Tag
-uint16_t exception_date_end[MAXIMUM_AMOUNT_DAY_EXCEPTIONS];
-
 // Funktionen zur Überprüfung des Status eines Alarms
 bool is_triggered(uint8_t index) { return triggered & (0b1 << index); }
 void set_triggered(uint8_t index) { triggered |= 0b1 << index; }
@@ -260,9 +254,31 @@ namespace Time
         return convert_time_to_alarm(hour(), minute());
     }
 
-    void get_upcoming_exceptions(char exception_start[6], char exception_end[6])
+    void alarm_exception_to_string(AlarmException alarm_exception, char buffer[13]){
+
+        sprintf(buffer, "%02d.%02d-%02d.%02d", alarm_exception.BeginDay, alarm_exception.BeginMonth, alarm_exception.EndDay, alarm_exception.EndMonth);
+    }
+
+    void get_alarm_exceptions(AlarmException *alarm_exceptions, uint8_t alarm_exception_count, char buffer[][13], bool *reoccurring_exception)
     {
-        // TODO: Upcoming exceptios auslesen
+        for(uint8_t i = 0; i < alarm_exception_count; i++){
+            alarm_exception_to_string(alarm_exceptions[i], buffer[i]);
+            *reoccurring_exception = alarm_exceptions->reoccurring;
+        }
+    }
+
+    AlarmException parse_to_alarm_exception(char exception_start[6], char exception_end[6], bool reoccurring){
+        AlarmException alarm_exception;
+        sscanf(exception_start, "%hhu.%hhu", &alarm_exception.BeginDay, &alarm_exception.BeginMonth);
+        sscanf(exception_end, "%hhu.%hhu", &alarm_exception.EndDay, &alarm_exception.EndMonth);
+        alarm_exception.reoccurring = reoccurring;
+        return alarm_exception;
+    }
+
+    uint8_t add_alarm_exception(AlarmException *alarm_exceptions, AlarmException alarm_exception, uint8_t alarm_exceptions_count)
+    {
+        alarm_exceptions[alarm_exceptions_count] = alarm_exception;
+        return alarm_exceptions_count + 1;
     }
 
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting)

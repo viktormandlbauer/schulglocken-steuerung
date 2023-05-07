@@ -5,9 +5,11 @@
 #define STORAGE_ALARMS_ASSIGNMENT_START MAXIMUM_AMOUNT_ALARMS * 2 + 1
 #define STORAGE_ALARM_TYPES_START STORAGE_ALARMS_ASSIGNMENT_START + MAXIMUM_AMOUNT_ALARMS * 1 + 1
 #define STORAGE_NETWORK_CONFIG_START STORAGE_ALARM_TYPES_START + MAXIMUM_AMOUNT_ALARM_TYPES * 8 + 1
-#define STORAGE_NETWORK_DHCP_ENABLED STORAGE_NETWORK_CONFIG_START + 36 + 1  + 300
+#define STORAGE_NETWORK_DHCP_ENABLED STORAGE_NETWORK_CONFIG_START + 36 + 1 + 300
 #define STORAGE_NETWORK_NTP_ENABlED STORAGE_NETWORK_DHCP_ENABLED + 1
-#define NEXT STORAGE_NETWORK_NTP_ENABlED + 1
+#define STORAGE_ALARM_EXCEPTIONS_COUNT STORAGE_NETWORK_NTP_ENABlED + 1
+#define STORAGE_ALARM_EXCEPTIONS STORAGE_ALARM_EXCEPTIONS_COUNT + 1
+#define NEXT STORAGE_ALARM_EXCEPTIONS + MAXIMUM_AMOUNT_ALARM_TYPES * 8 * 5 * 20 + 1
 
 namespace Storage
 {
@@ -272,4 +274,43 @@ namespace Storage
 #endif
         return (bool)EEPROM.read(STORAGE_NETWORK_NTP_ENABlED);
     }
+
+    uint8_t read_exception_count()
+    {
+#ifdef DEBUG
+        uint8_t exception_count = EEPROM.read(STORAGE_ALARM_EXCEPTIONS_COUNT);
+        Serial.print(F("[Info] (Storage) Read NTP enabled: "));
+        Serial.println(exception_count);
+        return exception_count;
+#endif
+        return EEPROM.read(STORAGE_ALARM_EXCEPTIONS_COUNT);
+    }
+
+    void save_exception_count(uint8_t exception_count)
+    {
+#ifdef DEBUG
+        Serial.print(F("[Info] (Storage) Read exception count: "));
+        Serial.println(exception_count);
+#endif
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS_COUNT, exception_count);
+    }
+
+    void read_exception(uint8_t *BeginDay, uint8_t *BeginMonth, uint8_t *EndDay, uint8_t *EndMonth, bool *reoccurring, uint8_t index)
+    {
+        *BeginDay = EEPROM.read(STORAGE_ALARM_EXCEPTIONS + 5 * index);
+        *BeginMonth = EEPROM.read(STORAGE_ALARM_EXCEPTIONS + 5 * index + 1);
+        *EndDay = EEPROM.read(STORAGE_ALARM_EXCEPTIONS + 5 * index + 2);
+        *EndMonth = EEPROM.read(STORAGE_ALARM_EXCEPTIONS + 5 * index + 3 );
+        *reoccurring = (bool)EEPROM.read(STORAGE_ALARM_EXCEPTIONS + 5 * index + 4);
+    }
+
+    void save_exception(uint8_t BeginDay, uint8_t BeginMonth, uint8_t EndDay, uint8_t EndMonth, bool reoccurring, uint8_t index)
+    {
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index, BeginDay);
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index + 1, BeginMonth);
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index + 2, EndDay);
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index + 3, EndMonth);
+        EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index + 4, reoccurring);
+    }
+
 }

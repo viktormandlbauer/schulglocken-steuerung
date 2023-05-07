@@ -30,6 +30,12 @@ char day_string[4];
 char buffer[20];
 char compare_time_string[9];
 
+Time::AlarmException alarm_exceptions[MAXIMUM_AMOUNT_EXCEPTIONS];
+uint8_t alarm_exceptions_count = 0;
+char exception_start_string[6];
+char exception_end_string[6];
+bool reoccuring_exception;
+
 void network_manager()
 {
     uint8_t NetworkSetup = Network::NetworkStatus;
@@ -163,10 +169,22 @@ void navigation_handler()
     }
     case ADD_EXCEPTION:
     {
-        navigation = GUI::check_add_exception();
+        navigation = GUI::check_add_exception(exception_start_string, exception_end_string, &reoccuring_exception);
         if (navigation == BUTTON_BACK)
         {
             navigation = SYSTEM;
+        }
+        else if (navigation == BUTTON_ACCEPT)
+        {
+            alarm_exceptions_count = Time::add_alarm_exception(alarm_exceptions, Time::parse_to_alarm_exception(exception_start_string, exception_end_string, reoccuring_exception), alarm_exceptions_count);
+
+            for (uint8_t i = 0; i < alarm_exceptions_count; i++)
+            {
+                Storage::save_exception(alarm_exceptions[i].BeginDay, alarm_exceptions[i].BeginMonth, alarm_exceptions[i].EndDay, alarm_exceptions[i].EndMonth, alarm_exceptions[i].reoccurring, i);
+            }
+            Storage::save_exception_count(alarm_exceptions_count);
+
+            navigation = SHOW_EXCEPTIONS;
         }
         break;
     }
@@ -387,12 +405,16 @@ void refresh_handler()
     }
     case SHOW_EXCEPTIONS:
     {
-        GUI::show_exception();
+        char buffer[5][13];
+        bool reoccurring[5];
+        Time::get_alarm_exceptions(alarm_exceptions, alarm_exceptions_count, buffer, reoccurring);
+        GUI::show_exception(buffer, alarm_exceptions_count);
         break;
     }
     case ADD_EXCEPTION:
     {
-        GUI::add_exception();
+        reoccuring_exception = true;
+        GUI::add_exception(exception_start_string, exception_end_string);
         break;
     }
     case REMOVE_EXCEPTION:
@@ -487,6 +509,12 @@ void setup()
     for (uint8_t i = 0; i < alarm_count; i++)
     {
         Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
+    }
+
+    alarm_exceptions_count = Storage::read_exception_count();
+    for (uint8_t i = 0; i < alarm_exceptions_count; i++)
+    {
+        Storage::read_exception(&alarm_exceptions[i].BeginDay, &alarm_exceptions[i].BeginMonth, &alarm_exceptions[i].EndDay, &alarm_exceptions[i].EndMonth, &alarm_exceptions[i].reoccurring, i);
     }
 
     TimeSync::init_timesync(Storage::read_network_ntp());

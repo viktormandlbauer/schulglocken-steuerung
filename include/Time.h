@@ -52,6 +52,10 @@ namespace Time
 
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting);
 
+    uint8_t add_alarm_exception(AlarmException *alarm_exceptions, AlarmException alarm_exception, uint8_t alarm_exceptions_count);
+    AlarmException parse_to_alarm_exception(char exception_start[6], char exception_end[6], bool reoccurring);
+
+    void get_alarm_exceptions(AlarmException *alarm_exceptions, uint8_t alarm_exception_count, char buffer[][13], bool *reoccurring_exception);
     void get_upcoming_exceptions(char exception_start[6], char exception_end[6]);
     void get_alarms_strings(Alarm alarms[], uint8_t alarm_count, char output[][6]);
 
