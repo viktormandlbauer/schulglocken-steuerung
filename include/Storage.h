@@ -33,4 +33,7 @@ namespace Storage
     void save_exception_count(uint8_t exception_count);
     void save_exception(uint8_t BeginDay, uint8_t BeginMonth, uint8_t EndDay, uint8_t EndMonth, bool reoccurring, uint8_t index);
     void read_exception(uint8_t *BeginDay, uint8_t *BeginMonth, uint8_t *EndDay, uint8_t *EndMonth, bool *reoccurring, uint8_t index);
+    
+    void save_weekday_exceptions(uint8_t weekday_exception_list);
+    uint8_t read_weekday_exceptions();
 }

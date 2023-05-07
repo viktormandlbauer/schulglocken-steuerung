@@ -9,7 +9,8 @@
 #define STORAGE_NETWORK_NTP_ENABlED STORAGE_NETWORK_DHCP_ENABLED + 1
 #define STORAGE_ALARM_EXCEPTIONS_COUNT STORAGE_NETWORK_NTP_ENABlED + 1
 #define STORAGE_ALARM_EXCEPTIONS STORAGE_ALARM_EXCEPTIONS_COUNT + 1
-#define NEXT STORAGE_ALARM_EXCEPTIONS + MAXIMUM_AMOUNT_ALARM_TYPES * 8 * 5 * 20 + 1
+#define STORAGE_WEEKDAY_EXCEPTIONS STORAGE_ALARM_EXCEPTIONS + MAXIMUM_AMOUNT_ALARM_TYPES * 8 * 5 * 20 + 1
+#define NEXT STORAGE_WEEKDAY_EXCEPTIONS + 1
 
 namespace Storage
 {
@@ -279,7 +280,7 @@ namespace Storage
     {
 #ifdef DEBUG
         uint8_t exception_count = EEPROM.read(STORAGE_ALARM_EXCEPTIONS_COUNT);
-        Serial.print(F("[Info] (Storage) Read NTP enabled: "));
+        Serial.print(F("[Info] (Storage) Read exception count: "));
         Serial.println(exception_count);
         return exception_count;
 #endif
@@ -313,4 +314,11 @@ namespace Storage
         EEPROM.put(STORAGE_ALARM_EXCEPTIONS + 5 * index + 4, reoccurring);
     }
 
+    void save_weekday_exceptions(uint8_t weekday_exception_list){
+        EEPROM.put(STORAGE_WEEKDAY_EXCEPTIONS, weekday_exception_list);
+    }
+
+    uint8_t read_weekday_exceptions(){
+        return EEPROM.read(STORAGE_WEEKDAY_EXCEPTIONS);
+    }
 }

@@ -35,6 +35,7 @@ uint8_t alarm_exceptions_count = 0;
 char exception_start_string[6];
 char exception_end_string[6];
 bool reoccuring_exception;
+uint8_t weekday_exception_list;
 
 void network_manager()
 {
@@ -188,11 +189,12 @@ void navigation_handler()
         }
         break;
     }
-    case REMOVE_EXCEPTION:
+    case WEEKDAY_EXCEPTION:
     {
-        navigation = GUI::check_remove_exception();
+        navigation = GUI::check_weekdays_exceptions(&weekday_exception_list);
         if (navigation == BUTTON_BACK)
         {
+            Storage::save_weekday_exceptions(weekday_exception_list);
             navigation = SYSTEM;
         }
         break;
@@ -417,9 +419,9 @@ void refresh_handler()
         GUI::add_exception(exception_start_string, exception_end_string);
         break;
     }
-    case REMOVE_EXCEPTION:
+    case WEEKDAY_EXCEPTION:
     {
-        GUI::remove_exception();
+        GUI::weekdays_exceptions(weekday_exception_list);
         break;
     }
     case TIME_SETTING:
@@ -505,17 +507,31 @@ void setup()
     }
     network_manager();
 
+    // Alarme von EEPROM auslesen
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Reading alarms from EEPROM.");
+#endif
+
     alarm_count = Storage::read_alarm_count();
     for (uint8_t i = 0; i < alarm_count; i++)
     {
         Storage::read_alarm(&alarms[i].minutes, &alarms[i].type, i);
     }
 
+    // Alarmausnahmen von EEPROM auslesen
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Reading alarm exceptions from EEPROM.");
+#endif
     alarm_exceptions_count = Storage::read_exception_count();
     for (uint8_t i = 0; i < alarm_exceptions_count; i++)
     {
         Storage::read_exception(&alarm_exceptions[i].BeginDay, &alarm_exceptions[i].BeginMonth, &alarm_exceptions[i].EndDay, &alarm_exceptions[i].EndMonth, &alarm_exceptions[i].reoccurring, i);
     }
+
+ #ifdef DEBUG
+    Serial.println("[Info] (Main) Reading weekday exceptions from EEPROM.");
+#endif   // Wochentagausnahmen von EEPROM auslesen
+    weekday_exception_list = Storage::read_weekday_exceptions();
 
     TimeSync::init_timesync(Storage::read_network_ntp());
 #ifdef DEBUG

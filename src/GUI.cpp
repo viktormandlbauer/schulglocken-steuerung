@@ -1126,41 +1126,24 @@ namespace GUI
         }
     }
 
-    void remove_exception()
-    {
-        Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
-        tft.setTextSize(4);
-        tft.print("Ausnahme entfernen");
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-    }
-
-    uint8_t check_remove_exception()
-    {
-
-        // TODO Löschen von Ausnahmen aus der Liste
-        return REMOVE_EXCEPTION;
-    }
-
-    Adafruit_GFX_Button button_show_exceptions, button_add_exception, button_remove_exception;
+    Adafruit_GFX_Button button_show_exceptions, button_add_exception, button_weekday_exceptions;
     void exception_menu()
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
+        tft.setCursor(X_DIM * 0.3, Y_DIM * 0.1);
         tft.setTextSize(4);
-        tft.print("Datumsausnahme");
+        tft.print("Ausnahmen");
 
         button_show_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 3, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
         button_add_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 5, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Erstellen", 3);
-        button_remove_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Entfernen", 3);
+        button_weekday_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Woche", 3);
 
         button_show_exceptions.drawButton();
         button_add_exception.drawButton();
-        button_remove_exception.drawButton();
+        button_weekday_exceptions.drawButton();
 
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 80, 80);
     }
 
     uint8_t check_exception_menu()
@@ -1169,9 +1152,9 @@ namespace GUI
         {
             return SHOW_EXCEPTIONS;
         }
-        else if (check_button_pressed(button_remove_exception))
+        else if (check_button_pressed(button_weekday_exceptions))
         {
-            return REMOVE_EXCEPTION;
+            return WEEKDAY_EXCEPTION;
         }
         else if (check_button_pressed(button_add_exception))
         {
@@ -1250,6 +1233,212 @@ namespace GUI
         draw_upcoming_alarms(alarms);
         draw_upcoming_exception(exception_start, exception_end);
         draw_status(status);
+    }
+
+    Adafruit_GFX_Button button_weekday_monday, button_weekday_tuesday, button_weekday_wednesday, button_weekday_thursday, button_weekday_friday, button_weekday_saturday, button_weekday_sunday;
+#define BUTTON_MO_X X_DIM * 0
+#define BUTTON_DI_X X_DIM * .2
+#define BUTTON_MI_X X_DIM * .4
+#define BUTTON_DO_X X_DIM * .6
+#define BUTTON_FR_X X_DIM * .8
+#define BUTTON_SA_X X_DIM * .2
+#define BUTTON_SO_X X_DIM * .6
+#define BUTTON_WEEKDAYS_Y Y_DIM * 0.3
+#define BUTTON_WEEKEND_Y Y_DIM * 0.6
+
+    void weekdays_exceptions(uint8_t weekday_exception_list)
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
+        tft.setTextSize(4);
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 80, 80);
+
+        // Montag
+        if (0b00000001 & weekday_exception_list)
+        {
+            button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MO", 3);
+        }
+        else
+        {
+            button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MO", 3);
+        }
+
+        // Dienstag
+        if (0b00000010 & weekday_exception_list)
+        {
+            button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DI", 3);
+        }
+        else
+        {
+            button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DI", 3);
+        }
+
+        // Mittwoch
+        if (0b00000100 & weekday_exception_list)
+        {
+            button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MI", 3);
+        }
+        else
+        {
+            button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MI", 3);
+        }
+
+        // Donnerstag
+        if (0b00001000 & weekday_exception_list)
+        {
+            button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DO", 3);
+        }
+        else
+        {
+            button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DO", 3);
+        }
+
+        // Freitag
+        if (0b00010000 & weekday_exception_list)
+        {
+            button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"FR", 3);
+        }
+        else
+        {
+            button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"FR", 3);
+        }
+
+        // Samstag
+        if (0b00100000 & weekday_exception_list)
+        {
+            button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SA", 3);
+        }
+        else
+        {
+            button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SA", 3);
+        }
+
+        // Sonntag
+        if (0b01000000 & weekday_exception_list)
+        {
+            button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SO", 3);
+        }
+        else
+        {
+            button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SO", 3);
+        }
+
+        button_weekday_monday.drawButton();
+        button_weekday_tuesday.drawButton();
+        button_weekday_wednesday.drawButton();
+        button_weekday_thursday.drawButton();
+        button_weekday_friday.drawButton();
+        button_weekday_saturday.drawButton();
+        button_weekday_sunday.drawButton();
+    }
+
+    uint8_t check_weekdays_exceptions(uint8_t *weekday_exception_list)
+    {
+        // Montag
+        if (check_button_pressed(button_weekday_monday))
+        {
+            if (0b00000001 & *weekday_exception_list)
+            {
+                button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MO", 3);
+            }
+            else
+            {
+                button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MO", 3);
+            }
+            button_weekday_monday.drawButton();
+            *weekday_exception_list ^= 0b00000001;
+        }
+        // Dienstag
+        else if (check_button_pressed(button_weekday_tuesday))
+        {
+            if (0b00000010 & *weekday_exception_list)
+            {
+                button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DI", 3);
+            }
+            else
+            {
+                button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DI", 3);
+            }
+            button_weekday_tuesday.drawButton();
+            *weekday_exception_list ^= 0b00000010;
+        }
+        // Mittwoch
+        else if (check_button_pressed(button_weekday_wednesday))
+        {
+            if (0b00000100 & *weekday_exception_list)
+            {
+                button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MI", 3);
+            }
+            else
+            {
+                button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MI", 3);
+            }
+            button_weekday_wednesday.drawButton();
+            *weekday_exception_list ^= 0b00000100;
+        }
+        // Donnerstag
+        else if (check_button_pressed(button_weekday_thursday))
+        {
+            if (0b00001000 & *weekday_exception_list)
+            {
+                button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DO", 3);
+            }
+            else
+            {
+                button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DO", 3);
+            }
+            button_weekday_thursday.drawButton();
+            *weekday_exception_list ^= 0b00001000;
+        }
+        // Freitag
+        else if (check_button_pressed(button_weekday_friday))
+        {
+            if (0b00010000 & *weekday_exception_list)
+            {
+                button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"FR", 3);
+            }
+            else
+            {
+                button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"FR", 3);
+            }
+            button_weekday_friday.drawButton();
+            *weekday_exception_list ^= 0b000010000;
+        }
+        //Samstag
+        else if (check_button_pressed(button_weekday_saturday))
+        {
+            if (0b00100000 & *weekday_exception_list)
+            {
+                button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SA", 3);
+            }
+            else
+            {
+                button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SA", 3);
+            }
+            button_weekday_saturday.drawButton();
+            *weekday_exception_list ^= 0b00100000;
+        }
+        // Sonntag
+        else if (check_button_pressed(button_weekday_sunday))
+        {
+            if (0b01000000 & *weekday_exception_list)
+            {
+                button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SO", 3);
+            }
+            else
+            {
+                button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SO", 3);
+            }
+            button_weekday_sunday.drawButton();
+            *weekday_exception_list ^= 0b01000000;
+        }
+        else if (check_button_pressed(button_back))
+        {
+            return BUTTON_BACK;
+        }
+
+        return WEEKDAY_EXCEPTION;
     }
 
     uint8_t check_default_menu()

@@ -52,9 +52,11 @@ namespace GUI
     void add_exception(char exception_start_string[6], char exception_end_string[6]);
     uint8_t check_add_exception(char exception_start_string[6], char exception_end_string[6], bool *reoccurring);
 
+    void weekdays_exceptions(uint8_t weekday_exception_list);
+    uint8_t check_weekdays_exceptions(uint8_t *weekday_exception_list);
+
     void remove_exception();
     uint8_t check_remove_exception();
-
 
     void default_menu(char date[11], char time[9], char day[4], char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status);
     uint8_t check_default_menu();
