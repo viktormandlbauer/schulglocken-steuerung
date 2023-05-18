@@ -2,6 +2,8 @@
  * Programmdefinitionen
  */
 
+// Sommerzeit deaktivierbar machen
+
 // Pin Definitionen
 #define RELAIS 30
 #define LED_SIGNAL 24
@@ -81,7 +83,7 @@
 #define NETWORK_DHCP 11
 #define NETWORK_RETRY 12
 #define NETWORK_HTTP 13
-#define SHOW_EXCEPTIONS 14
+#define REMOVE_EXCEPTION 14
 #define ADD_EXCEPTION 15
 #define WEEKDAY_EXCEPTION 16
 #define STANDARD 100

@@ -238,7 +238,7 @@ namespace GUI
         }
     }
 
-    uint8_t check_numeric_keyboard()
+    uint8_t check_numeric_keyboard(bool enable_delete_button)
     {
         if (check_button_pressed(button_right))
         {
@@ -255,14 +255,6 @@ namespace GUI
 
             return BUTTON_LEFT;
         }
-        else if (check_button_pressed(button_delete))
-        {
-#ifdef DEBUG
-            Serial.println("[Info] (GUI) Delete-Button pressed");
-#endif
-
-            return BUTTON_DELETE;
-        }
         else if (check_button_pressed(button_accept))
         {
 #ifdef DEBUG
@@ -270,6 +262,17 @@ namespace GUI
 #endif
 
             return BUTTON_ACCEPT;
+        }
+
+        if (enable_delete_button)
+        {
+            if (check_button_pressed(button_delete))
+            {
+#ifdef DEBUG
+                Serial.println("[Info] (GUI) Delete-Button pressed");
+#endif
+                return BUTTON_DELETE;
+            }
         }
 
         for (uint8_t i = 0; i < 10; i++)
@@ -291,17 +294,32 @@ namespace GUI
     char alarm_setting[6];
     uint8_t string_position;
 
-    void draw_time(char *time_string, uint8_t size)
+    void draw_time(char *datetime_string, uint8_t size)
     {
         for (uint8_t i = 0; i < size; i++)
         {
             if (i == string_position)
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_WHITE, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], COLOR_BLACK, COLOR_WHITE, 5);
             }
             else
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            }
+        }
+    }
+
+    void draw_date(char *date_string, uint8_t size)
+    {
+        for (uint8_t i = 0; i < size; i++)
+        {
+            if (i == string_position)
+            {
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], COLOR_BLACK, COLOR_WHITE, 5);
+            }
+            else
+            {
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
             }
         }
     }
@@ -364,7 +382,7 @@ namespace GUI
 
     uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new)
     {
-        uint8_t input = check_numeric_keyboard();
+        uint8_t input = check_numeric_keyboard(true);
         if (input < 10)
         {
             if ((string_position == 0 && input > 2) ||
@@ -498,6 +516,50 @@ namespace GUI
         return MENU;
     }
 
+#define POSITION_X_DATE X_DIM * 0.25
+#define POSITION_Y_DATE Y_DIM * 0.5
+#define POSITION_X_TIME X_DIM * 0.25
+#define POSITION_Y_TIME Y_DIM * 0.35
+
+    void draw_datetime(char datetime_string[20])
+    {
+        uint8_t i;
+        for (i = 0; i < 9; i++)
+        {
+            tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+        }
+        for (i = 9; i < 20; i++)
+        {
+            tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+        }
+    }
+    void draw_datetime(char datetime_string[20], uint8_t highlighted)
+    {
+        uint8_t i;
+        for (i = 0; i < 9; i++)
+        {
+            if (i == highlighted)
+            {
+                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, WHITE, 5);
+            }
+            else
+            {
+                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            }
+        }
+        for (i = 9; i < 20; i++)
+        {
+            if (i == highlighted)
+            {
+                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, WHITE, 5);
+            }
+            else
+            {
+                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            }
+        }
+    }
+
     bool time_setting_bg_drawn;
     void update_time(bool update)
     {
@@ -506,70 +568,105 @@ namespace GUI
 
     Adafruit_GFX_Button button_modify;
 
-    uint8_t check_time_setting(char *time_string)
+    bool validate_datetime(const char date_string[20])
     {
-        uint8_t input = check_numeric_keyboard();
+        uint8_t hour, minute, second, day, month;
+        uint16_t year;
+        int result = sscanf(date_string, "%hhu:%hhu:%hhu %hhu.%hhu.%hu", &hour, &minute, &second, &day, &month, &year);
+
+        if (result == 6)
+        {
+            if (hour <= 23 &&
+                minute <= 59 &&
+                second <= 59 &&
+                day >= 1 && day <= 31 &&
+                month >= 1 && month <= 12)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    uint8_t check_time_setting(char *datetime_string)
+    {
+        uint8_t input = check_numeric_keyboard(false);
+        char buffer[20];
+        strcpy(buffer, datetime_string);
+
         if (input < 10)
         {
-            if ((string_position == 0 && input > 2) ||
-                (string_position == 1 && input > 3 && time_string[0] - '0' == 2) ||
-                (string_position == 3 && input > 5) ||
-                ((time_string[1] - '0' > 3 && time_string[1] != '?') && string_position == 0 && input > 1) ||
-                (string_position == 6 && input > 5))
+            buffer[string_position] = input + '0';
+
+            if (!validate_datetime(buffer))
             {
 #ifdef DEBUG
                 Serial.println("[Error] (GUI) Invalid input");
 #endif
                 return TIME_SETTING;
             }
-
-            time_string[string_position] = input + '0';
-            draw_time(time_string, 8);
+            else
+            {
+                datetime_string[string_position] = input + '0';
+                draw_datetime(datetime_string, string_position);
+            }
         }
 
         switch (input)
         {
+
         case BUTTON_RIGH:
-            if (string_position == 1)
-            {
-                string_position += 2;
-            }
-            else if (string_position == 4)
-            {
-                string_position += 2;
-            }
-            else if (string_position == 7)
-            {
-                return TIME_SETTING;
-            }
-            else
+        {
+            if (string_position == 0 ||
+                string_position == 3 ||
+                string_position == 6 ||
+                string_position == 9 ||
+                string_position == 11 ||
+                string_position == 12 ||
+                string_position == 15 ||
+                string_position == 16 ||
+                string_position == 17)
             {
                 string_position += 1;
             }
-            draw_time(time_string, 8);
+            else if (string_position == 1 ||
+                     string_position == 4 ||
+                     string_position == 7 ||
+                     string_position == 10 ||
+                     string_position == 13)
+            {
+                string_position += 2;
+            }
+            draw_datetime(datetime_string, string_position);
             return TIME_SETTING;
             break;
+        }
 
         case BUTTON_LEFT:
-            if (string_position == 3)
-            {
-                string_position -= 2;
-            }
-            else if (string_position == 6)
-            {
-                string_position -= 2;
-            }
-            else if (string_position == 0)
-            {
-                return TIME_SETTING;
-            }
-            else
+        {
+            if (string_position == 1 ||
+                string_position == 4 ||
+                string_position == 7 ||
+                string_position == 10 ||
+                string_position == 13 ||
+                string_position == 16 ||
+                string_position == 17 ||
+                string_position == 18)
             {
                 string_position -= 1;
             }
-            draw_time(time_string, 8);
+            else if (string_position == 3 ||
+                     string_position == 6 ||
+                     string_position == 9 ||
+                     string_position == 12 ||
+                     string_position == 15)
+            {
+                string_position -= 2;
+            }
+            draw_datetime(datetime_string, string_position);
             return TIME_SETTING;
             break;
+        }
         case BUTTON_DELETE:
             return BUTTON_DELETE;
             break;
@@ -581,11 +678,12 @@ namespace GUI
         }
     }
 
-    void time_setting(char *time_string)
+    void time_setting(char datetime_string[20])
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        draw_numeric_keyboard(true);
-        draw_time(time_string, 8);
+        draw_numeric_keyboard(false);
+        string_position = 0;
+        draw_datetime(datetime_string, string_position);
     }
 
     uint8_t check_time()
@@ -601,21 +699,18 @@ namespace GUI
         return TIME;
     }
 
-    void time(char time_string[9])
+    void time(char datetime_string[20])
     {
         if (!time_setting_bg_drawn)
         {
             Waveshield.fillScreen(COLOR_BACKGROUND);
             draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-            button_modify.initButton(&tft, 400, 30, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, "Modify", 3);
+            button_modify.initButton(&tft, 400, 30, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, (char *)"Modify", 3);
             button_modify.drawButton();
             time_setting_bg_drawn = true;
         }
 
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            tft.drawChar(0.3 * X_DIM + 30 * i, Y_DIM * 0.4, time_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
-        }
+        draw_datetime(datetime_string);
     }
 
     Adafruit_GFX_Button button_ntp, button_dhcp, button_http, button_networkstatus;
@@ -903,30 +998,139 @@ namespace GUI
         return NETWORK_DHCP;
     }
 
-    void show_exception(char alarm_exceptions[][13], uint8_t alarm_exception_count)
+    void draw_alarm_exception_list_element(char alarm_exception_string[13], bool reoccurring, uint8_t index, bool highlighted)
     {
-        Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-        tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
-        tft.setTextSize(4);
-        tft.println("Ausnahmen anzeigen");
+        char yes[] = "Ja  ";
+        char no[] = "Nein";
+        uint8_t i;
 
-        Serial.println(alarm_exception_count);
-        for (uint8_t i = 0; i < alarm_exception_count; i++)
+        if (highlighted)
         {
-            tft.println(alarm_exceptions[i]);
+            for (i = 0; i < 11; i++)
+            {
+                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], COLOR_BLACK, COLOR_WHITE, 3);
+            }
         }
-
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        else
+        {
+            for (i = 0; i < 11; i++)
+            {
+                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+            }
+        }
+        if (reoccurring)
+        {
+            for (i = 0; i < 5; i++)
+            {
+                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), yes[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+            }
+        }
+        else
+        {
+            for (i = 0; i < 5; i++)
+            {
+                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), no[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+            }
+        }
     }
 
-    uint8_t check_show_exception()
+#define GRID_Y Y_DIM * 0.2
+    uint8_t selected = 0;
+    uint8_t page = 0;
+    void remove_exceptions(char alarm_exceptions_string[][13], bool reoccuring[], uint8_t alarm_exception_count)
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+
+        tft.setCursor(X_DIM * 0.75, 3);
+        tft.setTextColor(BLACK);
+        tft.setTextSize(2);
+        tft.print("Anzahl: ");
+        tft.print(alarm_exception_count);
+
+        tft.drawRect(X_DIM * 0.05, GRID_Y, X_DIM * 0.8, Y_DIM * 0.6, BLACK);
+        tft.drawLine(X_DIM * 0.05, Y_DIM * 0.35, X_DIM * 0.85, Y_DIM * 0.35, BLACK);
+        tft.drawLine(X_DIM * 0.05, Y_DIM * 0.5, X_DIM * 0.85, Y_DIM * 0.5, BLACK);
+        tft.drawLine(X_DIM * 0.05, Y_DIM * 0.65, X_DIM * 0.85, Y_DIM * 0.65, BLACK);
+
+        tft.setCursor(X_DIM * 0.06, Y_DIM * 0.1);
+        tft.setTextColor(BLACK);
+        tft.setTextSize(3);
+        tft.print("Datum        ");
+        tft.setTextSize(3);
+        tft.print("Wdh.");
+
+        for (uint8_t i = 0; i < 4 && (i + page * 4) < alarm_exception_count; i++)
+        {
+            draw_alarm_exception_list_element(alarm_exceptions_string[i + page * 4], reoccuring[i + page * 4], i, (selected == i));
+        }
+
+        button_up.initButtonUL(&tft, X_DIM * 0.85, GRID_Y, X_DIM * 0.15, Y_DIM * 0.3, COLOR_PRIMARY, COLOR_PRIMARY, WHITE, (char *)"", 3);
+        button_down.initButtonUL(&tft, X_DIM * 0.85, Y_DIM * 0.5, X_DIM * 0.15, Y_DIM * 0.3, COLOR_PRIMARY, COLOR_PRIMARY, WHITE, (char *)"", 3);
+        button_delete.initButtonUL(&tft, X_DIM * 0.4, Y_DIM * 0.8, X_DIM * 0.4, Y_DIM * 0.2, BLACK, RED, WHITE, (char *)"Entfernen", 3);
+
+        draw_back_button(X_DIM * 0.15, Y_DIM * 0.9, 100, 60);
+
+        button_down.drawButton();
+        button_up.drawButton();
+        button_delete.drawButton();
+    }
+
+    uint8_t check_remove_exceptions(char alarm_exceptions_string[][13], bool reoccuring[], uint8_t alarm_exception_count, uint8_t *remove_at_index)
     {
         if (check_button_pressed(button_back))
         {
+            selected = 0;
+            page = 0;
             return BUTTON_BACK;
         }
-        return SHOW_EXCEPTIONS;
+        else if (check_button_pressed(button_up))
+        {
+            if (selected)
+            {
+                draw_alarm_exception_list_element(alarm_exceptions_string[selected + page * 4], reoccuring[selected + page * 4], selected, false);
+                selected -= 1;
+                draw_alarm_exception_list_element(alarm_exceptions_string[selected + page * 4], reoccuring[selected + page * 4], selected, true);
+            }
+            else if (page)
+            {
+                page -= 1;
+                selected = 3;
+                remove_exceptions(alarm_exceptions_string, reoccuring, alarm_exception_count);
+            }
+        }
+        else if (check_button_pressed(button_down))
+        {
+            if (selected + 1 + page * 4 < alarm_exception_count)
+            {
+                if (selected + 1 >= 4)
+                {
+                    page += 1;
+                    selected = 0;
+                    remove_exceptions(alarm_exceptions_string, reoccuring, alarm_exception_count);
+                }
+                else
+                {
+                    draw_alarm_exception_list_element(alarm_exceptions_string[selected + page * 4], reoccuring[selected + page * 4], selected, false);
+                    selected += 1;
+                    draw_alarm_exception_list_element(alarm_exceptions_string[selected + page * 4], reoccuring[selected + page * 4], selected, true);
+                }
+            }
+        }
+        else if (check_button_pressed(button_delete))
+        {
+            if (alarm_exception_count > 0)
+            {
+                *remove_at_index = selected + page * 4;
+                selected = 0;
+                page = 0;
+                return BUTTON_DELETE;
+            }
+            else
+            {
+                return REMOVE_EXCEPTION;
+            }
+        }
+        return REMOVE_EXCEPTION;
     }
 
     void draw_add_exception(char exception_start[6], char exception_end[6])
@@ -971,7 +1175,7 @@ namespace GUI
 
         draw_add_exception(exception_start_string, exception_end_string);
 
-        button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, RED, (char *)"Wdh.", 2);
+        button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, GREEN, (char *)"Wdh. an", 2);
         button_exception_mode.drawButton(true);
     }
 
@@ -1023,7 +1227,7 @@ namespace GUI
 
     uint8_t check_add_exception(char exception_start_string[6], char exception_end_string[6], bool *reoccurring)
     {
-        uint8_t input = check_numeric_keyboard();
+        uint8_t input = check_numeric_keyboard(false);
         if (input < 10)
         {
 
@@ -1063,15 +1267,20 @@ namespace GUI
             {
                 if (*reoccurring)
                 {
-                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, RED, (char *)"Wdh.", 2);
+                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, RED, (char *)"Wdh. aus", 2);
                     button_exception_mode.drawButton(true);
+                    *reoccurring = false;
                 }
                 else
                 {
-                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, GREEN, (char *)"Wdh.", 2);
+                    button_exception_mode.initButton(&tft, REOCCURING_BUTTON_POS_X, REOCCURING_BUTTON_POS_Y, REOCCURING_BUTTON_WIDTH_Y, REOCCURING_BUTTON_HEIGHT_Y, COLOR_PRIMARY, WHITE, GREEN, (char *)"Wdh. an", 2);
                     button_exception_mode.drawButton(true);
+                    *reoccurring = true;
                 }
-                *reoccurring = !*reoccurring;
+            }
+            else if (check_button_pressed(button_back))
+            {
+                return SYSTEM;
             }
         }
         switch (input)
@@ -1150,7 +1359,7 @@ namespace GUI
     {
         if (check_button_pressed(button_show_exceptions))
         {
-            return SHOW_EXCEPTIONS;
+            return REMOVE_EXCEPTION;
         }
         else if (check_button_pressed(button_weekday_exceptions))
         {
@@ -1255,7 +1464,7 @@ namespace GUI
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 80, 80);
 
         // Montag
-        if (0b00000001 & weekday_exception_list)
+        if (0b10 & weekday_exception_list)
         {
             button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MO", 3);
         }
@@ -1265,7 +1474,7 @@ namespace GUI
         }
 
         // Dienstag
-        if (0b00000010 & weekday_exception_list)
+        if (0b100 & weekday_exception_list)
         {
             button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DI", 3);
         }
@@ -1275,7 +1484,7 @@ namespace GUI
         }
 
         // Mittwoch
-        if (0b00000100 & weekday_exception_list)
+        if (0b1000 & weekday_exception_list)
         {
             button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MI", 3);
         }
@@ -1285,7 +1494,7 @@ namespace GUI
         }
 
         // Donnerstag
-        if (0b00001000 & weekday_exception_list)
+        if (0b10000 & weekday_exception_list)
         {
             button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DO", 3);
         }
@@ -1295,7 +1504,7 @@ namespace GUI
         }
 
         // Freitag
-        if (0b00010000 & weekday_exception_list)
+        if (0b100000 & weekday_exception_list)
         {
             button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"FR", 3);
         }
@@ -1305,7 +1514,7 @@ namespace GUI
         }
 
         // Samstag
-        if (0b00100000 & weekday_exception_list)
+        if (0b1000000 & weekday_exception_list)
         {
             button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SA", 3);
         }
@@ -1315,7 +1524,7 @@ namespace GUI
         }
 
         // Sonntag
-        if (0b01000000 & weekday_exception_list)
+        if (0b1 & weekday_exception_list)
         {
             button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SO", 3);
         }
@@ -1338,7 +1547,7 @@ namespace GUI
         // Montag
         if (check_button_pressed(button_weekday_monday))
         {
-            if (0b00000001 & *weekday_exception_list)
+            if (0b10 & *weekday_exception_list)
             {
                 button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MO", 3);
             }
@@ -1347,12 +1556,12 @@ namespace GUI
                 button_weekday_monday.initButtonUL(&tft, BUTTON_MO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MO", 3);
             }
             button_weekday_monday.drawButton();
-            *weekday_exception_list ^= 0b00000001;
+            *weekday_exception_list ^= 0b10;
         }
         // Dienstag
         else if (check_button_pressed(button_weekday_tuesday))
         {
-            if (0b00000010 & *weekday_exception_list)
+            if (0b100 & *weekday_exception_list)
             {
                 button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DI", 3);
             }
@@ -1361,12 +1570,12 @@ namespace GUI
                 button_weekday_tuesday.initButtonUL(&tft, BUTTON_DI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DI", 3);
             }
             button_weekday_tuesday.drawButton();
-            *weekday_exception_list ^= 0b00000010;
+            *weekday_exception_list ^= 0b100;
         }
         // Mittwoch
         else if (check_button_pressed(button_weekday_wednesday))
         {
-            if (0b00000100 & *weekday_exception_list)
+            if (0b1000 & *weekday_exception_list)
             {
                 button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"MI", 3);
             }
@@ -1375,12 +1584,12 @@ namespace GUI
                 button_weekday_wednesday.initButtonUL(&tft, BUTTON_MI_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"MI", 3);
             }
             button_weekday_wednesday.drawButton();
-            *weekday_exception_list ^= 0b00000100;
+            *weekday_exception_list ^= 0b1000;
         }
         // Donnerstag
         else if (check_button_pressed(button_weekday_thursday))
         {
-            if (0b00001000 & *weekday_exception_list)
+            if (0b10000 & *weekday_exception_list)
             {
                 button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"DO", 3);
             }
@@ -1389,12 +1598,12 @@ namespace GUI
                 button_weekday_thursday.initButtonUL(&tft, BUTTON_DO_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"DO", 3);
             }
             button_weekday_thursday.drawButton();
-            *weekday_exception_list ^= 0b00001000;
+            *weekday_exception_list ^= 0b10000;
         }
         // Freitag
         else if (check_button_pressed(button_weekday_friday))
         {
-            if (0b00010000 & *weekday_exception_list)
+            if (0b100000 & *weekday_exception_list)
             {
                 button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, RED, WHITE, (char *)"FR", 3);
             }
@@ -1403,12 +1612,12 @@ namespace GUI
                 button_weekday_friday.initButtonUL(&tft, BUTTON_FR_X, BUTTON_WEEKDAYS_Y, X_DIM * 0.2, 80, BLACK, GREEN, WHITE, (char *)"FR", 3);
             }
             button_weekday_friday.drawButton();
-            *weekday_exception_list ^= 0b000010000;
+            *weekday_exception_list ^= 0b100000;
         }
-        //Samstag
+        // Samstag
         else if (check_button_pressed(button_weekday_saturday))
         {
-            if (0b00100000 & *weekday_exception_list)
+            if (0b1000000 & *weekday_exception_list)
             {
                 button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SA", 3);
             }
@@ -1417,12 +1626,12 @@ namespace GUI
                 button_weekday_saturday.initButtonUL(&tft, BUTTON_SA_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SA", 3);
             }
             button_weekday_saturday.drawButton();
-            *weekday_exception_list ^= 0b00100000;
+            *weekday_exception_list ^= 0b1000000;
         }
         // Sonntag
         else if (check_button_pressed(button_weekday_sunday))
         {
-            if (0b01000000 & *weekday_exception_list)
+            if (0b1 & *weekday_exception_list)
             {
                 button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, RED, WHITE, (char *)"SO", 3);
             }
@@ -1431,7 +1640,7 @@ namespace GUI
                 button_weekday_sunday.initButtonUL(&tft, BUTTON_SO_X, BUTTON_WEEKEND_Y, X_DIM * 0.4, 80, BLACK, GREEN, WHITE, (char *)"SO", 3);
             }
             button_weekday_sunday.drawButton();
-            *weekday_exception_list ^= 0b01000000;
+            *weekday_exception_list ^= 0b1;
         }
         else if (check_button_pressed(button_back))
         {

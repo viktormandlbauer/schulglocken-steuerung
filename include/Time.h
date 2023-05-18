@@ -16,11 +16,13 @@ namespace Time
     {
         uint16_t minutes;
         uint8_t type;
+        bool triggered;
     };
 
     struct AlarmException
     {
         uint8_t BeginDay, BeginMonth, EndDay, EndMonth;
+        uint16_t Days;
         bool reoccurring;
     };
 
@@ -34,11 +36,11 @@ namespace Time
 
     void get_current_date(char buffer[11]);
     bool get_current_timestring(char time_string[9]);
-    void get_current_datetime(char buffer[20]);
+    bool get_current_datetime(char buffer[20]);
     void get_current_weekday(char buffer[4]);
 
     void set_datetime(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
-    void timestring_to_timearray(char *time, uint8_t datetime_array[3]);
+    void set_datetime(char datetime_buffer[20]);
 
     uint16_t get_minutes_passed();
 
@@ -49,10 +51,12 @@ namespace Time
     void sort_alarms(Alarm alarms[], uint8_t alarm_count);
 
     uint8_t remove_alarm_at_index(Alarm alarms[], uint8_t alarm_count, uint8_t index);
-
     void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting);
 
+    bool is_alarm_exception_active(AlarmException *alarm_exceptions, uint8_t alarm_exceptions_count);
     uint8_t add_alarm_exception(AlarmException *alarm_exceptions, AlarmException alarm_exception, uint8_t alarm_exceptions_count);
+    uint8_t remove_alarm_exception_at_index(AlarmException alarm_excpetions[], uint8_t exception_count, uint8_t index);
+
     AlarmException parse_to_alarm_exception(char exception_start[6], char exception_end[6], bool reoccurring);
 
     void get_alarm_exceptions(AlarmException *alarm_exceptions, uint8_t alarm_exception_count, char buffer[][13], bool *reoccurring_exception);
@@ -69,4 +73,8 @@ namespace Time
 
     time_t time_provider();
     int compare(const void *s1, const void *s2);
+
+    bool day_changed();
+    void reset_alarms(Alarm *alarms, uint8_t alarm_count);
+    bool check_alarm_exception(AlarmException *alarm_exceptions, uint8_t alarm_exceptions_count, uint8_t weekday_exception_list);
 }

@@ -28,7 +28,7 @@ namespace GUI
     uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new);
 
     void update_time(bool update);
-    void time(char time_string[9]);
+    void time(char datetime_string[9]);
     uint8_t check_time();
     void time_setting(char time_string[9]);
     uint8_t check_time_setting(char *time_string);
@@ -46,17 +46,14 @@ namespace GUI
     void exception_menu();
     uint8_t check_exception_menu();
 
-    void show_exception(char alarm_exceptions[][13], uint8_t alarm_exception_count);
-    uint8_t check_show_exception();
-
     void add_exception(char exception_start_string[6], char exception_end_string[6]);
     uint8_t check_add_exception(char exception_start_string[6], char exception_end_string[6], bool *reoccurring);
 
     void weekdays_exceptions(uint8_t weekday_exception_list);
     uint8_t check_weekdays_exceptions(uint8_t *weekday_exception_list);
 
-    void remove_exception();
-    uint8_t check_remove_exception();
+    void remove_exceptions(char alarm_exceptions_string[][13], bool reoccuring[], uint8_t alarm_exception_count);
+    uint8_t check_remove_exceptions(char alarm_exceptions_string[][13], bool reoccuring[], uint8_t alarm_exception_count, uint8_t *remove_at_index);
 
     void default_menu(char date[11], char time[9], char day[4], char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status);
     uint8_t check_default_menu();

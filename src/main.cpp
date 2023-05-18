@@ -14,6 +14,7 @@
 static Time::Alarm alarms[MAXIMUM_AMOUNT_ALARMS];
 static Time::Alarm alarm;
 static uint8_t alarm_count = 0;
+static bool alarms_enabled = true;
 
 uint8_t ip[4], gw[4], dns[4], prefix;
 
@@ -34,6 +35,8 @@ Time::AlarmException alarm_exceptions[MAXIMUM_AMOUNT_EXCEPTIONS];
 uint8_t alarm_exceptions_count = 0;
 char exception_start_string[6];
 char exception_end_string[6];
+char exception_buffer[MAXIMUM_AMOUNT_EXCEPTIONS][13];
+bool reoccurring[MAXIMUM_AMOUNT_EXCEPTIONS];
 bool reoccuring_exception;
 uint8_t weekday_exception_list;
 
@@ -79,8 +82,11 @@ void navigation_handler()
     switch (navigation)
     {
     case STANDARD:
+    {
+
         navigation = GUI::check_default_menu();
         break;
+    }
     case MENU:
     {
 
@@ -139,13 +145,11 @@ void navigation_handler()
     }
     case TIME_SETTING:
     {
-        navigation = GUI::check_time_setting(time_string);
+        navigation = GUI::check_time_setting(buffer);
 
         if (navigation == BUTTON_ACCEPT)
         {
-            uint8_t timearray[3];
-            Time::timestring_to_timearray(time_string, timearray);
-            Time::set_datetime(23, 18, 2, timearray[0], timearray[1], timearray[2]);
+            Time::set_datetime(buffer);
             navigation = TIME;
         }
         break;
@@ -159,12 +163,36 @@ void navigation_handler()
         }
         break;
     }
-    case SHOW_EXCEPTIONS:
+    case REMOVE_EXCEPTION:
     {
-        navigation = GUI::check_show_exception();
+        uint8_t *remove_at_index;
+        navigation = GUI::check_remove_exceptions(exception_buffer, reoccurring, alarm_exceptions_count, remove_at_index);
         if (navigation == BUTTON_BACK)
         {
             navigation = SYSTEM;
+        }
+        else if (navigation == BUTTON_DELETE)
+        {
+            alarm_exceptions_count = Time::remove_alarm_exception_at_index(alarm_exceptions, alarm_exceptions_count, *remove_at_index);
+
+            if (Time::check_alarm_exception(alarm_exceptions, alarm_exceptions_count, weekday_exception_list))
+            {
+                alarms_enabled = false;
+            }
+            else
+            {
+                alarms_enabled = true;
+            }
+
+            // Ausnahme aus EEPROM entfernen
+            for (uint8_t i = 0; i < alarm_exceptions_count; i++)
+            {
+                Storage::save_exception(alarm_exceptions[i].BeginDay, alarm_exceptions[i].BeginMonth, alarm_exceptions[i].EndDay, alarm_exceptions[i].EndMonth, alarm_exceptions[i].reoccurring, i);
+            }
+            Storage::save_exception_count(alarm_exceptions_count);
+
+            navigation = REMOVE_EXCEPTION;
+            refresh = true;
         }
         break;
     }
@@ -179,13 +207,23 @@ void navigation_handler()
         {
             alarm_exceptions_count = Time::add_alarm_exception(alarm_exceptions, Time::parse_to_alarm_exception(exception_start_string, exception_end_string, reoccuring_exception), alarm_exceptions_count);
 
+            if (Time::check_alarm_exception(alarm_exceptions, alarm_exceptions_count, weekday_exception_list))
+            {
+                alarms_enabled = false;
+            }
+            else
+            {
+                alarms_enabled = true;
+            }
+
+            // Ausnahme zu EEPROM hinzufügen
             for (uint8_t i = 0; i < alarm_exceptions_count; i++)
             {
                 Storage::save_exception(alarm_exceptions[i].BeginDay, alarm_exceptions[i].BeginMonth, alarm_exceptions[i].EndDay, alarm_exceptions[i].EndMonth, alarm_exceptions[i].reoccurring, i);
             }
             Storage::save_exception_count(alarm_exceptions_count);
 
-            navigation = SHOW_EXCEPTIONS;
+            navigation = REMOVE_EXCEPTION;
         }
         break;
     }
@@ -195,6 +233,14 @@ void navigation_handler()
         if (navigation == BUTTON_BACK)
         {
             Storage::save_weekday_exceptions(weekday_exception_list);
+            if (Time::check_alarm_exception(alarm_exceptions, alarm_exceptions_count, weekday_exception_list))
+            {
+                alarms_enabled = false;
+            }
+            else
+            {
+                alarms_enabled = true;
+            }
             navigation = SYSTEM;
         }
         break;
@@ -300,7 +346,6 @@ void navigation_handler()
     }
     case NEW_ALARM_CONFIG:
     {
-
         navigation = GUI::check_alarm_config(&alarm.minutes, &alarm.type, true);
 
         if (navigation == BUTTON_ACCEPT)
@@ -371,6 +416,8 @@ void refresh_handler()
     switch (navigation)
     {
     case STANDARD:
+    {
+
         Time::get_current_timestring(time_string);
         Time::get_current_date(date_string);
         Time::get_current_weekday(day_string);
@@ -379,6 +426,7 @@ void refresh_handler()
 
         GUI::default_menu(date_string, time_string, day_string, alarm_string, "01.01", "02.02", 0b11111111);
         break;
+    }
     case MENU:
     {
         GUI::menu();
@@ -393,9 +441,9 @@ void refresh_handler()
     }
     case TIME:
     {
-        if (Time::get_current_timestring(time_string))
+        if (Time::get_current_datetime(buffer))
         {
-            GUI::time(time_string);
+            GUI::time(buffer);
         }
         refresh = true;
         break;
@@ -405,12 +453,10 @@ void refresh_handler()
         GUI::exception_menu();
         break;
     }
-    case SHOW_EXCEPTIONS:
+    case REMOVE_EXCEPTION:
     {
-        char buffer[5][13];
-        bool reoccurring[5];
-        Time::get_alarm_exceptions(alarm_exceptions, alarm_exceptions_count, buffer, reoccurring);
-        GUI::show_exception(buffer, alarm_exceptions_count);
+        Time::get_alarm_exceptions(alarm_exceptions, alarm_exceptions_count, exception_buffer, reoccurring);
+        GUI::remove_exceptions(exception_buffer, reoccurring, alarm_exceptions_count);
         break;
     }
     case ADD_EXCEPTION:
@@ -426,10 +472,9 @@ void refresh_handler()
     }
     case TIME_SETTING:
     {
-        GUI::time_setting(time_string);
+        GUI::time_setting(buffer);
         break;
     }
-
     case ALARM_CONFIG:
     {
         alarm.minutes = alarms[selection].minutes;
@@ -474,7 +519,23 @@ void loop()
         refresh_handler();
     }
 
-    Time::check_alarms(alarms, alarm_count);
+    if (Time::day_changed())
+    {
+        Time::reset_alarms(alarms, alarm_count);
+        if (Time::check_alarm_exception(alarm_exceptions, alarm_exceptions_count, weekday_exception_list))
+        {
+            alarms_enabled = false;
+        }
+        else
+        {
+            alarms_enabled = true;
+        }
+    }
+
+    if (alarms_enabled)
+    {
+        Time::check_alarms(alarms, alarm_count);
+    }
 }
 
 void setup()
@@ -484,7 +545,6 @@ void setup()
     pinMode(LED_SIGNAL, OUTPUT);
     pinMode(RELAIS, OUTPUT);
     pinMode(AUDIO_SIGNAL, OUTPUT);
-
     digitalWrite(LED_SIGNAL, HIGH);
 
     GUI::init_display();
@@ -507,6 +567,10 @@ void setup()
     }
     network_manager();
 
+    TimeSync::init_timesync(Storage::read_network_ntp());
+#ifdef DEBUG
+    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
+#endif
     // Alarme von EEPROM auslesen
 #ifdef DEBUG
     Serial.println("[Info] (Main) Reading alarms from EEPROM.");
@@ -528,15 +592,11 @@ void setup()
         Storage::read_exception(&alarm_exceptions[i].BeginDay, &alarm_exceptions[i].BeginMonth, &alarm_exceptions[i].EndDay, &alarm_exceptions[i].EndMonth, &alarm_exceptions[i].reoccurring, i);
     }
 
- #ifdef DEBUG
-    Serial.println("[Info] (Main) Reading weekday exceptions from EEPROM.");
-#endif   // Wochentagausnahmen von EEPROM auslesen
-    weekday_exception_list = Storage::read_weekday_exceptions();
-
-    TimeSync::init_timesync(Storage::read_network_ntp());
 #ifdef DEBUG
-    Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
+    Serial.println("[Info] (Main) Reading weekday exceptions from EEPROM.");
 #endif
+    // Wochentagausnahmen von EEPROM auslesen
+    weekday_exception_list = Storage::read_weekday_exceptions();
 
     Time::init_alarm_interrupt();
 #ifdef DEBUG
