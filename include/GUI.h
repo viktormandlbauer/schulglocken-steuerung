@@ -8,9 +8,6 @@
 #include <Waveshare_ILI9486.h>
 #include <XPT2046_Touchscreen.h>
 
-#define CS_PIN 4
-#define TIRQ_PIN 3
-
 namespace GUI
 {
     void init_display();
@@ -27,7 +24,6 @@ namespace GUI
     void alarm_config(char alarm_time[6], uint8_t alarm_type);
     uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new);
 
-    void update_time(bool update);
     void time(char datetime_string[9]);
     uint8_t check_time();
     void time_setting(char time_string[9]);
@@ -39,9 +35,10 @@ namespace GUI
     void network_ntp(char *lastNtpSync, bool isEnabled);
     uint8_t check_network_ntp(bool isEnabled);
 
-    void network_ip(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
-    uint8_t check_network_ip();
-    void network_config_update(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
+    void network_ip(bool DhcpEnabled, bool IsLinkUP, uint8_t error_code, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix);
+    uint8_t check_network_ip(bool *DhcpEnabled);
+    void network_ip_static(char addresses_string[49]);
+    uint8_t check_network_ip_static(char addresses_string[49]);
 
     void exception_menu();
     uint8_t check_exception_menu();

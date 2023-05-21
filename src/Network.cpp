@@ -4,9 +4,9 @@ byte Ethernet::buffer[700];
 
 namespace Network
 {
-    int8_t NetworkStatus;
+    NetworkStatus nw_status;
 
-    bool init_ethernet()
+    void init_ethernet()
     {
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Activate ethernet ..."));
@@ -16,17 +16,16 @@ namespace Network
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) Failed to active ethernet."));
 #endif
-            NetworkStatus = ETHERNET_INITIALIZED_FAILED;
-            return false;
+            nw_status.active = false;
+            return;
         }
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Ethernet activated."));
 #endif
-        NetworkStatus = ETHERNET_INITIALIZED;
-        return true;
+        nw_status.active = true;
     }
 
-    bool is_cable_connected()
+    void check_link()
     {
         uint8_t count = 0;
         while (!ether.isLinkUp())
@@ -34,13 +33,18 @@ namespace Network
             count += 1;
             if (count > 254)
             {
-                NetworkStatus = ETHERNET_LINKDOWN;
-                return false;
+#ifdef DEBUG
+                Serial.println(F("[Info] (Network) No cable connected"));
+#endif
+                nw_status.linkup = false;
+                return;
             }
-            delay(1);
+            delayMicroseconds(1);
         }
-        NetworkStatus = ETHERNET_LINKUP;
-        return true;
+#ifdef DEBUG
+        Serial.println(F("[Info] (Network) Cable connected"));
+#endif
+        nw_status.linkup = true;
     }
 
     bool dhcp_setup()
@@ -57,7 +61,7 @@ namespace Network
             ether.printIp(F("[Info] DNS:  "), ether.dnsip);
             ether.printIp(F("[Info] NM:   "), ether.netmask);
 #endif
-            NetworkStatus = ETHERNET_DHCP_SUCCESS;
+            nw_status.error_code = 0;
             return true;
         }
         else
@@ -65,7 +69,7 @@ namespace Network
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) DHCP failed."));
 #endif
-            NetworkStatus = ETHERNET_DHCP_FAILED;
+            nw_status.error_code = ETHERNET_DHCP_FAILED;
             return false;
         }
     }
@@ -90,7 +94,8 @@ namespace Network
             ether.printIp(F("[Info] (Network) DNS:  "), ether.dnsip);
             ether.printIp(F("[Info] (Network) NM:   "), ether.netmask);
 #endif
-            NetworkStatus = ETHERNET_STATIC_SUCCESS;
+
+            nw_status.error_code = 0;
             return true;
         }
         else
@@ -98,7 +103,7 @@ namespace Network
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) Static network setup failed!"));
 #endif
-            NetworkStatus = ETHERNET_STATIC_FAILED;
+            nw_status.error_code = ETHERNET_STATIC_FAILED;
             return false;
         }
     }
@@ -116,6 +121,7 @@ namespace Network
                          hour / 10, hour % 10, minute / 10, minute % 10, second / 10, second % 10);
             ether.httpServerReply(bfill.position());
         }
+        return true;
     }
 
     uint8_t *get_ip()

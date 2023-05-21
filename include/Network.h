@@ -8,7 +8,23 @@
 
 namespace Network
 {
-    extern int8_t NetworkStatus;
+    // Struct for network settings and activities
+    struct NetworkStatus
+    {
+        bool active;
+        bool linkup;
+        bool DhcpEnabled;
+        bool NtpEnabled;
+        bool HttpEnabled;
+        uint8_t ip[4], gw[4], dns[4];
+        uint8_t snm;
+        uint8_t error_code;
+    };
+
+    // Defined in Network.cpp
+    extern NetworkStatus nw_status;
+
+    // Read-Only settings 
     const char hostname[] PROGMEM = HOSTNAME;
     const char timeServer[] PROGMEM = "pool.ntp.org";
     const byte mac_address[6] PROGMEM = MAC_ADDRESS;
@@ -17,11 +33,10 @@ namespace Network
     const unsigned int NTP_REMOTEPORT PROGMEM = 123;
 
     // Network Configuration
-    bool init_ethernet();
-    bool is_cable_connected();
+    void init_ethernet();
+    void check_link();
     bool static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm);
     bool dhcp_setup();
-    bool using_dhcp();
     uint8_t *get_ip();
     uint8_t *get_gw();
     uint8_t *get_dns();

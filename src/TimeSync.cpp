@@ -2,6 +2,9 @@
 #include "Time.h"
 #include "Network.h"
 
+// NetworkStatus from Network.h
+// Network::NetworkStatus Network::nw_status;
+
 namespace TimeSync
 {
     bool EnableNtpSync = false;
@@ -50,7 +53,7 @@ namespace TimeSync
     time_t getTime()
     {
         time_t rtc_time = getRtcTime();
-        if (EnableNtpSync && (NtpSyncCoutner >= SYNC_WITH_NTP) && (Network::NetworkStatus == ETHERNET_DHCP_SUCCESS || Network::NetworkStatus == ETHERNET_STATIC_SUCCESS))
+        if (Network::nw_status.DhcpEnabled && (NtpSyncCoutner >= SYNC_WITH_NTP) && !Network::nw_status.error_code)
         {
             time_t ntp_time = getNtpTime();
             NtpSyncCoutner = 0;
