@@ -561,18 +561,13 @@ namespace GUI
     }
 
     bool time_setting_bg_drawn;
-    void update_time(bool update)
-    {
-        time_setting_bg_drawn = update;
-    }
-
     Adafruit_GFX_Button button_modify;
 
     bool validate_datetime(const char date_string[20])
     {
         uint8_t hour, minute, second, day, month;
         uint16_t year;
-        int result = sscanf(date_string, "%hhu:%hhu:%hhu %hhu.%hhu.%hu", &hour, &minute, &second, &day, &month, &year);
+        int result = sscanf(date_string, "%hhu:%hhu:%hhu %hhu.%hhu.%hu", &hour, &minute, &second, &day, &month, (unsigned short int *)&year);
 
         if (result == 6)
         {
@@ -690,10 +685,12 @@ namespace GUI
     {
         if (check_button_pressed(button_back))
         {
+            time_setting_bg_drawn = false;
             return MENU;
         }
         else if (check_button_pressed(button_modify))
         {
+            time_setting_bg_drawn = false;
             return BUTTON_MODIFY;
         }
         return TIME;
@@ -773,7 +770,7 @@ namespace GUI
         }
         else if (check_button_pressed(button_dhcp))
         {
-            return NETWORK_DHCP;
+            return NETWORK_IP;
         }
         else if (check_button_pressed(button_http))
         {
@@ -839,7 +836,8 @@ namespace GUI
         return NETWORK_NTP;
     }
 
-    void network_ip(uint8_t NetworkStatus, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
+    Adafruit_GFX_Button button_retry;
+    void network_ip(bool DhcpEnabled, bool IsLinkUP, uint8_t error_code, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
@@ -849,127 +847,115 @@ namespace GUI
 
         char address_string[16];
 
-        if (NetworkStatus == ETHERNET_DHCP_SUCCESS)
+        if (IsLinkUP)
         {
-            char output[3];
-            if (prefix > 9)
+            if (DhcpEnabled)
             {
-                output[0] = (uint8_t)(prefix / 10) + '0';
-                output[1] = (uint8_t)(prefix % 10) + '0';
-                output[2] = '\0';
+                if (error_code != ETHERNET_DHCP_FAILED)
+                {
+                    char output[3];
+                    sprintf(output, "%hhu", prefix);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("IP:"));
+                    address_to_chararr(ip, address_string);
+                    tft.print(address_string);
+                    tft.print(F("/"));
+                    tft.print(output);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("GW:"));
+                    address_to_chararr(gw, address_string);
+                    tft.print(address_string);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("DNS:"));
+                    address_to_chararr(dns, address_string);
+                    tft.print(address_string);
+                    tft.setFont();
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.7);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(2);
+                    tft.print(F("Dynamische IP Konfiguration"));
+                }
+                else
+                {
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(2);
+                    tft.print(F("Dynamische IP Konfiguration ist fehlgeschlagen."));
+
+                    button_retry.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, WHITE, (char *)"Retry", 2);
+                    button_retry.drawButton(true);
+                }
             }
             else
             {
-                output[0] = prefix + '0';
-                output[1] = '\0';
+                if (error_code != ETHERNET_STATIC_FAILED)
+                {
+                    char output[3];
+                    sprintf(output, "%hhu", prefix);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("IP:"));
+                    address_to_chararr(ip, address_string);
+                    tft.print(address_string);
+                    tft.print(F("/"));
+                    tft.print(output);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("GW:"));
+                    address_to_chararr(gw, address_string);
+                    tft.print(address_string);
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(3);
+                    tft.print(F("DNS:"));
+                    address_to_chararr(dns, address_string);
+                    tft.print(address_string);
+                    tft.setFont();
+
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.7);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(2);
+                    tft.print(F("Statische IP Konfiguration"));
+                }
+                else
+                {
+                    tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
+                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextSize(2);
+                    tft.print(F("Statische IP Konfiguration ist fehlgeschlagen."));
+                }
             }
 
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("IP:"));
-            address_to_chararr(ip, address_string);
-            tft.print(address_string);
-            tft.print(F("/"));
-            tft.print(output);
-
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("GW:"));
-            address_to_chararr(gw, address_string);
-            tft.print(address_string);
-
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("DNS:"));
-            address_to_chararr(dns, address_string);
-            tft.print(address_string);
-            tft.setFont();
-
-            button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Static", 2);
-            button_dhcp.drawButton(true);
-        }
-        else if (NetworkStatus == ETHERNET_STATIC_SUCCESS)
-        {
-            char output[3];
-            if (prefix > 9)
+            if (DhcpEnabled)
             {
-                output[0] = (uint8_t)(prefix / 10) + '0';
-                output[1] = (uint8_t)(prefix % 10) + '0';
-                output[2] = '\0';
+                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+                button_dhcp.drawButton(true);
             }
             else
             {
-                output[0] = prefix + '0';
-                output[1] = '\0';
+                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+                button_dhcp.drawButton(true);
+
+                button_modify.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, WHITE, (char *)"Modify", 2);
+                button_modify.drawButton(true);
             }
-
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("IP:"));
-            address_to_chararr(ip, address_string);
-            tft.print(address_string);
-            tft.print(F("/"));
-            tft.print(output);
-
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("GW:"));
-            address_to_chararr(gw, address_string);
-            tft.print(address_string);
-
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("DNS:"));
-            address_to_chararr(dns, address_string);
-            tft.print(address_string);
-            tft.setFont();
-
-            button_dhcp.initButton(&tft, X_DIM * 0.6, Y_DIM * 0.9, 300, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"DHCP", 2);
-            button_dhcp.drawButton(true);
         }
-        else if (NetworkStatus == ETHERNET_DHCP_INIT)
-        {
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("DHCP Einstellungen werden geladen..."));
-        }
-        else if (NetworkStatus == ETHERNET_STATIC_INIT)
-        {
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("Statische IP Einstellungen werden geladen..."));
-        }
-        else if (NetworkStatus == ETHERNET_DHCP_FAILED)
-        {
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("Statische IP Konfiguration ist fehlgeschlagen."));
-            button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
-            button_network.drawButton(true);
-            button_dhcp.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
-            button_dhcp.drawButton(true);
-        }
-        else if (NetworkStatus == ETHERNET_STATIC_FAILED)
-        {
-            tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
-            tft.setTextSize(3);
-            tft.print(F("DHCP ist fehlgeschlagen"));
-            button_network.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, YELLOW, (char *)"Retry", 2);
-            button_network.drawButton(true);
-            button_dhcp.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
-            button_dhcp.drawButton(true);
-        }
-        else if (NetworkStatus == ETHERNET_LINKDOWN)
+        else
         {
             tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
             tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
@@ -980,22 +966,261 @@ namespace GUI
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 100, 60);
     }
 
-    uint8_t check_network_ip()
+    uint8_t check_network_ip(bool *dhcpEnabled)
     {
-        // TODO Einstellungen einer statischen IP per GUI
         if (check_button_pressed(button_back))
         {
-            return NETWORK_MENU;
+            return BUTTON_BACK;
         }
         else if (check_button_pressed(button_dhcp))
         {
-            return NETWORK_DHCP_SWITCH;
+            *dhcpEnabled = !*dhcpEnabled;
+            return NETWORK_SETUP;
         }
-        else if (check_button_pressed(button_network))
+        else if (check_button_pressed(button_modify))
         {
-            return NETWORK_RETRY;
+            return NETWORK_STATIC_MODIFY;
         }
-        return NETWORK_DHCP;
+        return NETWORK_IP;
+    }
+
+#define POSITION_X_IP X_DIM * 0.05
+#define POSITION_Y_IP Y_DIM * 0.1
+#define POSITION_X_GW X_DIM * 0.05
+#define POSITION_Y_GW Y_DIM * 0.3
+#define POSITION_X_DNS X_DIM * 0.05
+#define POSITION_Y_DNS Y_DIM * 0.5
+
+    bool validate_addresses(char address_string[49])
+    {
+        uint16_t ip[4], gw[4], dns[4], prefixLength;
+
+        // Extrahiere die Adressen aus dem address_string mit sscanf (cast in unsigned short int, um type warnings zu vermeiden)
+        sscanf(address_string, "%3hu.%3hu.%3hu.%3hu/%2hu%3hu.%3hu.%3hu.%3hu%3hu.%3hu.%3hu.%3hu",
+               (unsigned short int *)&ip[0], (unsigned short int *)&ip[1], (unsigned short int *)&ip[2], (unsigned short int *)&ip[3], (unsigned short int *)&prefixLength,
+               (unsigned short int *)&gw[0], (unsigned short int *)&gw[1], (unsigned short int *)&gw[2], (unsigned short int *)&gw[3],
+               (unsigned short int *)&dns[0], (unsigned short int *)&dns[1], (unsigned short int *)&dns[2], (unsigned short int *)&dns[3]);
+
+        uint8_t i;
+        for (i = 0; i < 4; i++)
+        {
+            // Überprüfe, ob jede Oktett der IP-Adresse im gültigen Bereich (0-255) liegt
+            if (ip[i] > 255)
+            {
+                return false;
+            }
+        }
+
+        // Überprüfe, ob die Präfixlänge im gültigen Bereich (0-32) liegt
+        if (prefixLength > 32)
+        {
+            return false;
+        }
+
+        for (i = 0; i < 4; i++)
+        {
+            // Überprüfe, ob jedes Oktett der Gateway-Adresse im gültigen Bereich (0-255) liegt
+            if (gw[i] > 255)
+            {
+                return false;
+            }
+        }
+
+        for (i = 0; i < 4; i++)
+        {
+            // Überprüfe, ob jedes Oktett der DNS-Adresse im gültigen Bereich (0-255) liegt
+            if (dns[i] > 255)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void draw_address(char address_string[49], uint8_t highlighted)
+    {
+        uint8_t i;
+
+        for (i = 0; i < 18; i++)
+        {
+            if (i == highlighted)
+            {
+                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], COLOR_BLACK, WHITE, 4);
+            }
+            else
+            {
+                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+            }
+        }
+
+        for (i = 18; i < 33; i++)
+        {
+            if (i == highlighted)
+            {
+                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], COLOR_BLACK, WHITE, 4);
+            }
+            else
+            {
+                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+            }
+        }
+
+        for (i = 33; i < 48; i++)
+        {
+            if (i == highlighted)
+            {
+                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], COLOR_BLACK, WHITE, 4);
+            }
+            else
+            {
+                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+            }
+        }
+    }
+
+    void network_ip_static(char address_string[49])
+    {
+        Waveshield.fillScreen(COLOR_BACKGROUND);
+        string_position = 0;
+        draw_address(address_string, string_position);
+        draw_numeric_keyboard(false);
+    }
+
+    uint8_t check_network_ip_static(char address_string[49])
+    {
+        uint8_t input = check_numeric_keyboard(false);
+
+        char buffer[49];
+        strcpy(buffer, address_string);
+
+        if (input < 10)
+        {
+            buffer[string_position] = input + '0';
+
+            if (!validate_addresses(buffer))
+            {
+#ifdef DEBUG
+                Serial.println("[Error] (GUI) Invalid input");
+#endif
+                return NETWORK_STATIC_MODIFY;
+            }
+            else
+            {
+                address_string[string_position] = input + '0';
+                draw_address(address_string, string_position);
+            }
+        }
+        switch (input)
+        {
+
+        case BUTTON_RIGH:
+        {
+            if (string_position == 0 ||
+                string_position == 1 ||
+                string_position == 4 ||
+                string_position == 5 ||
+                string_position == 8 ||
+                string_position == 9 ||
+                string_position == 12 ||
+                string_position == 13 ||
+                string_position == 16 ||
+                string_position == 17 ||
+                string_position == 18 ||
+                string_position == 19 ||
+                string_position == 22 ||
+                string_position == 23 ||
+                string_position == 26 ||
+                string_position == 27 ||
+                string_position == 30 ||
+                string_position == 31 ||
+                string_position == 32 ||
+                string_position == 33 ||
+                string_position == 34 ||
+                string_position == 37 ||
+                string_position == 38 ||
+                string_position == 41 ||
+                string_position == 42 ||
+                string_position == 45 ||
+                string_position == 46)
+            {
+                string_position += 1;
+            }
+            else if (string_position == 2 ||
+                     string_position == 6 ||
+                     string_position == 10 ||
+                     string_position == 14 ||
+                     string_position == 20 ||
+                     string_position == 24 ||
+                     string_position == 28 ||
+                     string_position == 35 ||
+                     string_position == 39 ||
+                     string_position == 43)
+            {
+                string_position += 2;
+            }
+            draw_address(address_string, string_position);
+            return NETWORK_STATIC_MODIFY;
+            break;
+        }
+
+        case BUTTON_LEFT:
+        {
+            if (string_position == 1 ||
+                string_position == 2 ||
+                string_position == 5 ||
+                string_position == 6 ||
+                string_position == 9 ||
+                string_position == 10 ||
+                string_position == 13 ||
+                string_position == 14 ||
+                string_position == 17 ||
+                string_position == 18 ||
+                string_position == 19 ||
+                string_position == 20 ||
+                string_position == 23 ||
+                string_position == 24 ||
+                string_position == 27 ||
+                string_position == 28 ||
+                string_position == 31 ||
+                string_position == 32 ||
+                string_position == 33 ||
+                string_position == 34 ||
+                string_position == 35 ||
+                string_position == 38 ||
+                string_position == 39 ||
+                string_position == 42 ||
+                string_position == 43 ||
+                string_position == 46 ||
+                string_position == 47)
+            {
+                string_position -= 1;
+            }
+            else if (string_position == 4 ||
+                     string_position == 8 ||
+                     string_position == 12 ||
+                     string_position == 16 ||
+                     string_position == 22 ||
+                     string_position == 26 ||
+                     string_position == 30 ||
+                     string_position == 37 ||
+                     string_position == 41 ||
+                     string_position == 45)
+            {
+                string_position -= 2;
+            }
+            draw_address(address_string, string_position);
+            return NETWORK_STATIC_MODIFY;
+            break;
+        }
+        default:
+            break;
+        }
+        if (check_button_pressed(button_accept))
+        {
+            return BUTTON_ACCEPT;
+        }
+        return NETWORK_STATIC_MODIFY;
     }
 
     void draw_alarm_exception_list_element(char alarm_exception_string[13], bool reoccurring, uint8_t index, bool highlighted)

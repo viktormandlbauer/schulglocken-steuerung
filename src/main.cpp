@@ -16,9 +16,7 @@ static Time::Alarm alarm;
 static uint8_t alarm_count = 0;
 static bool alarms_enabled = true;
 
-uint8_t ip[4], gw[4], dns[4], prefix;
-
-char alarm_string[64][6];
+char alarm_string[MAXIMUM_AMOUNT_ALARMS][6];
 int navigation = GUI_INIT;
 int last_navigation = GUI_INIT;
 int selection;
@@ -30,6 +28,7 @@ char day_string[4];
 
 char buffer[20];
 char compare_time_string[9];
+char addresses_string[49];
 
 Time::AlarmException alarm_exceptions[MAXIMUM_AMOUNT_EXCEPTIONS];
 uint8_t alarm_exceptions_count = 0;
@@ -39,43 +38,6 @@ char exception_buffer[MAXIMUM_AMOUNT_EXCEPTIONS][13];
 bool reoccurring[MAXIMUM_AMOUNT_EXCEPTIONS];
 bool reoccuring_exception;
 uint8_t weekday_exception_list;
-
-void network_manager()
-{
-    uint8_t NetworkSetup = Network::NetworkStatus;
-
-    if (Network::init_ethernet())
-    {
-#ifdef DEBUG
-        Serial.println(F("[Info] (Main) Ethernet Modul wurde aktiviert."));
-#endif
-        if (Network::is_cable_connected())
-        {
-#ifdef DEBUG
-            Serial.println(F("[Info] (Main) Netzwerkanschluss ist aktiv."));
-#endif
-            if (NetworkSetup == ETHERNET_DHCP_INIT)
-            {
-                Network::dhcp_setup();
-                if (Network::NetworkStatus == ETHERNET_DHCP_SUCCESS)
-                {
-                    Storage::save_network_settings(Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
-                    Storage::save_network_dhcp(true);
-                }
-            }
-            else if (NetworkSetup == ETHERNET_STATIC_INIT)
-            {
-                Storage::read_network_settings(ip, gw, dns, &prefix);
-                Network::static_setup(ip, gw, dns, prefix);
-
-                if (Network::NetworkStatus == ETHERNET_STATIC_SUCCESS)
-                {
-                    Storage::save_network_dhcp(false);
-                }
-            }
-        }
-    }
-}
 
 void navigation_handler()
 {
@@ -94,11 +56,6 @@ void navigation_handler()
         Serial.println(F("[Info] (Main) Menu"));
 #endif
         navigation = GUI::check_menu();
-
-        if (navigation == TIME)
-        {
-            GUI::update_time(false);
-        }
         break;
     }
     case TIMEPLAN:
@@ -133,10 +90,6 @@ void navigation_handler()
     case TIME:
     {
         navigation = GUI::check_time();
-        if (navigation != TIME)
-        {
-            GUI::update_time(false);
-        }
         if (navigation == BUTTON_MODIFY)
         {
             navigation = TIME_SETTING;
@@ -250,41 +203,52 @@ void navigation_handler()
         navigation = GUI::check_network_menu();
         break;
     }
-    case NETWORK_DHCP:
+    case NETWORK_IP:
     {
-        selection = GUI::check_network_ip();
+        selection = GUI::check_network_ip(&Network::nw_status.DhcpEnabled);
 
-        if (selection == NETWORK_DHCP_SWITCH)
+        if (selection == NETWORK_SETUP)
         {
-            if ((Network::NetworkStatus == ETHERNET_DHCP_SUCCESS) || (Network::NetworkStatus == ETHERNET_DHCP_FAILED))
+            if (!Network::nw_status.linkup)
             {
-                Network::NetworkStatus = ETHERNET_STATIC_INIT;
+                Network::check_link();
+                refresh = true;
             }
-            else if ((Network::NetworkStatus == ETHERNET_STATIC_SUCCESS) || (Network::NetworkStatus == ETHERNET_STATIC_FAILED))
+            else if (Network::nw_status.DhcpEnabled)
             {
-                Network::NetworkStatus = ETHERNET_DHCP_INIT;
-            }
-
-            GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
-            network_manager();
-            GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
-        }
-        else if (selection == NETWORK_RETRY)
-        {
-            if (Network::NetworkStatus == ETHERNET_DHCP_FAILED)
-            {
-                Network::NetworkStatus = ETHERNET_DHCP_INIT;
-                network_manager();
-            }
-            else if (Network::NetworkStatus == ETHERNET_STATIC_FAILED)
-            {
-                Network::NetworkStatus = ETHERNET_DHCP_FAILED;
-                network_manager();
+                if (Network::dhcp_setup())
+                {
+                    Storage::save_network_dhcp(true);
+                }
+                else
+                {
+                }
+                refresh = true;
             }
         }
-        else if (selection == NETWORK_MENU)
+        else if (selection == BUTTON_BACK)
         {
             navigation = NETWORK_MENU;
+        }
+        else if (selection == NETWORK_STATIC_MODIFY)
+        {
+            navigation = NETWORK_STATIC_MODIFY;
+        }
+        break;
+    }
+    case NETWORK_STATIC_MODIFY:
+    {
+        selection = GUI::check_network_ip_static(addresses_string);
+        if (selection == BUTTON_ACCEPT)
+        {
+            sscanf(addresses_string, "%3hhu.%3hhu.%3hhu.%3hhu/%2hhu%3hhu.%3hhu.%3hhu.%3hhu%3hhu.%3hhu.%3hhu.%3hhu",
+                   &Network::nw_status.ip[0], &Network::nw_status.ip[1], &Network::nw_status.ip[2], &Network::nw_status.ip[3], &Network::nw_status.snm,
+                   &Network::nw_status.gw[0], &Network::nw_status.gw[1], &Network::nw_status.gw[2], &Network::nw_status.gw[3],
+                   &Network::nw_status.dns[0], &Network::nw_status.dns[1], &Network::nw_status.dns[2], &Network::nw_status.dns[3]);
+            Storage::save_network_settings(Network::nw_status.ip, Network::nw_status.gw, Network::nw_status.dns, Network::nw_status.snm);
+            Storage::save_network_dhcp(false);
+            Network::static_setup(Network::nw_status.ip, Network::nw_status.gw, Network::nw_status.dns, Network::nw_status.snm);
+            navigation = NETWORK_IP;
         }
         break;
     }
@@ -493,11 +457,24 @@ void refresh_handler()
         GUI::network_menu();
         break;
     }
-    case NETWORK_DHCP:
+    case NETWORK_IP:
     {
-        GUI::network_ip(Network::NetworkStatus, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
+        Network::check_link();
+        GUI::network_ip(Network::nw_status.DhcpEnabled, Network::nw_status.linkup, Network::nw_status.error_code, Network::get_ip(), Network::get_gw(), Network::get_dns(), Network::get_prefix());
         break;
     }
+    case NETWORK_STATIC_MODIFY:
+    {
+        sprintf(addresses_string, "%03d.%03d.%03d.%03d/%02d%03d.%03d.%03d.%03d%03d.%03d.%03d.%03d",
+                Network::nw_status.ip[0], Network::nw_status.ip[1], Network::nw_status.ip[2], Network::nw_status.ip[3],
+                Network::nw_status.snm,
+                Network::nw_status.gw[0], Network::nw_status.gw[1], Network::nw_status.gw[2], Network::nw_status.gw[3],
+                Network::nw_status.dns[0], Network::nw_status.dns[1], Network::nw_status.dns[2], Network::nw_status.dns[3]);
+
+        GUI::network_ip_static(addresses_string);
+        break;
+    }
+
     case NETWORK_NTP:
     {
         Time::get_formatted_time(TimeSync::LastNtpSync, buffer);
@@ -556,18 +533,25 @@ void setup()
 #ifdef DEBUG
     Serial.println("[Info] (Main) RTC Modul wurde aktiviert.");
 #endif
-    // TODO
-    if (Storage::read_network_dhcp())
+    Network::init_ethernet();
+    Network::check_link();
+    Network::nw_status.DhcpEnabled = Storage::read_network_dhcp();
+    Storage::read_network_settings(Network::nw_status.ip, Network::nw_status.gw, Network::nw_status.dns, &Network::nw_status.snm);
+
+    if (Network::nw_status.active && Network::nw_status.linkup)
     {
-        Network::NetworkStatus = ETHERNET_DHCP_INIT;
+        if (Network::nw_status.DhcpEnabled)
+        {
+            Network::dhcp_setup();
+        }
+        else
+        {
+            Network::static_setup(Network::nw_status.ip, Network::nw_status.gw, Network::nw_status.dns, Network::nw_status.snm);
+        }
     }
-    else
-    {
-        Network::NetworkStatus = ETHERNET_STATIC_INIT;
-    }
-    network_manager();
 
     TimeSync::init_timesync(Storage::read_network_ntp());
+
 #ifdef DEBUG
     Serial.println("[Info] (Main) Zeitsynchronisation wurde aktiviert.");
 #endif

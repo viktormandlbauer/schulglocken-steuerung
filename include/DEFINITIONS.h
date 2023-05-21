@@ -2,13 +2,13 @@
  * Programmdefinitionen
  */
 
-// Sommerzeit deaktivierbar machen
-
 // Pin Definitionen
 #define RELAIS 30
 #define LED_SIGNAL 24
 #define AUDIO_SIGNAL 22
 #define CS_ETHERNET 28
+#define CS_PIN 4
+#define TIRQ_PIN 3
 
 // Maximal möglich einstellbare Alarme
 #define MAXIMUM_AMOUNT_ALARMS 64
@@ -20,7 +20,7 @@
 #define MAXIMUM_AMOUNT_EXCEPTIONS 20
 
 // MAC Addresse der Netzwerkschnittstelle
-#define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
+#define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x32};
 
 // Farbeschema grafischen Benutzeroberfläche
 #define COLOR_BLACK 0x0000
@@ -80,12 +80,13 @@
 #define NETWORK_CONFIG 8
 #define NETWORK_NTP 9
 #define NETWORK_STATUS 10
-#define NETWORK_DHCP 11
-#define NETWORK_RETRY 12
+#define NETWORK_IP 11
+#define NETWORK_SETUP 12
 #define NETWORK_HTTP 13
 #define REMOVE_EXCEPTION 14
 #define ADD_EXCEPTION 15
 #define WEEKDAY_EXCEPTION 16
+#define NETWORK_STATIC_MODIFY 17
 #define STANDARD 100
 #define NETWORK_NTP_SWITCH 245
 #define NETWORK_NTP_TEST 246
