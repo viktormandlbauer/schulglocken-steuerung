@@ -216,7 +216,8 @@ void navigation_handler()
             }
             else if (Network::nw_status.DhcpEnabled)
             {
-                if (Network::dhcp_setup())
+                Network::dhcp_setup();
+                if (!Network::nw_status.error_code)
                 {
                     Storage::save_network_dhcp(true);
                 }
@@ -540,7 +541,7 @@ void setup()
 
     if (Network::nw_status.active && Network::nw_status.linkup)
     {
-        if (Network::nw_status.DhcpEnabled)
+        if (!Network::nw_status.DhcpEnabled)
         {
             Network::dhcp_setup();
         }

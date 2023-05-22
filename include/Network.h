@@ -27,7 +27,7 @@ namespace Network
     // Read-Only settings 
     const char hostname[] PROGMEM = HOSTNAME;
     const char timeServer[] PROGMEM = "pool.ntp.org";
-    const byte mac_address[6] PROGMEM = MAC_ADDRESS;
+    const static uint8_t mac_address[6] = MAC_ADDRESS;
     const unsigned int NTP_LOCALPORT PROGMEM = 8888;
     const unsigned int NTP_PACKET_SIZE PROGMEM = 48;
     const unsigned int NTP_REMOTEPORT PROGMEM = 123;
@@ -36,7 +36,7 @@ namespace Network
     void init_ethernet();
     void check_link();
     bool static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm);
-    bool dhcp_setup();
+    void dhcp_setup();
     uint8_t *get_ip();
     uint8_t *get_gw();
     uint8_t *get_dns();

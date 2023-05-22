@@ -20,7 +20,7 @@
 #define MAXIMUM_AMOUNT_EXCEPTIONS 20
 
 // MAC Addresse der Netzwerkschnittstelle
-#define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x32};
+#define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
 // Farbeschema grafischen Benutzeroberfläche
 #define COLOR_BLACK 0x0000

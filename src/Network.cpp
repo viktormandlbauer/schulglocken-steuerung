@@ -1,5 +1,4 @@
 #include "Network.h"
-
 byte Ethernet::buffer[700];
 
 namespace Network
@@ -47,31 +46,28 @@ namespace Network
         nw_status.linkup = true;
     }
 
-    bool dhcp_setup()
+    void dhcp_setup()
     {
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Starting DHCP setup."));
 #endif
-        if (ether.dhcpSetup(hostname))
-        {
-#ifdef DEBUG
-            Serial.println(F("[Info] (Network) DHCP setup successful!"));
-            ether.printIp(F("[Info] IP:   "), ether.myip);
-            ether.printIp(F("[Info] GW:   "), ether.gwip);
-            ether.printIp(F("[Info] DNS:  "), ether.dnsip);
-            ether.printIp(F("[Info] NM:   "), ether.netmask);
-#endif
-            nw_status.error_code = 0;
-            return true;
-        }
-        else
+        if (!ether.dhcpSetup(hostname))
         {
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) DHCP failed."));
 #endif
             nw_status.error_code = ETHERNET_DHCP_FAILED;
-            return false;
+            return;
         }
+#ifdef DEBUG
+
+        Serial.println(F("[Info] (Network) DHCP setup successful!"));
+        ether.printIp(F("[Info] IP:   "), ether.myip);
+        ether.printIp(F("[Info] GW:   "), ether.gwip);
+        ether.printIp(F("[Info] DNS:  "), ether.dnsip);
+        ether.printIp(F("[Info] NM:   "), ether.netmask);
+#endif
+        nw_status.error_code = 0;
     }
 
     bool static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
@@ -85,20 +81,7 @@ namespace Network
         netmask[2] = (mask >> 8) & 0xFF;
         netmask[3] = mask & 0xFF;
 
-        if (ether.staticSetup(ip, gw, dns, netmask))
-        {
-#ifdef DEBUG
-            Serial.println(F("[Info] (Network) Static network successful!"));
-            ether.printIp(F("[Info] (Network) IP:   "), ether.myip);
-            ether.printIp(F("[Info] (Network) GW:   "), ether.gwip);
-            ether.printIp(F("[Info] (Network) DNS:  "), ether.dnsip);
-            ether.printIp(F("[Info] (Network) NM:   "), ether.netmask);
-#endif
-
-            nw_status.error_code = 0;
-            return true;
-        }
-        else
+        if (!ether.staticSetup(ip, gw, dns, netmask))
         {
 #ifdef DEBUG
             Serial.println(F("[Error] (Network) Static network setup failed!"));
@@ -106,6 +89,17 @@ namespace Network
             nw_status.error_code = ETHERNET_STATIC_FAILED;
             return false;
         }
+
+#ifdef DEBUG
+        Serial.println(F("[Info] (Network) Static network successful!"));
+        ether.printIp(F("[Info] (Network) IP:   "), ether.myip);
+        ether.printIp(F("[Info] (Network) GW:   "), ether.gwip);
+        ether.printIp(F("[Info] (Network) DNS:  "), ether.dnsip);
+        ether.printIp(F("[Info] (Network) NM:   "), ether.netmask);
+#endif
+
+        nw_status.error_code = 0;
+        return true;
     }
 
     BufferFiller bfill;
@@ -160,5 +154,4 @@ namespace Network
         }
         return snm_prefix;
     }
-
 }
