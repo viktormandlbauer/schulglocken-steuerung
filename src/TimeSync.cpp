@@ -2,9 +2,6 @@
 #include "Time.h"
 #include "Network.h"
 
-// NetworkStatus from Network.h
-// Network::NetworkStatus Network::nw_status;
-
 namespace TimeSync
 {
     bool EnableNtpSync = false;
