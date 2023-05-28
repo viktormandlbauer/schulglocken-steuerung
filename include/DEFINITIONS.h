@@ -7,24 +7,39 @@
 #define LED_SIGNAL 24
 #define AUDIO_SIGNAL 22
 #define CS_ETHERNET 28
-#define CS_PIN 4
+#define CS_TP 4
+#define CS_LCD 10
 #define TIRQ_PIN 3
 
 // Maximal möglich einstellbare Alarme
 #define MAXIMUM_AMOUNT_ALARMS 64
 
-// Maximal mögliche verschiedene Alarmtypen
+// Verschiedene Alarmtypen
 #define MAXIMUM_AMOUNT_ALARM_TYPES 3
 
-// Maximale Anzahl an Ausnahmen
+// Anzahl Datumsausnahmen
 #define MAXIMUM_AMOUNT_EXCEPTIONS 20
 
 // MAC Addresse der Netzwerkschnittstelle
 #define MAC_ADDRESS {0x74, 0x69, 0x69, 0x2D, 0x30, 0x31};
 
+// Hostname
+#define HOSTNAME "sgs2023"
+
+// Zeitserver
+#define NTP_SERVER "pool.ntp.org"
+
+// Synchronisierungsintervall Systemzeit mit RTC in Sekunden
+#define SYNC_INTERVAL_RTC 600
+
+// NTP Synchronisation nach x RTC-Synchronisationen
+#define SYNC_WITH_NTP 60
+
+// Displaydimension
+#define X_DIM 480
+#define Y_DIM 320
+
 // Farbeschema grafischen Benutzeroberfläche
-#define COLOR_BLACK 0x0000
-#define COLOR_WHITE 0xFFFF
 #define COLOR_PRIMARY 0x4C96
 #define COLOR_SECONDARY 0x02F2
 #define COLOR_BACKGROUND 0xC6DD
@@ -38,19 +53,6 @@
 #define MAGENTA 0xF81F
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
-
-// Displaydimension
-#define X_DIM 480
-#define Y_DIM 320
-
-// Hostname
-#define HOSTNAME "sgs2023"
-
-// Synchronisierungsintervall Systemzeit mit RTC in Sekunden
-#define SYNC_INTERVAL_RTC 600
-
-// NTP Synchronisation nach x RTC-Synchronisationen
-#define SYNC_WITH_NTP 60
 
 /**
  * Bereich für das Aktivieren/Deaktivieren des Debug Modes in den verschiedenen Bereichen.
@@ -67,6 +69,8 @@
 #define DEBUG_STORAGE
 #define DEBUG_GUI
 #define DEBUG_NETWORK
+
+#define BAUD_RATE 9600
 
 // Definitionen für "return codes"
 #define MENU 0
@@ -104,13 +108,5 @@
 #define GUI_INIT STANDARD
 
 // Network Status Code
-#define ETHERNET_INITIALIZED_FAILED 255
-#define ETHERNET_LINKDOWN 254
 #define ETHERNET_DHCP_FAILED 253
 #define ETHERNET_STATIC_FAILED 252
-#define ETHERNET_INITIALIZED 0
-#define ETHERNET_LINKUP 1
-#define ETHERNET_DHCP_INIT 2
-#define ETHERNET_DHCP_SUCCESS 3
-#define ETHERNET_STATIC_INIT 4
-#define ETHERNET_STATIC_SUCCESS 5

@@ -45,8 +45,7 @@ namespace Time
         return hour * 60ul + minute;
     }
 
-    // Funktion zur Formatierung eines Unix-Zeitstempels als Zeichenkette im Format DD.MM.YYYY HH:MM:SS
-    void get_formatted_time(time_t unix_time, char *buffer)
+    void get_formatted_datetime(time_t unix_time, char *buffer)
     {
         sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d", day(unix_time), month(unix_time), year(unix_time), hour(unix_time), minute(unix_time), second(unix_time));
     }
@@ -77,7 +76,7 @@ namespace Time
         }
     }
 
-    bool init_rtc_module(void)
+    bool init_rtc_module()
     {
         while (!rtc.begin())
         {
@@ -96,11 +95,11 @@ namespace Time
         return true;
     }
 
-    byte dstOffset(byte d, byte m, unsigned int y, byte h)
+    uint8_t dstOffset(uint8_t d, uint8_t m, uint16_t y, uint8_t h)
     {
         // Berechnung des Datums, an dem die Sommerzeit beginnt und endet
-        byte dstOn = (31 - (5 * y / 4 + 4) % 7);
-        byte dstOff = (31 - (5 * y / 4 + 1) % 7);
+        uint8_t dstOn = (31 - (5 * y / 4 + 4) % 7);
+        uint8_t dstOff = (31 - (5 * y / 4 + 1) % 7);
 
         // Überprüfung, ob das aktuelle Datum innerhalb des Sommerzeitzeitraums liegt
         if ((m > 3 && m < 10) ||
@@ -110,7 +109,8 @@ namespace Time
         else
             return 0;
     }
-
+    
+    uint8_t utcOffset = 1;
     time_t get_corrected_utctime(time_t t)
     {
         // Überprüfen, ob die Eingabezeit gültig ist
@@ -265,7 +265,7 @@ namespace Time
         sprintf(buffer, "%02d.%02d-%02d.%02d", alarm_exception.BeginDay, alarm_exception.BeginMonth, alarm_exception.EndDay, alarm_exception.EndMonth);
     }
 
-    void get_alarm_exceptions(AlarmException *alarm_exceptions, uint8_t alarm_exception_count, char buffer[][13], bool reoccurring_exception[])
+    void get_alarm_exceptions_strings(AlarmException *alarm_exceptions, uint8_t alarm_exception_count, char buffer[][13], bool reoccurring_exception[])
     {
         for (uint8_t i = 0; i < alarm_exception_count; i++)
         {
@@ -310,11 +310,11 @@ namespace Time
         return exception_count - 1;
     }
 
-    void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t wanting)
+    void get_upcoming_alarm_strings(Alarm alarms[], uint8_t alarm_count, char output[][6], uint8_t result_count)
     {
         uint16_t minutes_passed = get_minutes_passed();
         uint8_t found = 0;
-        for (uint8_t i = 0; (i < alarm_count) && (found < wanting); i++)
+        for (uint8_t i = 0; (i < alarm_count) && (found < result_count); i++)
         {
             if (minutes_passed < alarms[i].minutes)
             {
@@ -467,25 +467,27 @@ namespace Time
 
     void init_alarm_interrupt()
     {
-        // Reset Timer1
+        // Zurücksetzen von Timer/Counter1 Control Register A
         TCCR1A = 0;
 
-        // Reset timer on compare interrupt match
+        // Setze CTC (Clear Timer on Compare) Modus in Timer/Counter Control Register B
         TCCR1B &= ~(1 << WGM13);
         TCCR1B |= (1 << WGM12);
 
-        // Set prescaler to 64
+        // Setze Prescaler auf 64 in Timer/Counter1 in Controler Register B
         TCCR1B |= (1 << CS11);
         TCCR1B |= (1 << CS10);
 
-        // Set compare register
+        // Setze Timer/Counter1 auf 0
         TCNT1 = 0;
+
+        // Setze Output Compare Register
         OCR1A = 62500;
 
-        // Enable Timer1 compare interrupt ~ interrupts every 0.25 seconds
+        // Aktiviere Vergleichsregister für Timer/Counter1 
         TIMSK1 = (1 << OCIE1A);
 
-        // Enable global interrupts
+        // Aktiviere globale Interrupts
         interrupts();
     }
 }

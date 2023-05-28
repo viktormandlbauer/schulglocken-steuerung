@@ -7,7 +7,7 @@ namespace GUI
     Adafruit_GFX &tft = Waveshield;
     TSPoint p;
 
-    XPT2046_Touchscreen ts(CS_PIN, TIRQ_PIN);
+    XPT2046_Touchscreen ts(CS_TP, TIRQ_PIN);
 
     void draw_button(Adafruit_GFX_Button button, int x_pos, int y_pos, int xsize, int ysize, char *textarr, int textsize, uint16_t outlinecolor, uint16_t textcolor, uint16_t innercolor)
     {
@@ -37,10 +37,10 @@ namespace GUI
 
         Waveshield.fillScreen(COLOR_BACKGROUND);
 
-        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
-        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
-        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"System", 3);
-        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
+        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
+        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
+        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"System", 3);
+        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
 
         button_plan.drawButton(true);
         button_time.drawButton(true);
@@ -64,11 +64,11 @@ namespace GUI
     void draw_menu_button(uint16_t pos_x, uint16_t pos_y, uint8_t width, uint8_t height)
     {
         button_main.initButton(&tft, pos_x, pos_y, width, height,
-                               COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 0);
+                               COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"", 0);
         button_main.drawButton(true);
-        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.5, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
-        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.25, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
-        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y, width - PADDING_X * 2, height * 0.1, COLOR_WHITE);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.5, width - PADDING_X * 2, height * 0.1, WHITE);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y - height * 0.25, width - PADDING_X * 2, height * 0.1, WHITE);
+        tft.fillRect(PADDING_X + pos_x - width * 0.5, PADDING_Y + pos_y, width - PADDING_X * 2, height * 0.1, WHITE);
     }
 
     Adafruit_GFX_Button button_back;
@@ -76,7 +76,7 @@ namespace GUI
     {
 
         button_back.initButton(&tft, BACKARROW_POS_X, BACKARROW_POS_Y, BACKARROW_WIDTH, BACKARROW_HEIGHT,
-                               COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 0);
+                               COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"", 0);
         button_back.drawButton(true);
 
         tft.fillTriangle(BACKARROW_POS_X - BACKARROW_WIDTH * 0.5 + 5,
@@ -85,23 +85,23 @@ namespace GUI
                          BACKARROW_POS_Y + BACKARROW_HEIGHT * 0.5 - 10,
                          BACKARROW_POS_X,
                          BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.5 + 10,
-                         COLOR_WHITE);
+                         WHITE);
 
         tft.fillRect(BACKARROW_POS_X,
                      BACKARROW_POS_Y - BACKARROW_HEIGHT * 0.125,
                      BACKARROW_WIDTH * 0.5 - 5,
                      BACKARROW_HEIGHT * 0.25,
-                     COLOR_WHITE);
+                     WHITE);
     }
 
     Adafruit_GFX_Button button_alarm[4], button_up, button_down, button_add;
 
     void draw_alarms(char alarm_strings[][6], uint8_t alarm_list_position)
     {
-        button_alarm[0].initButton(&tft, X_DIM / 2, (Y_DIM * 0.3), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[0 + alarm_list_position], 3);
-        button_alarm[1].initButton(&tft, X_DIM / 2, (Y_DIM * 0.45), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[1 + alarm_list_position], 3);
-        button_alarm[2].initButton(&tft, X_DIM / 2, (Y_DIM * 0.6), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[2 + alarm_list_position], 3);
-        button_alarm[3].initButton(&tft, X_DIM / 2, (Y_DIM * 0.75), X_DIM * 0.5, 50, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, alarm_strings[3 + alarm_list_position], 3);
+        button_alarm[0].initButton(&tft, X_DIM / 2, (Y_DIM * 0.3), X_DIM * 0.5, 50, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, alarm_strings[0 + alarm_list_position], 3);
+        button_alarm[1].initButton(&tft, X_DIM / 2, (Y_DIM * 0.45), X_DIM * 0.5, 50, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, alarm_strings[1 + alarm_list_position], 3);
+        button_alarm[2].initButton(&tft, X_DIM / 2, (Y_DIM * 0.6), X_DIM * 0.5, 50, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, alarm_strings[2 + alarm_list_position], 3);
+        button_alarm[3].initButton(&tft, X_DIM / 2, (Y_DIM * 0.75), X_DIM * 0.5, 50, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, alarm_strings[3 + alarm_list_position], 3);
         button_alarm[0].drawButton(true);
         button_alarm[1].drawButton(true);
         button_alarm[2].drawButton(true);
@@ -112,9 +112,9 @@ namespace GUI
 
     void draw_alarm_list(char alarm_strings[][6])
     {
-        button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 3);
-        button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"", 3);
-        button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"+", 5);
+        button_up.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.35, 60, 80, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"", 3);
+        button_down.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.60, 60, 80, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"", 3);
+        button_add.initButton(&tft, X_DIM * 0.9, Y_DIM * 0.85, 60, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"+", 5);
 
         button_down.drawButton(true);
         button_up.drawButton(true);
@@ -131,7 +131,7 @@ namespace GUI
 
         Waveshield.fillScreen(COLOR_BACKGROUND);
         tft.setCursor(150, Y_DIM * 0.125);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setTextSize(4);
         tft.print("Zeitplan");
         tft.setFont();
@@ -201,20 +201,20 @@ namespace GUI
 
     void draw_numeric_keyboard(bool enable_delete_button)
     {
-        buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"0", 4);
-        buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"1", 4);
-        buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"2", 4);
-        buttons_keys[3].initButton(&tft, 168, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"3", 4);
-        buttons_keys[4].initButton(&tft, 216, 230, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"4", 4);
-        buttons_keys[5].initButton(&tft, 24, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"5", 4);
-        buttons_keys[6].initButton(&tft, 72, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"6", 4);
-        buttons_keys[7].initButton(&tft, 120, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"7", 4);
-        buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"8", 4);
-        buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"9", 4);
+        buttons_keys[0].initButton(&tft, 24, 230, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"0", 4);
+        buttons_keys[1].initButton(&tft, 72, 230, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"1", 4);
+        buttons_keys[2].initButton(&tft, 120, 230, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"2", 4);
+        buttons_keys[3].initButton(&tft, 168, 230, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"3", 4);
+        buttons_keys[4].initButton(&tft, 216, 230, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"4", 4);
+        buttons_keys[5].initButton(&tft, 24, 290, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"5", 4);
+        buttons_keys[6].initButton(&tft, 72, 290, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"6", 4);
+        buttons_keys[7].initButton(&tft, 120, 290, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"7", 4);
+        buttons_keys[8].initButton(&tft, 168, 290, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"8", 4);
+        buttons_keys[9].initButton(&tft, 216, 290, 48, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"9", 4);
 
-        button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"<", 3);
-        button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)">", 3);
-        button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Sichern", 3);
+        button_left.initButton(&tft, 300, 230, 120, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"<", 3);
+        button_right.initButton(&tft, 420, 230, 120, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)">", 3);
+        button_accept.initButton(&tft, 360, 290, 240, 60, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Sichern", 3);
 
         buttons_keys[0].drawButton(true);
         buttons_keys[1].drawButton(true);
@@ -233,7 +233,7 @@ namespace GUI
 
         if (enable_delete_button)
         {
-            button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Entfernen", 2);
+            button_delete.initButton(&tft, 400, 24, 160, 60, COLOR_PRIMARY, WHITE, RED, (char *)"Entfernen", 2);
             button_delete.drawButton(true);
         }
     }
@@ -300,11 +300,11 @@ namespace GUI
         {
             if (i == string_position)
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], COLOR_BLACK, COLOR_WHITE, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, datetime_string[i], BLACK, COLOR_BACKGROUND, 5);
             }
         }
     }
@@ -315,11 +315,11 @@ namespace GUI
         {
             if (i == string_position)
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], COLOR_BLACK, COLOR_WHITE, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(0.5 * Y_DIM + 30 * i, Y_DIM * 0.4, date_string[i], BLACK, COLOR_BACKGROUND, 5);
             }
         }
     }
@@ -462,10 +462,10 @@ namespace GUI
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
 
-        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
-        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
-        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"System", 3);
-        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
+        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
+        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
+        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"System", 3);
+        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
 
         button_plan.drawButton(true);
         button_time.drawButton(true);
@@ -526,11 +526,11 @@ namespace GUI
         uint8_t i;
         for (i = 0; i < 9; i++)
         {
-            tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], BLACK, COLOR_BACKGROUND, 5);
         }
         for (i = 9; i < 20; i++)
         {
-            tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+            tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], BLACK, COLOR_BACKGROUND, 5);
         }
     }
     void draw_datetime(char datetime_string[20], uint8_t highlighted)
@@ -540,22 +540,22 @@ namespace GUI
         {
             if (i == highlighted)
             {
-                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, WHITE, 5);
+                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(POSITION_X_TIME + 30 * i, POSITION_Y_TIME, datetime_string[i], BLACK, COLOR_BACKGROUND, 5);
             }
         }
         for (i = 9; i < 20; i++)
         {
             if (i == highlighted)
             {
-                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, WHITE, 5);
+                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(POSITION_X_DATE + 30 * (i - 9), POSITION_Y_DATE, datetime_string[i], BLACK, COLOR_BACKGROUND, 5);
             }
         }
     }
@@ -702,7 +702,7 @@ namespace GUI
         {
             Waveshield.fillScreen(COLOR_BACKGROUND);
             draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
-            button_modify.initButton(&tft, 400, 30, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, COLOR_WHITE, (char *)"Modify", 3);
+            button_modify.initButton(&tft, 400, 30, 160, 60, COLOR_SECONDARY, COLOR_PRIMARY, WHITE, (char *)"Modify", 3);
             button_modify.drawButton();
             time_setting_bg_drawn = true;
         }
@@ -751,10 +751,10 @@ namespace GUI
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
 
-        button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"IP", 3);
-        button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
-        button_http.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"HTTP", 3);
-        button_networkstatus.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Status", 3);
+        button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"IP", 3);
+        button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
+        button_http.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"HTTP", 3);
+        button_networkstatus.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Status", 3);
 
         button_ntp.drawButton(true);
         button_dhcp.drawButton(true);
@@ -787,12 +787,12 @@ namespace GUI
     void network_ntp(char *lastNtpSync, bool isEnabled)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.1);
         tft.setTextSize(4);
         tft.print("NTP Einstellungen");
 
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.1, Y_DIM * 0.2);
         tft.setTextSize(3);
         tft.print("NTP ist ");
@@ -804,15 +804,15 @@ namespace GUI
             tft.print("Letzte Synchronisierung: ");
             tft.setCursor(X_DIM * 0.1, Y_DIM * 0.5);
             tft.print(lastNtpSync);
-            button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"OFF", 2);
+            button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, WHITE, RED, (char *)"OFF", 2);
             button_ntp.drawButton(true);
-            button_networkstatus.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Test", 2);
+            button_networkstatus.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Test", 2);
             button_networkstatus.drawButton(true);
         }
         else
         {
             tft.print("deaktiviert");
-            button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"ON", 2);
+            button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, BLACK, GREEN, (char *)"ON", 2);
             button_ntp.drawButton(true);
         }
 
@@ -840,7 +840,7 @@ namespace GUI
     void network_ip(bool DhcpEnabled, bool IsLinkUP, uint8_t error_code, uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
         tft.setTextSize(4);
         tft.print(F("IP Einstellungen"));
@@ -857,7 +857,7 @@ namespace GUI
                     sprintf(output, "%hhu", prefix);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("IP:"));
                     address_to_chararr(ip, address_string);
@@ -866,14 +866,14 @@ namespace GUI
                     tft.print(output);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("GW:"));
                     address_to_chararr(gw, address_string);
                     tft.print(address_string);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("DNS:"));
                     address_to_chararr(dns, address_string);
@@ -881,18 +881,18 @@ namespace GUI
                     tft.setFont();
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.7);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(2);
                     tft.print(F("Dynamische IP Konfiguration"));
                 }
                 else
                 {
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(2);
                     tft.print(F("Dynamische IP Konfiguration ist fehlgeschlagen."));
 
-                    button_retry.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, WHITE, (char *)"Retry", 2);
+                    button_retry.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, BLACK, WHITE, (char *)"Retry", 2);
                     button_retry.drawButton(true);
                 }
             }
@@ -904,7 +904,7 @@ namespace GUI
                     sprintf(output, "%hhu", prefix);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("IP:"));
                     address_to_chararr(ip, address_string);
@@ -913,14 +913,14 @@ namespace GUI
                     tft.print(output);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.35);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("GW:"));
                     address_to_chararr(gw, address_string);
                     tft.print(address_string);
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.45);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(3);
                     tft.print(F("DNS:"));
                     address_to_chararr(dns, address_string);
@@ -928,14 +928,14 @@ namespace GUI
                     tft.setFont();
 
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.7);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(2);
                     tft.print(F("Statische IP Konfiguration"));
                 }
                 else
                 {
                     tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-                    tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+                    tft.setTextColor(BLACK, COLOR_BACKGROUND);
                     tft.setTextSize(2);
                     tft.print(F("Statische IP Konfiguration ist fehlgeschlagen."));
                 }
@@ -943,22 +943,22 @@ namespace GUI
 
             if (DhcpEnabled)
             {
-                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, RED, (char *)"Manuell", 2);
+                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, WHITE, RED, (char *)"Manuell", 2);
                 button_dhcp.drawButton(true);
             }
             else
             {
-                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, GREEN, (char *)"Auto", 2);
+                button_dhcp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, BLACK, GREEN, (char *)"Auto", 2);
                 button_dhcp.drawButton(true);
 
-                button_modify.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, COLOR_BLACK, WHITE, (char *)"Modify", 2);
+                button_modify.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.9, 150, Y_DIM / 6, COLOR_PRIMARY, BLACK, WHITE, (char *)"Modify", 2);
                 button_modify.drawButton(true);
             }
         }
         else
         {
             tft.setCursor(X_DIM * 0.05, Y_DIM * 0.25);
-            tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+            tft.setTextColor(BLACK, COLOR_BACKGROUND);
             tft.setTextSize(2);
             tft.print(F("Kein Netzwerkanschluss vorhanden"));
         }
@@ -1046,11 +1046,11 @@ namespace GUI
         {
             if (i == highlighted)
             {
-                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], COLOR_BLACK, WHITE, 4);
+                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], BLACK, WHITE, 4);
             }
             else
             {
-                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+                tft.drawChar(POSITION_X_IP + 25 * i, POSITION_Y_IP, address_string[i], BLACK, COLOR_BACKGROUND, 4);
             }
         }
 
@@ -1058,11 +1058,11 @@ namespace GUI
         {
             if (i == highlighted)
             {
-                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], COLOR_BLACK, WHITE, 4);
+                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], BLACK, WHITE, 4);
             }
             else
             {
-                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+                tft.drawChar(POSITION_X_GW + 25 * (i - 18), POSITION_Y_GW, address_string[i], BLACK, COLOR_BACKGROUND, 4);
             }
         }
 
@@ -1070,11 +1070,11 @@ namespace GUI
         {
             if (i == highlighted)
             {
-                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], COLOR_BLACK, WHITE, 4);
+                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], BLACK, WHITE, 4);
             }
             else
             {
-                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], COLOR_BLACK, COLOR_BACKGROUND, 4);
+                tft.drawChar(POSITION_X_DNS + 25 * (i - 33), POSITION_Y_DNS, address_string[i], BLACK, COLOR_BACKGROUND, 4);
             }
         }
     }
@@ -1233,28 +1233,28 @@ namespace GUI
         {
             for (i = 0; i < 11; i++)
             {
-                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], COLOR_BLACK, COLOR_WHITE, 3);
+                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], BLACK, WHITE, 3);
             }
         }
         else
         {
             for (i = 0; i < 11; i++)
             {
-                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+                tft.drawChar(0.06 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), alarm_exception_string[i], BLACK, COLOR_BACKGROUND, 3);
             }
         }
         if (reoccurring)
         {
             for (i = 0; i < 5; i++)
             {
-                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), yes[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), yes[i], BLACK, COLOR_BACKGROUND, 3);
             }
         }
         else
         {
             for (i = 0; i < 5; i++)
             {
-                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), no[i], COLOR_BLACK, COLOR_BACKGROUND, 3);
+                tft.drawChar(0.6 * X_DIM + 18 * i, Y_DIM * (0.25 + 0.15 * index), no[i], BLACK, COLOR_BACKGROUND, 3);
             }
         }
     }
@@ -1364,23 +1364,23 @@ namespace GUI
         {
             if (i == string_position)
             {
-                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], COLOR_BLACK, COLOR_WHITE, 5);
+                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(0.2 * X_DIM + 30 * i, Y_DIM * 0.4, exception_start[i], BLACK, COLOR_BACKGROUND, 5);
             }
 
             if (i + 5 == string_position)
             {
-                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], COLOR_BLACK, COLOR_WHITE, 5);
+                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], BLACK, WHITE, 5);
             }
             else
             {
-                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], COLOR_BLACK, COLOR_BACKGROUND, 5);
+                tft.drawChar(0.2 * X_DIM + 30 * (i + 6), Y_DIM * 0.4, exception_end[i], BLACK, COLOR_BACKGROUND, 5);
             }
         }
-        tft.drawChar(0.2 * X_DIM + 30 * 5, Y_DIM * 0.4, '-', COLOR_BLACK, COLOR_BACKGROUND, 5);
+        tft.drawChar(0.2 * X_DIM + 30 * 5, Y_DIM * 0.4, '-', BLACK, COLOR_BACKGROUND, 5);
     }
 
     Adafruit_GFX_Button button_exception_mode;
@@ -1564,14 +1564,14 @@ namespace GUI
     void exception_menu()
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.3, Y_DIM * 0.1);
         tft.setTextSize(4);
         tft.print("Ausnahmen");
 
-        button_show_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 3, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
-        button_add_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 5, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Erstellen", 3);
-        button_weekday_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, COLOR_WHITE, COLOR_SECONDARY, (char *)"Woche", 3);
+        button_show_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 3, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Anzeigen", 3);
+        button_add_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 5, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Erstellen", 3);
+        button_weekday_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Woche", 3);
 
         button_show_exceptions.drawButton();
         button_add_exception.drawButton();
@@ -1659,7 +1659,7 @@ namespace GUI
     void default_menu(char *date, char *time, char *day, char alarms[3][6], char exception_start[6], char exception_end[6], uint8_t status)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         draw_menu_button(X_DIM * 0.9, Y_DIM * 0.9, 100, 80);
 
         draw_datetime(date, time, day);
@@ -1683,7 +1683,7 @@ namespace GUI
     void weekdays_exceptions(uint8_t weekday_exception_list)
     {
         Waveshield.fillScreen(COLOR_BACKGROUND);
-        tft.setTextColor(COLOR_BLACK, COLOR_BACKGROUND);
+        tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
         tft.setTextSize(4);
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 80, 80);

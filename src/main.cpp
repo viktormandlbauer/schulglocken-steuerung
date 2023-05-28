@@ -420,7 +420,7 @@ void refresh_handler()
     }
     case REMOVE_EXCEPTION:
     {
-        Time::get_alarm_exceptions(alarm_exceptions, alarm_exceptions_count, exception_buffer, reoccurring);
+        Time::get_alarm_exceptions_strings(alarm_exceptions, alarm_exceptions_count, exception_buffer, reoccurring);
         GUI::remove_exceptions(exception_buffer, reoccurring, alarm_exceptions_count);
         break;
     }
@@ -478,7 +478,7 @@ void refresh_handler()
 
     case NETWORK_NTP:
     {
-        Time::get_formatted_time(TimeSync::LastNtpSync, buffer);
+        Time::get_formatted_datetime(TimeSync::LastNtpSync, buffer);
         GUI::network_ntp(buffer, TimeSync::EnableNtpSync);
         break;
     }
@@ -518,7 +518,7 @@ void loop()
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(BAUD_RATE);
 
     pinMode(LED_SIGNAL, OUTPUT);
     pinMode(RELAIS, OUTPUT);
