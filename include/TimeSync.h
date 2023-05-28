@@ -9,6 +9,12 @@
 
 namespace TimeSync
 {
+    // Zeitserver aus der Definitionsdatei
+    const char timeServer[] = NTP_SERVER;
+
+    // NTP Port (Standard 123)
+    const unsigned int NTP_REMOTEPORT = 123;
+
     // NTP Synchronisierung aktiviert/deaktiviert
     extern bool EnableNtpSync;
 
@@ -18,4 +24,3 @@ namespace TimeSync
     // Initialisierung der Zeitsynchronisation
     void init_timesync(bool isNtpEnabled);
 }
-

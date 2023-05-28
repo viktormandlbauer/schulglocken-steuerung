@@ -12,7 +12,7 @@ namespace TimeSync
     {
 
         Serial.println(F("[Info] (TimeSync) Transmit NTP Request"));
-        if (!ether.dnsLookup(Network::timeServer))
+        if (!ether.dnsLookup(timeServer))
         {
             Serial.println(F("[Error] (TimeSync) DNS failed"));
             return 0; // return 0 if unable to get the time
@@ -20,7 +20,7 @@ namespace TimeSync
         else
         {
             // ether.printIp("SRV: ", ether.hisip);
-            ether.ntpRequest(ether.hisip, Network::NTP_REMOTEPORT);
+            ether.ntpRequest(ether.hisip, NTP_REMOTEPORT);
 
             // Wait for reply
             uint32_t beginWait = millis();
@@ -30,7 +30,7 @@ namespace TimeSync
                 ether.packetLoop(len);
 
                 uint32_t secsSince1900 = 0L;
-                if (len > 0 && ether.ntpProcessAnswer(&secsSince1900, Network::NTP_REMOTEPORT))
+                if (len > 0 && ether.ntpProcessAnswer(&secsSince1900, NTP_REMOTEPORT))
                 {
                     Serial.println(F("[Info] (TimeSync) Receive NTP Response"));
                     return secsSince1900 - 2208988800UL;

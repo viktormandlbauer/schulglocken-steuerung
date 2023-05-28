@@ -26,11 +26,7 @@ namespace Network
 
     // Read-Only settings 
     const char hostname[] PROGMEM = HOSTNAME;
-    const char timeServer[] PROGMEM = NTP_SERVER;
     const static uint8_t mac_address[6] = MAC_ADDRESS;
-    const unsigned int NTP_LOCALPORT PROGMEM = 8888;
-    const unsigned int NTP_PACKET_SIZE PROGMEM = 48;
-    const unsigned int NTP_REMOTEPORT PROGMEM = 123;
 
     // Network Configuration
     void init_ethernet();
