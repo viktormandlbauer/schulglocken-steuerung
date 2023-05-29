@@ -5,7 +5,7 @@ namespace Network
 {
     NetworkStatus nw_status;
 
-    void init_ethernet()
+    bool init_ethernet()
     {
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Activate ethernet ..."));
@@ -16,15 +16,16 @@ namespace Network
             Serial.println(F("[Error] (Network) Failed to active ethernet."));
 #endif
             nw_status.active = false;
-            return;
+            return false;
         }
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Ethernet activated."));
 #endif
         nw_status.active = true;
+        return true;
     }
 
-    void check_link()
+    bool check_link()
     {
         uint8_t count = 0;
         while (!ether.isLinkUp())
@@ -36,7 +37,7 @@ namespace Network
                 Serial.println(F("[Info] (Network) No cable connected"));
 #endif
                 nw_status.linkup = false;
-                return;
+                return false;
             }
             delayMicroseconds(1);
         }
@@ -44,9 +45,10 @@ namespace Network
         Serial.println(F("[Info] (Network) Cable connected"));
 #endif
         nw_status.linkup = true;
+        return true;
     }
 
-    void dhcp_setup()
+    bool dhcp_setup()
     {
 #ifdef DEBUG
         Serial.println(F("[Info] (Network) Starting DHCP setup."));
@@ -57,7 +59,7 @@ namespace Network
             Serial.println(F("[Error] (Network) DHCP failed."));
 #endif
             nw_status.error_code = ETHERNET_DHCP_FAILED;
-            return;
+            return false;
         }
 #ifdef DEBUG
 
@@ -68,6 +70,7 @@ namespace Network
         ether.printIp(F("[Info] NM:   "), ether.netmask);
 #endif
         nw_status.error_code = 0;
+        return true;
     }
 
     bool static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t prefix)
@@ -103,11 +106,12 @@ namespace Network
     }
 
     BufferFiller bfill;
-    bool http_response(byte day, byte month, byte year, byte hour, byte minute, byte second)
+    void http_response(char *buffer)
     {
         word len = ether.packetReceive();
         word pos = ether.packetLoop(len);
-
+        /**
+         *
         if (pos)
         {
             bfill = ether.tcpOffset();
@@ -115,7 +119,7 @@ namespace Network
                          hour / 10, hour % 10, minute / 10, minute % 10, second / 10, second % 10);
             ether.httpServerReply(bfill.position());
         }
-        return true;
+        */
     }
 
     uint8_t *get_ip()

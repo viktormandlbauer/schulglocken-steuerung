@@ -8,7 +8,7 @@
 
 namespace Network
 {
-    // Struct for network settings and activities
+    // Struktur für die Netzwerkeinstellung
     struct NetworkStatus
     {
         bool active;
@@ -21,23 +21,43 @@ namespace Network
         uint8_t error_code;
     };
 
-    // Defined in Network.cpp
+    // Definition für externe Abfragen der Netzwerkeinstellung
     extern NetworkStatus nw_status;
 
-    // Read-Only settings 
+    // Hostname für DHCP Konfiguration
     const char hostname[] PROGMEM = HOSTNAME;
+
+    // MAC Adresse 
     const static uint8_t mac_address[6] = MAC_ADDRESS;
 
-    // Network Configuration
-    void init_ethernet();
-    void check_link();
+    // Initialisierung der Ethernet Schnittstelle
+    bool init_ethernet();
+
+    // Test ob Kabel angeschlossen ist
+    bool check_link();
+
+    // Setup für statische IP Konfiguration 
     bool static_setup(uint8_t ip[4], uint8_t gw[4], uint8_t dns[4], uint8_t snm);
-    void dhcp_setup();
+    
+    // Setup für DHCP
+    bool dhcp_setup();
+
+    // HTTP Server ausgabe
+    void http_response(char buffer[20]);
+
+    // Rückgabe der IP Adresse
     uint8_t *get_ip();
+
+    // Rückgabe der Gateway Adresse
     uint8_t *get_gw();
+
+    // Rückgabe der DNS Adresse
     uint8_t *get_dns();
+
+    // Rückgabe der Subntzmaske
     uint8_t *get_snm();
+
+    //Rückgabe des Präfixes der Subnetzmaske
     uint8_t get_prefix();
 
-    bool http_response(byte day, byte month, byte year, byte hour, byte minute, byte second);
 }
