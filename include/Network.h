@@ -59,5 +59,4 @@ namespace Network
 
     //Rückgabe des Präfixes der Subnetzmaske
     uint8_t get_prefix();
-
 }
