@@ -228,7 +228,12 @@ Viktor Mandlbauer
 <dimension x1="0" y1="90" x2="0" y2="0" x3="-22.02926875" y3="45" textsize="1.778" layer="51"/>
 <text x="34.5" y="59.5" size="1.778" layer="1" align="center">Viktor Mandlbauer
 Michael Schima
-2022 / 2023</text>
+2022 / 2023
+
+SV: 2B
+BV: 1</text>
+<text x="78" y="8" size="1.016" layer="25">SV: 2B
+BV: 1</text>
 </plain>
 <libraries>
 <library name="rcl" urn="urn:adsk.eagle:library:334">
