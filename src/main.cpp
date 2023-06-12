@@ -350,6 +350,11 @@ void navigation_handler()
             Storage::save_network_ntp(TimeSync::EnableNtpSync);
             refresh = true;
         }
+        else if (selection == NETWORK_NTP_TEST)
+        {
+            TimeSync::init_timesync(true);
+            refresh = true;
+        }
         break;
     }
     default:
@@ -445,12 +450,12 @@ void refresh_handler()
         alarm.minutes = alarms[selection].minutes;
         alarm.type = alarms[selection].type;
         Time::get_alarm_string(alarm.minutes, time_string);
-        GUI::alarm_config(time_string, alarm.type);
+        GUI::alarm_config(time_string, alarm.type, false);
         break;
     }
     case NEW_ALARM_CONFIG:
     {
-        GUI::alarm_config((char *)"??:??", alarm.type);
+        GUI::alarm_config((char *)"??:??", alarm.type, true);
         break;
     }
     case NETWORK_MENU:
@@ -514,17 +519,23 @@ void loop()
     {
         Time::check_alarms(alarms, alarm_count);
     }
+
+    if (Network::nw_status.HttpEnabled)
+    {
+        Time::get_current_datetime(buffer);
+        Network::http_response(buffer);
+    }
 }
 
 void setup()
 {
+    Network::nw_status.HttpEnabled = true;
     Serial.begin(BAUD_RATE);
 
     pinMode(LED_SIGNAL, OUTPUT);
     pinMode(RELAIS, OUTPUT);
     pinMode(AUDIO_SIGNAL, OUTPUT);
     digitalWrite(LED_SIGNAL, HIGH);
-
     GUI::init_display();
 #ifdef DEBUG
     Serial.println(F("[Info] (Main) Display wurde aktiviert."));
@@ -541,7 +552,7 @@ void setup()
 
     if (Network::nw_status.active && Network::nw_status.linkup)
     {
-        if (!Network::nw_status.DhcpEnabled)
+        if (Network::nw_status.DhcpEnabled)
         {
             Network::dhcp_setup();
         }

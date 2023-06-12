@@ -31,7 +31,7 @@ namespace GUI
     uint8_t check_timeplan(uint8_t alarm_count);
 
     // Ausgabe Alarmkonfiguration
-    void alarm_config(char alarm_time[6], uint8_t alarm_type);
+    void alarm_config(char alarm_time[6], uint8_t alarm_type, bool is_new);
 
     // Überprüft Komponenten der Alarmkonfiguration
     uint8_t check_alarm_config(uint16_t *alarm, uint8_t *alarm_type, bool is_new);

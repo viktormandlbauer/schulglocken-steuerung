@@ -110,16 +110,16 @@ namespace Network
     {
         word len = ether.packetReceive();
         word pos = ether.packetLoop(len);
-        /**
-         *
         if (pos)
         {
+#ifdef DEBUG
+            Serial.println(F("[Info] (Network) HTTP Response"));
+#endif
             bfill = ether.tcpOffset();
-            bfill.emit_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n<meta http-equiv='refresh' content='1'/><title>Schulglockensteuerung</title><h1>$D$D:$D$D:$D$D</h1>"),
-                         hour / 10, hour % 10, minute / 10, minute % 10, second / 10, second % 10);
+            bfill.emit_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n<title>Schulglockensteuerung</title><h1>$S</h1>"),
+                         buffer);
             ether.httpServerReply(bfill.position());
         }
-        */
     }
 
     uint8_t *get_ip()

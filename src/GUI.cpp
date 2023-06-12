@@ -32,22 +32,6 @@ namespace GUI
     // Zeitplan buttons
     Adafruit_GFX_Button button_menu, button_pause;
 
-    void draw_menu()
-    {
-
-        Waveshield.fillScreen(COLOR_BACKGROUND);
-
-        button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
-        button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
-        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"System", 3);
-        button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
-
-        button_plan.drawButton(true);
-        button_time.drawButton(true);
-        button_sys.drawButton(true);
-        button_network.drawButton(true);
-    }
-
     void init_display()
     {
         SPI.begin();
@@ -356,7 +340,7 @@ namespace GUI
         }
     }
 
-    void alarm_config(char alarm_time[6], uint8_t alarm_type)
+    void alarm_config(char alarm_time[6], uint8_t alarm_type, bool is_new)
     {
         memcpy(alarm_setting, alarm_time, 6);
         string_position = 0;
@@ -369,9 +353,13 @@ namespace GUI
 #endif
         Waveshield.fillScreen(COLOR_BACKGROUND);
 
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
+        if (is_new)
+        {
+            draw_back_button(X_DIM * 0.1, Y_DIM * 0.1, 60, 60);
+        }
+
         draw_time(alarm_setting, 5);
-        draw_numeric_keyboard(true);
+        draw_numeric_keyboard(!is_new);
     }
 
     uint16_t text_to_time(char *alarm_string)
@@ -399,8 +387,6 @@ namespace GUI
             alarm_setting[string_position] = input + '0';
 
             *alarm = text_to_time(alarm_setting);
-
-            // @todo: set alarm type
 
             draw_time(alarm_setting, 5);
             return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
@@ -452,10 +438,12 @@ namespace GUI
                 alarm_setting[4] == '?')
                 return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
             return BUTTON_ACCEPT;
-        default:
-            return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
-            break;
         }
+        if (check_button_pressed(button_back))
+        {
+            return TIMEPLAN;
+        }
+        return is_new ? NEW_ALARM_CONFIG : ALARM_CONFIG;
     }
 
     void menu()
@@ -464,7 +452,7 @@ namespace GUI
 
         button_plan.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Zeitplan", 3);
         button_time.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Uhrzeit", 3);
-        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"System", 3);
+        button_sys.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Ausnahmen", 3);
         button_network.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Netzwerk", 3);
 
         button_plan.drawButton(true);
@@ -754,31 +742,34 @@ namespace GUI
         button_dhcp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 2, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"IP", 3);
         button_ntp.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 4, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"NTP", 3);
         button_http.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 6, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"HTTP", 3);
-        button_networkstatus.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 8, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Status", 3);
 
         button_ntp.drawButton(true);
         button_dhcp.drawButton(true);
         button_http.drawButton(true);
-        button_networkstatus.drawButton(true);
+
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 60, 60);
     }
 
     uint8_t check_network_menu()
     {
         if (check_button_pressed(button_ntp))
         {
+            button_ntp.drawButton(false);
             return NETWORK_NTP;
         }
         else if (check_button_pressed(button_dhcp))
         {
+            button_dhcp.drawButton(false);
             return NETWORK_IP;
         }
         else if (check_button_pressed(button_http))
         {
+            button_http.drawButton(false);
             return NETWORK_HTTP;
         }
-        else if (check_button_pressed(button_networkstatus))
+        else if (check_button_pressed(button_back))
         {
-            return NETWORK_STATUS;
+            return MENU;
         }
 
         return NETWORK_MENU;
@@ -806,7 +797,7 @@ namespace GUI
             tft.print(lastNtpSync);
             button_ntp.initButton(&tft, X_DIM * 0.4, Y_DIM * 0.8, 100, Y_DIM / 6, COLOR_PRIMARY, WHITE, RED, (char *)"OFF", 2);
             button_ntp.drawButton(true);
-            button_networkstatus.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Test", 2);
+            button_networkstatus.initButton(&tft, X_DIM * 0.8, Y_DIM * 0.8, 150, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Sync", 2);
             button_networkstatus.drawButton(true);
         }
         else
@@ -975,10 +966,12 @@ namespace GUI
         else if (check_button_pressed(button_dhcp))
         {
             *dhcpEnabled = !*dhcpEnabled;
+            button_dhcp.drawButton(false);
             return NETWORK_SETUP;
         }
         else if (check_button_pressed(button_modify))
         {
+            button_modify.drawButton(false);
             return NETWORK_STATIC_MODIFY;
         }
         return NETWORK_IP;
@@ -1573,11 +1566,11 @@ namespace GUI
         button_add_exception.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 5, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Erstellen", 3);
         button_weekday_exceptions.initButton(&tft, X_DIM * 0.5, (Y_DIM * 0.1) * 7, X_DIM * 0.7, Y_DIM / 6, COLOR_PRIMARY, WHITE, COLOR_SECONDARY, (char *)"Woche", 3);
 
-        button_show_exceptions.drawButton();
-        button_add_exception.drawButton();
-        button_weekday_exceptions.drawButton();
+        button_show_exceptions.drawButton(true);
+        button_add_exception.drawButton(true);
+        button_weekday_exceptions.drawButton(true);
 
-        draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 80, 80);
+        draw_back_button(X_DIM * 0.1, Y_DIM * 0.9, 60, 60);
     }
 
     uint8_t check_exception_menu()
@@ -1636,7 +1629,6 @@ namespace GUI
 
         draw_upcoming_alarms(alarms);
         draw_upcoming_exception(exception_start, exception_end);
-        draw_status(status);
     }
 
     Adafruit_GFX_Button button_weekday_monday, button_weekday_tuesday, button_weekday_wednesday, button_weekday_thursday, button_weekday_friday, button_weekday_saturday, button_weekday_sunday;
@@ -1656,6 +1648,7 @@ namespace GUI
         tft.setTextColor(BLACK, COLOR_BACKGROUND);
         tft.setCursor(X_DIM * 0.05, Y_DIM * 0.1);
         tft.setTextSize(4);
+        tft.print("Wochentagausnahmen");
         draw_back_button(X_DIM * 0.1, Y_DIM * 0.8, 80, 80);
 
         // Montag

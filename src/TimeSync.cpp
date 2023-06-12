@@ -4,22 +4,24 @@
 
 namespace TimeSync
 {
-    bool EnableNtpSync = false;
-    uint32_t LastNtpSync = 0;
-    uint32_t NtpSyncCoutner = SYNC_WITH_NTP;
+    bool EnableNtpSync;
+    uint32_t LastNtpSync;
+    uint32_t NtpSyncCoutner;
 
     time_t getNtpTime()
     {
-
+#ifdef DEBUG
         Serial.println(F("[Info] (TimeSync) Transmit NTP Request"));
-        if (!ether.dnsLookup(timeServer))
+#endif
+        if (!ether.dnsLookup(NTP_SERVER, true))
         {
+#ifdef DEBUG
             Serial.println(F("[Error] (TimeSync) DNS failed"));
-            return 0; // return 0 if unable to get the time
+#endif
+            return 0;
         }
         else
         {
-            // ether.printIp("SRV: ", ether.hisip);
             ether.ntpRequest(ether.hisip, NTP_REMOTEPORT);
 
             // Wait for reply
@@ -32,12 +34,15 @@ namespace TimeSync
                 uint32_t secsSince1900 = 0L;
                 if (len > 0 && ether.ntpProcessAnswer(&secsSince1900, NTP_REMOTEPORT))
                 {
+#ifdef DEBUG
                     Serial.println(F("[Info] (TimeSync) Receive NTP Response"));
+#endif
                     return secsSince1900 - 2208988800UL;
                 }
             }
-
+#ifdef DEBUG
             Serial.println(F("[Error] (TimeSync) No NTP Response"));
+#endif
             return 0;
         }
     }
@@ -73,6 +78,7 @@ namespace TimeSync
 
     void init_timesync(bool isNtpEnabled)
     {
+        NtpSyncCoutner = SYNC_WITH_NTP;
         EnableNtpSync = isNtpEnabled;
         setSyncProvider(getTime);
         setSyncInterval(SYNC_INTERVAL_RTC);

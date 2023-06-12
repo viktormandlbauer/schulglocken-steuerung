@@ -17,6 +17,9 @@
 // Verschiedene Alarmtypen
 #define MAXIMUM_AMOUNT_ALARM_TYPES 3
 
+// Alarmtypen 1,2,3,...
+#define ALARM_TYPES 0xAAAAAAAA, 0b11110001111100001111111111000000, 0xFFF0FF0F
+
 // Anzahl Datumsausnahmen
 #define MAXIMUM_AMOUNT_EXCEPTIONS 20
 
@@ -28,6 +31,7 @@
 
 // Zeitserver
 #define NTP_SERVER "pool.ntp.org"
+#define NTP_REMOTEPORT 123
 
 // Synchronisierungsintervall Systemzeit mit RTC in Sekunden
 #define SYNC_INTERVAL_RTC 600

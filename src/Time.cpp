@@ -3,9 +3,10 @@
 #include "TimeSync.h"
 
 // Array mit Alarmtypen
-uint32_t alarm_types[MAXIMUM_AMOUNT_ALARM_TYPES];
+uint32_t alarm_types[MAXIMUM_AMOUNT_ALARM_TYPES] = {ALARM_TYPES};
 
-uint8_t current_alarm_type;
+uint8_t current_alarm_type = 0;
+
 uint32_t position;
 bool finished = true;
 char time_internal_timestring[9];
@@ -148,7 +149,7 @@ namespace Time
 
         rtc.adjust(DateTime(new_year, new_month, new_day, new_hour, new_minute, new_second));
         setTime(new_hour, new_minute, new_second, new_day, new_month, new_year);
-        now();
+        // now();
 #ifdef DEBUG
         Serial.print(F("[Info] (Time) Datetime set: "));
         Serial.print(new_hour);
@@ -437,7 +438,7 @@ namespace Time
             {
                 if (!alarms[i].triggered)
                 {
-                    if (current_time >= alarms[i].minutes)
+                    if (current_time == alarms[i].minutes)
                     {
                         // Flag um ein erneutes Läuten in der selben Minute zu verhindern
                         alarms[i].triggered = true;
@@ -495,22 +496,32 @@ namespace Time
 ISR(TIMER1_COMPA_vect)
 {
 
-    // Wird abgefragt um ungewolltes Läuten zu vermeiden
+    // Abfrage um Läuten zu vermeiden
     if (!finished)
     {
         if (alarm_types[current_alarm_type] & (1ul << position))
         {
-            // HIGH wenn bit von ring_types an position 1 ist.
+            // HIGH, wenn Bit an aktueller position 1 ist.
+            digitalWrite(LED_SIGNAL, HIGH);
             digitalWrite(RELAIS, HIGH);
+#ifdef DEBUG
+            digitalWrite(AUDIO_SIGNAL, HIGH);
+#endif
         }
         else
         {
-            // LOW wenn bit von ring_types an position 0 ist.
+            // LOW, wenn Bit an aktueller position 0 ist
+            digitalWrite(LED_SIGNAL, LOW);
             digitalWrite(RELAIS, LOW);
+#ifdef DEBUG
+            digitalWrite(AUDIO_SIGNAL, LOW);
+#endif
         }
         if (position >= 32)
         {
             // Nach 8 Sekunden ist das Läuten fertig
+            digitalWrite(RELAIS, LOW);
+            digitalWrite(LED_SIGNAL, LOW);
             finished = true;
             position = 0;
         }
