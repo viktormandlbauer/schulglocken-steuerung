@@ -1601,36 +1601,6 @@ namespace GUI
         return SYSTEM;
     }
 
-    void draw_status(uint8_t status)
-    {
-        // TODO Auswertung der Zustände am Default Screen
-
-        // Tagesausnahme aktiv
-        if (status & (0b1 << 0))
-        {
-        }
-
-        // RTC SYNC
-        if (status & (0b1 << 1))
-        {
-        }
-
-        // NTP SYNC
-        if (status & (0b1 << 2))
-        {
-        }
-
-        // Ethernet
-        if (status & (0b1 << 4))
-        {
-        }
-
-        // IP Konfig
-        if (status & (0b1 << 3))
-        {
-        }
-    }
-
     void draw_upcoming_exception(char exception_start[6], char exception_end[6])
     {
         tft.print(exception_start);
